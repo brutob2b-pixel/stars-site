@@ -144,6 +144,8 @@
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
 <script src="icones.js"></script>
 <script src="marca.js"></script>
+<script src="logo.js"></script>
+<script src="rotulo.js"></script>
 <script src="data.js"></script>
 <script src="site.js"></script>
 <script>
@@ -230,7 +232,7 @@ function pote(c, cx, cy, R, aberto = false) {
     c.strokeStyle = t.ring; c.lineWidth = R * 0.025; c.stroke();
     c.save(); c.beginPath(); c.ellipse(cx, cy - L, R * 0.92, ry * 0.92, 0, 0, 7); c.clip();
     c.translate(cx, cy - L); c.scale(1, ry / R); c.translate(-R * 0.775, -R * 0.775);
-    drawLogo(c, R * 1.55, nome, MARCA.logo(m), corEscura(t), m.cidade || "BARBEARIA");
+    drawLogo(c, R * 1.55, nome, MARCA.logo(m), corEscura(t), m.cidade || "BARBEARIA", m.simbolo);
     c.restore();
   }
   c.restore();

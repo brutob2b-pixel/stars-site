@@ -460,6 +460,8 @@ html{scrollbar-gutter:stable}
 .bf-resumo ul{display:flex;flex-wrap:wrap;gap:6px;margin:0;padding:0;list-style:none}
 .bf-resumo li{padding:5px 11px;border-radius:999px;border:1px solid var(--line);font-size:12px;color:var(--muted)}
 .bb-car .page{height:100%}
+.pote-bb{display:grid;place-items:center;flex:1}
+.pote-bb svg{width:100%;max-width:230px;height:auto}
 </style>
 </head>
 <body>
@@ -634,6 +636,7 @@ html{scrollbar-gutter:stable}
         <article class="page cartao" data-glow="217,164,65" style="--i:1"><h4>02 · Cores</h4><div class="cores" data-bb="cores"></div><div class="pf"><span data-bb-nome></span><span>2</span></div></article>
         <article class="page tipo cartao" data-glow="217,164,65" style="--i:2"><h4>03 · Tipografia</h4><div class="aa" data-bb="aa">Aa</div><strong data-bb="fonte"></strong><p data-bb="alfa">ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789</p><div class="pf"><span data-bb-nome></span><span>3</span></div></article>
         <article class="page cartao" data-glow="217,164,65" style="--i:3"><h4>04 · Aplicações</h4><div class="apps"><div><canvas data-bb="tampa" width="400" height="400"></canvas><span>Tampa do pote</span></div><div><canvas data-bb="perfil" width="400" height="400"></canvas><span>Foto do Instagram</span></div></div><div class="pf"><span data-bb-nome></span><span>4</span></div></article>
+        <article class="page cartao" data-glow="217,164,65" style="--i:4"><h4>05 · Embalagem</h4><div class="pote-bb" data-bb-pote></div><div class="pf"><span data-bb-nome></span><span>5</span></div></article>
       </div>
       <p class="muted" style="font-size:13px;margin-top:14px">Prévia montada automaticamente a partir das suas escolhas. O brandbook final é feito pelo designer.</p>
       <ul class="recebe" data-reveal>
@@ -827,6 +830,8 @@ html{scrollbar-gutter:stable}
 </footer>
 
 <script src="marca.js"></script>
+<script src="logo.js"></script>
+<script src="rotulo.js"></script>
 <script src="cartoes.js"></script>
 <script src="briefing.js"></script>
 <script src="hat-data.js"></script>
@@ -1012,11 +1017,12 @@ function updateSteps(prog) {
 const MARCA_SALVA = MARCA.load();
 nomeInput.value = $("#nome2").value = MARCA_SALVA.nome;
 let tema = MARCA.tema(MARCA_SALVA), pomada = MARCA.pomada(MARCA_SALVA);
-const salvarMarca = () => MARCA.save({ ...MARCA.load(), nome: nomeInput.value.trim(), tema: tema.id, logo: estilo.id, pomada: pomada.id });
+let cidade = MARCA_SALVA.cidade || "BARBEARIA", simbolo = MARCA_SALVA.simbolo, personalizou = !!(MARCA_SALVA.nome || MARCA_SALVA.slogan);
+const salvarMarca = () => MARCA.save({ ...MARCA.load(), nome: nomeInput.value.trim(), tema: tema.id, logo: estilo.id, pomada: pomada.id, cidade, simbolo });
 
 /* ---- tema: usado pela simulação e pelas direções de marca ---- */
 let spinKick = 0; // radianos de giro extra ao trocar o acabamento
-function escolherTema(t) { tema = t; spinKick = 2.1; redrawAll(); }
+function escolherTema(t) { tema = t; personalizou = true; spinKick = 2.1; redrawAll(); }
 
 /* ---- logotipo base: desenho automático por modelos (não é IA; o designer finaliza) ---- */
 /* ---- estilos de pomada: cartões da seção e botões da simulação usam a mesma escolha ---- */
@@ -1031,7 +1037,7 @@ POMADAS.forEach(p => {
   estilosBox.append(b);
 });
 function escolherPomada(p) {
-  pomada = p; spinKick = 1.2;
+  pomada = p; personalizou = true; spinKick = 1.2;
   $$("[data-pomada]").forEach(b => b.setAttribute("aria-pressed", b.dataset.pomada === p.id));
   $(".estilo-desc").innerHTML = `<b>${p.nome}.</b> ${p.desc}`;
   aplicarPomada3D(p); redrawAll();
@@ -1042,13 +1048,14 @@ $(".estilo-desc").innerHTML = `<b>${pomada.nome}.</b> ${pomada.desc}`;
 const ESTILOS = LOGOS; // desenho do logotipo: marca.js
 let estilo = MARCA.logo(MARCA_SALVA);
 const nomeAtual = () => nomeInput.value.trim() || "Sua barbearia";
+const marcaObj = () => ({ nome: nomeAtual(), tema: tema.id, logo: estilo.id, pomada: pomada.id, cidade, simbolo });
 const corEscura = () => ({ text: tema.text, ring: tema.ring, sub: tema.sub });
 const corClara = () => ({ text: "#17150F", ring: tema.ring === "#C9CDD3" ? "#6F737A" : "#A8772A", sub: "#6F695F" });
 function pintar(cv, bg, cor, pad = 0.08) {
   const c = cv.getContext("2d"), W = cv.width, H = cv.height, S = Math.min(W, H) * (1 - pad * 2);
   c.clearRect(0, 0, W, H);
   c.fillStyle = bg; c.fillRect(0, 0, W, H);
-  c.save(); c.translate((W - S) / 2, (H - S) / 2); drawLogo(c, S, nomeAtual(), estilo, cor); c.restore();
+  c.save(); c.translate((W - S) / 2, (H - S) / 2); drawLogo(c, S, nomeAtual(), estilo, cor, cidade, simbolo); c.restore();
 }
 const fundoTema = cv => { const c = cv.getContext("2d"), g = c.createRadialGradient(cv.width / 2, cv.height * 0.4, 10, cv.width / 2, cv.height / 2, cv.width * 0.7); g.addColorStop(0, tema.bg1); g.addColorStop(1, tema.bg2); return g; };
 
@@ -1063,7 +1070,7 @@ ESTILOS.forEach(e => {
 let carLogos = null, logosPronto = false;
 function selecionarLogo(e) {
   if (estilo === e) return;
-  estilo = e; redrawAll();
+  estilo = e; personalizou = true; redrawAll();
   carLogos?.ir(ESTILOS.indexOf(e));
 }
 function drawMarca() {
@@ -1076,6 +1083,7 @@ function drawMarca() {
   pintar($('[data-bb="neg"]'), "#F1ECE2", corClara(), 0.02);
   ["tampa", "perfil"].forEach(k => {
     const cv = $(`[data-bb="${k}"]`), c = cv.getContext("2d");
+    if (k === "tampa" && window.RotuloKit) { c.clearRect(0, 0, 400, 400); c.drawImage(RotuloKit.tampa(marcaObj(), { s: 400, pomada }), 0, 0, 400, 400); return; }
     pintar(cv, k === "tampa" ? fundoTema(cv) : "#17150F", corEscura(), 0.16);
     if (k === "tampa") { c.strokeStyle = tema.ring; c.lineWidth = 10; c.beginPath(); c.arc(200, 200, 186, 0, 7); c.stroke(); }
   });
@@ -1102,12 +1110,17 @@ DIRECOES.forEach((d, i) => {
   b.innerHTML = `<div class="dir-in"><span class="dir-num">0${i + 1}</span><div class="dir-pote" data-dir-pote aria-hidden="true"></div><h3>${d.nome}</h3><p>${d.frase}</p><span class="dir-tags">${t.nome} · ${l.nome} · ${p.nome}</span></div>`;
   dirBox.append(b);
 });
-function drawDirecoes() {
-  const base = MARCA.load();
+let potesFeitos = false, potesT;
+function drawDirecoes() { // o pote realista custa alguns ms: o primeiro desenho é imediato, ao digitar espera um instante
+  clearTimeout(potesT);
+  if (!potesFeitos) { potesFeitos = true; pintarPotes(); } else potesT = setTimeout(pintarPotes, 240);
+}
+function pintarPotes() {
   $$("[data-dir-pote]", dirBox).forEach((el, i) => {
     const d = DIRECOES[i];
-    el.innerHTML = embalagem("pote", { ...base, nome: nomeAtual(), tema: d.tema, logo: d.logo, pomada: d.pomada }, { pomada: POMADAS.find(x => x.id === d.pomada) });
+    el.innerHTML = embalagem("pote", { ...marcaObj(), tema: d.tema, logo: d.logo, pomada: d.pomada }, { pomada: POMADAS.find(x => x.id === d.pomada), largura: 360 });
   });
+  const bb = $("[data-bb-pote]"); if (bb) bb.innerHTML = embalagem("pote", marcaObj(), { pomada, largura: 320 });
 }
 let dirPronto = false, carDir = null;
 function aplicarDirecao(d) {
@@ -1126,7 +1139,7 @@ function mostrarBriefing(m) {
 }
 function aplicarMarca(m) {
   nomeInput.value = $("#nome2").value = simNome.value = m.nome || "";
-  tema = MARCA.tema(m); estilo = MARCA.logo(m);
+  tema = MARCA.tema(m); estilo = MARCA.logo(m); cidade = m.cidade || "BARBEARIA"; simbolo = m.simbolo; personalizou = true;
   carLogos?.ir(ESTILOS.indexOf(estilo));
   mostrarBriefing(m);
   escolherPomada(MARCA.pomada(m)); syncSim();
@@ -1281,7 +1294,8 @@ btnSeguir.addEventListener("click", () => sim.passo === passos.length - 1 ? fech
 /* ---- 3D ---- */
 let redraw = () => {};
 let aplicarPomada3D = () => {};
-const redrawAll = () => { drawMarca(); redraw(); updateResumo(); updateWa(); salvarMarca(); };
+let rdT; const redrawSoon = () => { clearTimeout(rdT); rdT = setTimeout(() => redraw(), 80); };
+const redrawAll = () => { if (nomeInput.value.trim()) personalizou = true; drawMarca(); redrawSoon(); updateResumo(); updateWa(); salvarMarca(); };
 drawMarca(); updateResumo(); updateWa();
 const fontes = ['700 100px "Playfair Display"', '700 100px "Barlow Condensed"', '600 40px "Barlow"'];
 Promise.all(fontes.map(f => document.fonts.load(f))).then(() => redrawAll());
@@ -1609,8 +1623,16 @@ async function initStage(RoomEnvironment) {
   shadow.rotation.x = -Math.PI / 2; shadow.position.y = -0.01; jar.add(shadow);
 
   // tampa: aros do pote + o logotipo base escolhido no centro
+  // a arte pronta do exemplo (tarja náutica) vale só até a pessoa personalizar; depois o pote usa a tarja e a tampa geradas pela marca
+  const usarGerada = () => window.RotuloKit && (personalizou || !tarja);
   function drawTop() {
     const c = topCv.getContext("2d"), S = 1024, m = S / 2;
+    if (usarGerada()) {
+      Object.assign(top.material, { roughness: 0.45, clearcoat: 0.5 });
+      c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, 2048, 2048);
+      c.drawImage(RotuloKit.tampa(marcaObj(), { s: 2048, pomada }), 0, 0, 2048, 2048);
+      topTex.needsUpdate = true; return;
+    }
     // arte clara de papel: menos verniz, senão o reflexo da luz estoura a tampa para branco
     Object.assign(top.material, tampa ? { roughness: 0.6, clearcoat: 0.2 } : { roughness: 0.35, clearcoat: 0.8 });
     if (tampa) { // arte completa da tampa (rotulo-vetorizador) ocupa o disco todo; os aros e o texto padrão saem
@@ -1623,7 +1645,7 @@ async function initStage(RoomEnvironment) {
       c.fillStyle = f; c.fillRect(m - L, m - L, 2 * L, 2 * L);
       c.save(); c.translate(m - L / 2, m - L / 2);
       c.shadowColor = "rgba(0,0,0,.45)"; c.shadowBlur = 16;
-      drawLogo(c, L, nomeAtual(), estilo, corEscura());
+      drawLogo(c, L, nomeAtual(), estilo, corEscura(), cidade, simbolo);
       c.restore(); c.setTransform(1, 0, 0, 1, 0, 0);
       topTex.needsUpdate = true; return;
     }
@@ -1636,7 +1658,7 @@ async function initStage(RoomEnvironment) {
     const L = 660;
     c.save(); c.translate(m - L / 2, m - L / 2 - 20);
     c.shadowColor = "rgba(0,0,0,.55)"; c.shadowBlur = 14;
-    drawLogo(c, L, nomeAtual(), estilo, corEscura());
+    drawLogo(c, L, nomeAtual(), estilo, corEscura(), cidade, simbolo);
     c.restore();
     c.textAlign = "center"; c.textBaseline = "middle";
     c.fillStyle = tema.sub; c.font = `600 34px "Barlow", sans-serif`;
@@ -1646,6 +1668,13 @@ async function initStage(RoomEnvironment) {
   function drawBand() {
     const c = bandCv.getContext("2d"), W = bandCv.width, H = bandCv.height, k = H / 256;
     const nome = nomeAtual().toUpperCase();
+    if (usarGerada()) { // tarja 190 x 17 mm gerada pela marca, centrada na frente como a arte pronta
+      const mmPorUn = 44.55 / R, volta = 2 * Math.PI * 44.55, faixa = (BODY_H - 0.08) * mmPorUn;
+      const tw = W * 190 / volta, th = H * 17 / faixa, y0 = (H - th) / 2, t = RotuloKit.tarja(marcaObj(), { w: 4096, pomada });
+      c.fillStyle = "#0b0b0b"; c.fillRect(0, 0, W, H);
+      for (const ox of [-tw / 2, W - tw / 2]) c.drawImage(t, ox, y0, tw, th);
+      bandTex.needsUpdate = true; return;
+    }
     if (tarja) { // arte pronta (exportar-3d.js): o nome vai dentro da moldura
       const a = tarja.cfg.nome, mmPorUn = 44.55 / R;
       const volta = 2 * Math.PI * 44.55, faixa = (BODY_H - 0.08) * mmPorUn; // mm

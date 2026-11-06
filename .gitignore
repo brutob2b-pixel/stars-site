@@ -2,3 +2,5 @@ _backup-*/
 index.antes-*.html
 .env
 *.log
+*-lab.html
+_t_*.html

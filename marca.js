@@ -133,7 +133,7 @@ function pintarLogo(cv, m, { bg = "tema", cor, pad = 0.08 } = {}) {
   const t = MARCA.tema(m), c = cv.getContext("2d"), W = cv.width, H = cv.height, S = Math.min(W, H) * (1 - pad * 2);
   c.clearRect(0, 0, W, H);
   if (bg) { c.fillStyle = bg === "tema" ? fundoTema(cv, t) : bg; c.fillRect(0, 0, W, H); }
-  c.save(); c.translate((W - S) / 2, (H - S) / 2); drawLogo(c, S, MARCA.nome(m), MARCA.logo(m), cor || corEscura(t), m.cidade || "BARBEARIA"); c.restore();
+  c.save(); c.translate((W - S) / 2, (H - S) / 2); drawLogo(c, S, MARCA.nome(m), MARCA.logo(m), cor || corEscura(t), m.cidade || "BARBEARIA", m.simbolo); c.restore();
 }
 // salva um canvas como PNG no computador de quem está vendo
 function baixarCanvas(cv, nomeArquivo) {
@@ -148,7 +148,9 @@ const slug = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().repla
 
 /* ---- embalagens em SVG com a marca da barbearia (desenho de vitrine, não é a arte final) ---- */
 let _svgId = 0;
-function embalagem(tipo, m, { pomada, rotulo } = {}) {
+function embalagem(tipo, m, { pomada, rotulo, largura } = {}) {
+  // o pote usa o desenho realista de rotulo.js (medidas reais, tarja no cilindro); se não carregou, cai no desenho antigo abaixo
+  if (tipo === "pote" && window.RotuloKit) { try { return RotuloKit.svgPote(m, { pomada: pomada || MARCA.pomada(m), largura: largura || 300 }); } catch (e) { /* desenho antigo */ } }
   const t = MARCA.tema(m), p = pomada || MARCA.pomada(m), id = "e" + (++_svgId);
   const nome = escHTML(MARCA.nome(m).toUpperCase()), sub = escHTML(rotulo || p.rotulo);
   const fz = (w, base) => Math.min(base, (w * 1.75) / Math.max(4, MARCA.nome(m).length)).toFixed(1);

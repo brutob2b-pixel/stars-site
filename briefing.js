@@ -4,7 +4,7 @@
 (function () {
   "use strict";
 
-  const TOTAL = 5;
+  const TOTAL = 6;
 
   /* ---------- conteúdo fixo ---------- */
   const SVG_ESTILO = {
@@ -16,6 +16,14 @@
     { id: "tradicao", nome: "Tradição", logo: "emblema", frase: "Barbearia raiz: ofício, navalha e história.", porque: "Emblema, porque você descreveu uma casa de tradição." },
     { id: "classica", nome: "Clássica elegante", logo: "classico", frase: "Ambiente refinado e atendimento com hora marcada.", porque: "Logotipo clássico, porque sua casa é refinada e atende com hora marcada." },
     { id: "urbana", nome: "Urbana", logo: "moderno", frase: "Street, fade e muita rede social.", porque: "Monograma moderno, porque sua casa é urbana e vive de fade e redes sociais." }
+  ];
+  const SIMBOLOS = [
+    { id: "navalha", nome: "Navalha", frase: "Ofício, precisão e tradição." },
+    { id: "tesoura", nome: "Tesoura", frase: "Corte técnico e acabamento." },
+    { id: "poste", nome: "Poste", frase: "A barbearia clássica de rua." },
+    { id: "bigode", nome: "Bigode", frase: "Barba, estilo e personalidade." },
+    { id: "pente", nome: "Pente", frase: "Fade, risca e cabelo alinhado." },
+    { id: "nenhum", nome: "Só o nome", frase: "Marca limpa, sem desenho." }
   ];
   const CLIMA = { black: "luxo discreto", verde: "tradição de bancada", prata: "frio e moderno", vinho: "acolhedor, madeira e couro", marfim: "claro, limpo, minimalista" };
   const CORTE = { pasta: "o corte social do dia a dia", argila: "volume e textura seca", gel: "risca-lado e topete", molhado: "o visual molhado", fibra: "o despenteado com textura", cera: "barba e fios brancos" };
@@ -110,8 +118,10 @@
 @media (min-width:720px){.bf-res{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)}}
 .bf-logo{width:100%;max-width:340px;height:auto;aspect-ratio:1;border-radius:20px;border:1px solid rgba(255,255,255,.14);display:block;margin:0 auto;transition:opacity .6s ease,transform .6s cubic-bezier(.2,.8,.2,1)}
 .bf-logo.bf-pre{transform:scale(.9)}
-.bf-pote{max-width:260px;margin:0 auto;transition:opacity .6s ease .15s,transform .6s ease .15s}
+.bf-t:focus{outline:none}
+.bf-pote{max-width:380px;margin:0 auto;transition:opacity .6s ease .15s,transform .6s ease .15s}
 .bf-pote svg{width:100%;height:auto;display:block}
+.bf-sim{width:64px;height:64px;display:block;margin-bottom:4px}
 .bf-slog{font-family:var(--f-disp,'Barlow Condensed',sans-serif);text-transform:uppercase;font-size:clamp(24px,4.5vw,34px);line-height:1.05;margin:18px 0 8px;color:var(--bf-gold2)}
 .bf-why{margin:6px 0 0;padding:0;list-style:none;display:grid;gap:6px}
 .bf-why li{padding-left:18px;position:relative;color:var(--bf-muted);font-size:15px}
@@ -180,6 +190,16 @@
       valido: () => !!s.estilo
     },
     {
+      titulo: "Qual símbolo combina com a sua casa?", sub: "Vai no logotipo, na tampa e na tarja do pote.",
+      html: () => grade("simbolo", "bf-g3", SIMBOLOS.map(x => ({ id: x.id, html: `<canvas class="bf-sim" width="160" height="160" data-simbolo="${x.id}" aria-hidden="true"></canvas><b>${x.nome}</b><span>${x.frase}</span>` }))),
+      valido: () => !!s.simbolo,
+      depois: () => corpo.querySelectorAll(".bf-sim").forEach(cv => {
+        const c = cv.getContext("2d");
+        if (cv.dataset.simbolo === "nenhum") { c.fillStyle = "#F0C46A"; c.font = "700 44px 'Barlow Condensed',sans-serif"; c.textAlign = "center"; c.textBaseline = "middle"; c.fillText("Aa", 80, 82); return; }
+        if (window.desenharIcone) window.desenharIcone(c, cv.dataset.simbolo, 80, 80, 112, "#F0C46A", 7);
+      })
+    },
+    {
       titulo: "Qual é o clima do ambiente?", sub: "As cores do logotipo e do rótulo seguem o seu clima.",
       html: () => grade("tema", "bf-g5", TEMAS.map(t => ({ id: t.id, html: `<canvas class="bf-mini" width="160" height="160" data-tema="${t.id}" aria-hidden="true"></canvas><b>${t.nome}</b><span>${CLIMA[t.id]}</span>` }))),
       valido: () => !!s.tema,
@@ -201,7 +221,7 @@
   function marcaAtual(extra) {
     const d = Object.assign({}, s, extra);
     const est = ESTILOS.find(e => e.id === d.estilo) || ESTILOS[1];
-    return { nome: nomeBonito(d.nome) || "Sua barbearia", cidade: (d.cidade || "").trim().toUpperCase() || "BARBEARIA", logo: est.logo, tema: d.tema || "black", pomada: d.pomada || "pasta" };
+    return { nome: nomeBonito(d.nome) || "Sua barbearia", cidade: (d.cidade || "").trim().toUpperCase() || "BARBEARIA", logo: est.logo, tema: d.tema || "black", pomada: d.pomada || "pasta", simbolo: d.simbolo || "nenhum" };
   }
 
   function entrar(el) { // entrada animada só com transform e opacity
@@ -246,10 +266,11 @@
   function telaResultado() {
     const m = resultadoMarca(), est = ESTILOS.find(e => e.id === s.estilo), t = TEMAS.find(x => x.id === s.tema);
     const p = POMADAS.find(x => x.id === s.pomada), pub = PUBLICOS.find(x => x.id === s.publico);
-    const porques = [est.porque, `${t.nome}, porque o clima da sua casa é ${CLIMA[t.id]}.`, `${p.nome} como pomada principal, porque o que mais sai da sua cadeira é ${CORTE[p.id]}.`, `Slogan no tom de quem mais senta na sua cadeira: ${pub.nome.toLowerCase()}.`];
+    const sim = SIMBOLOS.find(x => x.id === s.simbolo);
+    const porques = [est.porque, sim.id === "nenhum" ? "Só o nome, porque você prefere uma marca limpa, sem desenho." : `${sim.nome} como símbolo: ${sim.frase.toLowerCase().replace(/\.$/, "")}.`, `${t.nome}, porque o clima da sua casa é ${CLIMA[t.id]}.`, `${p.nome} como pomada principal, porque o que mais sai da sua cadeira é ${CORTE[p.id]}.`, `Slogan no tom de quem mais senta na sua cadeira: ${pub.nome.toLowerCase()}.`];
     return `<h2 class="bf-t" id="bf-titulo" tabindex="-1">Sua base de marca</h2><p class="bf-s">Um rascunho feito com as suas respostas. O designer refina no pedido real.</p>
       <div class="bf-res"><canvas class="bf-logo bf-pre" width="840" height="840" role="img" aria-label="Logotipo de ${escHTML(m.nome)}"></canvas>
-      <div class="bf-pote bf-anim bf-pre">${embalagem("pote", m, { pomada: p })}</div></div>
+      <div class="bf-pote bf-anim bf-pre">${embalagem("pote", m, { pomada: p, largura: 460 })}</div></div>
       <p class="bf-slog">${escHTML(m.slogan)}</p>
       <div class="bf-why"><h3>Por que escolhemos isso</h3><ul class="bf-why">${porques.map(x => `<li>${escHTML(x)}</li>`).join("")}</ul></div>
       <div class="bf-acts"><button type="button" class="bf-btn solid" data-acao="aplicar">Aplicar no pote</button>
@@ -320,7 +341,7 @@
     prox.focus();
   }
 
-  const estadoInicial = () => ({ nome: "", cidade: "", estilo: "", tema: "", pomada: "", publico: "" });
+  const estadoInicial = () => ({ nome: "", cidade: "", estilo: "", simbolo: "", tema: "", pomada: "", publico: "" });
 
   window.Briefing = {
     abrir(o) {
