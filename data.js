@@ -102,8 +102,8 @@ const PEDIDOS = {
   }
 };
 
-const FRETE_EXEMPLO = 25; // frete fixo de exemplo para São Paulo capital
-const ENDERECO_EXEMPLO = "Rua Exemplo, 100 · Pinheiros, São Paulo";
+const FRETE_EXEMPLO = 25; // frete fixo de exemplo (no produto real varia por região)
+const ENDERECO_EXEMPLO = "Rua Exemplo, 100 · Centro, Sua Cidade";
 const precoTxt = p => p == null ? "R$ [PLACEHOLDER]" : p.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 const dataTxt = d => d ? new Date(d + "T12:00:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "short" }) : "";
 const hojeISO = (somaDias = 0) => new Date(Date.now() + somaDias * 864e5).toISOString().slice(0, 10);
@@ -121,7 +121,7 @@ const CURSOS = [
   { id: "c-mkt-1", trilha: "marketing", titulo: "Instagram da barbearia em 30 dias", aulas: 9, horas: 7, preco: 197, turmas: [["t1", 10, "Online ao vivo"], ["t2", 42, "Online ao vivo"]] },
   { id: "c-mkt-2", trilha: "marketing", titulo: "WhatsApp que vende", aulas: 6, horas: 4, preco: 147, turmas: [["t1", 28, "Online ao vivo"]] },
   { id: "c-brand-1", trilha: "branding", titulo: "Identidade da sua barbearia", aulas: 8, horas: 6, preco: 247, turmas: [["t1", 18, "Online ao vivo"]] },
-  { id: "c-tec-1", trilha: "tecnicas", titulo: "Degradê e barba: tendências", aulas: 12, horas: 16, preco: 397, turmas: [["t1", 24, "Presencial · São Paulo"], ["t2", 56, "Presencial · São Paulo"]] }
+  { id: "c-tec-1", trilha: "tecnicas", titulo: "Degradê e barba: tendências", aulas: 12, horas: 16, preco: 397, turmas: [["t1", 24, "Presencial · cidade a definir"], ["t2", 56, "Presencial · cidade a definir"]] }
 ];
 const PLANOS_MENTORIA = [
   { id: "avulso", nome: "Avulso", preco: null, itens: ["Um curso à sua escolha", "Aulas gravadas + encontro ao vivo", "Certificado de participação"] },

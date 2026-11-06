@@ -229,7 +229,7 @@ dialog.janela::backdrop{background:rgba(5,5,4,.6);-webkit-backdrop-filter:blur(4
   <ul data-itens></ul>
   <div class="foot">
     <div class="linha-tot"><span>Subtotal <span class="ex">exemplo</span></span><span data-subtotal></span></div>
-    <div class="linha-tot"><span>Frete (São Paulo capital)</span><span class="ph" data-frete></span></div>
+    <div class="linha-tot"><span>Frete (exemplo; varia por região)</span><span class="ph" data-frete></span></div>
     <div class="linha-tot forte"><span>Total</span><span data-total></span></div>
     <p class="muted" style="font-size:12px" data-cart-nota></p>
     <button class="btn btn-solid" type="button" data-finalizar>Finalizar compra</button>
@@ -381,7 +381,7 @@ function specs(p) {
   const base = p.tipo === "lote"
     ? [["Embalagem", { pote: "Pote com tampa de rosca", lata: "Lata baixa", frasco: "Frasco âmbar conta-gotas", tubo: "Bisnaga", pump: "Frasco com válvula", spray: "Frasco spray", caixa: "Caixa rígida" }[p.emb]],
        ["Lote mínimo", "150 unidades"], ["Conteúdo", { frasco: "30 ml", tubo: "100 ml", pump: "250 ml", spray: "120 ml", caixa: "120 g + 30 ml" }[p.emb] || "120 g"], ["Arte", "Revisada por designer antes da produção"], ["Prazo", "até 30 dias após a arte aprovada*"], ["Anvisa", "grau 1 · notificação em andamento"]]
-    : [["Categoria", p.cat], ["Fornecedor", "linha profissional homologada"], ["Garantia", p.cat === "Máquinas" || p.cat === "Mobiliário" ? "12 meses" : "90 dias"], ["Envio", "São Paulo capital · 2 dias úteis"]];
+    : [["Categoria", p.cat], ["Fornecedor", "linha profissional homologada"], ["Garantia", p.cat === "Máquinas" || p.cat === "Mobiliário" ? "12 meses" : "90 dias"], ["Envio", "Todo o Brasil · prazo por região"]];
   return base.map(([k, v]) => `<li><span>${k}</span><b class="ph">${v}</b></li>`).join("");
 }
 function abrirProduto(id) {
@@ -442,7 +442,7 @@ function telaCK() {
       ${campo("whats", "WhatsApp com DDD", 'required inputmode="tel" maxlength="15" placeholder="11 90000-0000" autocomplete="tel"')}
       <p class="muted full" style="font-size:13px">CNPJ: <span class="ph">00.000.000/0001-00</span> · no produto real vem do cadastro da barbearia.</p></div>`,
     `<h3>Como receber</h3><div class="opcoes" style="margin-top:14px">
-      <label class="opcao"><input type="radio" name="ent" value="entrega" ${d.entrega === "entrega" ? "checked" : ""}><span><b>Entrega na barbearia</b><small>São Paulo capital · frete <span class="ph">${precoTxt(FRETE_EXEMPLO)}</span></small></span></label>
+      <label class="opcao"><input type="radio" name="ent" value="entrega" ${d.entrega === "entrega" ? "checked" : ""}><span><b>Entrega na barbearia</b><small>Todo o Brasil · frete <span class="ph">${precoTxt(FRETE_EXEMPLO)}</span></small></span></label>
       <label class="opcao"><input type="radio" name="ent" value="retirada" ${d.entrega === "retirada" ? "checked" : ""}><span><b>Retirar no ponto parceiro</b><small>Endereço: <span class="ph">${ENDERECO_EXEMPLO}</span></small></span></label>
     </div>
     <div class="ck-grid" style="margin-top:14px" data-endereco ${d.entrega === "retirada" ? "hidden" : ""}>
