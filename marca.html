@@ -141,13 +141,14 @@
 
   <div class="estudio">
     <aside class="controles glass" aria-label="Escolhas da marca">
+      <button class="btn btn-ghost btn-sm" type="button" data-briefing>Gerar a base com o quiz de 1 minuto</button>
       <div class="field">
         <label for="m-nome">Nome da barbearia</label>
         <input id="m-nome" maxlength="28" autocomplete="organization" placeholder="Ex.: Barbearia do Zé">
       </div>
       <div class="field">
         <label for="m-cidade">Linha de baixo (bairro ou cidade)</label>
-        <input id="m-cidade" maxlength="18" placeholder="SÃO PAULO">
+        <input id="m-cidade" maxlength="18" placeholder="BARBEARIA">
       </div>
       <div><h3>Logotipo</h3><div class="opts tres" role="group" aria-label="Estilo do logotipo" data-logos></div></div>
       <div><h3>Cores</h3><div class="opts cinco" role="group" aria-label="Paleta" data-temas></div></div>
@@ -278,6 +279,7 @@
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
 <script src="icones.js"></script>
 <script src="marca.js"></script>
+<script src="briefing.js"></script>
 <script src="data.js"></script>
 <script src="site.js"></script>
 <script>
@@ -306,8 +308,11 @@ function gravar() {
   MARCA.save(m); // as outras páginas leem a marca do projeto ativo
 }
 function atualizar(fn) { PJ = { ...PJ, lista: PJ.lista.map(p => p.id === PJ.ativo ? fn(p) : p) }; m = proj().m; gravar(); }
+// o briefing da home grava a marca mais nova em stars-marca: o Estúdio a adota se for mais recente e diferente do projeto ativo
+{ const h = MARCA.load(), campos = x => [x.nome, x.tema, x.logo, x.pomada, x.cidade].join("|");
+  if ((h.atualizado || 0) > (m.atualizado || 0) && campos(h) !== campos(m)) atualizar(p => log({ ...p, m: { ...h } }, "Marca atualizada pelo briefing da home")); }
 const nomeIn = $("#m-nome"), cidadeIn = $("#m-cidade");
-nomeIn.value = m.nome; cidadeIn.value = m.cidade === "SÃO PAULO" ? "" : m.cidade;
+nomeIn.value = m.nome; cidadeIn.value = m.cidade === "BARBEARIA" ? "" : m.cidade;
 const cv = k => $(`[data-c="${k}"]`);
 
 function salvar(mud) {
@@ -315,7 +320,8 @@ function salvar(mud) {
   atualizar(p => { const q = { ...p, m: { ...p.m, ...mud } }; return p.status === "rascunho" ? q : log({ ...q, status: "rascunho" }, "Marca alterada: a arte volta a rascunho"); });
   render();
 }
-function sincronizar() { nomeIn.value = m.nome; cidadeIn.value = m.cidade === "SÃO PAULO" ? "" : m.cidade; montarOpcoes(); render(); }
+function sincronizar() { nomeIn.value = m.nome; cidadeIn.value = m.cidade === "BARBEARIA" ? "" : m.cidade; montarOpcoes(); render(); }
+$("[data-briefing]").addEventListener("click", () => window.Briefing?.abrir({ marca: m, onAplicar: h => { atualizar(p => log({ ...p, m: { ...h } }, "Marca gerada pelo briefing")); sincronizar(); } }));
 function ativar(id) { PJ = { ...PJ, ativo: id }; m = proj().m; gravar(); sincronizar(); }
 function novoProjeto(copiar) {
   if (PJ.lista.length >= MAX_PROJ) { avisar(`Limite de ${MAX_PROJ} projetos na demonstração.`); return; }
@@ -499,7 +505,7 @@ function pulsar(sel) { if (anima) G.fromTo(sel, { scale: 0.97, opacity: 0.6 }, {
 /* ---- eventos ---- */
 let digT;
 nomeIn.addEventListener("input", () => { clearTimeout(digT); digT = setTimeout(() => salvar({ nome: nomeIn.value.trim() }), 120); });
-cidadeIn.addEventListener("input", () => { clearTimeout(digT); digT = setTimeout(() => salvar({ cidade: cidadeIn.value.trim().toUpperCase() || "SÃO PAULO" }), 120); });
+cidadeIn.addEventListener("input", () => { clearTimeout(digT); digT = setTimeout(() => salvar({ cidade: cidadeIn.value.trim().toUpperCase() || "BARBEARIA" }), 120); });
 document.addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
   if (b.dataset.logo) { salvar({ logo: b.dataset.logo }); pulsar('[data-c="logo"]'); }

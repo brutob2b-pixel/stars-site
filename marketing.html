@@ -230,7 +230,7 @@ function pote(c, cx, cy, R, aberto = false) {
     c.strokeStyle = t.ring; c.lineWidth = R * 0.025; c.stroke();
     c.save(); c.beginPath(); c.ellipse(cx, cy - L, R * 0.92, ry * 0.92, 0, 0, 7); c.clip();
     c.translate(cx, cy - L); c.scale(1, ry / R); c.translate(-R * 0.775, -R * 0.775);
-    drawLogo(c, R * 1.55, nome, MARCA.logo(m), corEscura(t), m.cidade || "SÃO PAULO");
+    drawLogo(c, R * 1.55, nome, MARCA.logo(m), corEscura(t), m.cidade || "BARBEARIA");
     c.restore();
   }
   c.restore();

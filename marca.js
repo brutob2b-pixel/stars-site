@@ -33,13 +33,14 @@ const POMADAS = [
 
 /* ---- marca guardada neste navegador (vale para todas as páginas do protótipo) ---- */
 const MARCA_KEY = "stars-marca";
-const MARCA_PADRAO = { nome: "", tema: "black", logo: "classico", pomada: "pasta", cidade: "SÃO PAULO" };
+const MARCA_PADRAO = { nome: "", tema: "black", logo: "classico", pomada: "pasta", cidade: "BARBEARIA" };
 const MARCA = {
   load() {
     try { return { ...MARCA_PADRAO, ...(JSON.parse(localStorage.getItem(MARCA_KEY)) || {}) }; }
     catch { return { ...MARCA_PADRAO }; }
   },
   save(m) {
+    m = { ...m, atualizado: Date.now() }; // o Estúdio usa isto para adotar a marca mais nova (ex.: vinda do briefing da home)
     try { localStorage.setItem(MARCA_KEY, JSON.stringify(m)); } catch { /* sem armazenamento: vale só nesta visita */ }
     return m;
   },
@@ -80,7 +81,7 @@ function arcText(c, text, cx, cy, r, top, gap) {
   });
 }
 // desenha o logotipo num quadrado S×S, fundo transparente; cor = {text, ring, sub}; sub = linha de baixo (cidade)
-function drawLogo(c, S, nome, est, cor, sub = "SÃO PAULO") {
+function drawLogo(c, S, nome, est, cor, sub = "BARBEARIA") {
   const m = S / 2, N = nome.toUpperCase(), F = est.css;
   c.save(); c.textAlign = "center"; c.textBaseline = "middle";
   if (est.id === "classico") {
@@ -132,7 +133,7 @@ function pintarLogo(cv, m, { bg = "tema", cor, pad = 0.08 } = {}) {
   const t = MARCA.tema(m), c = cv.getContext("2d"), W = cv.width, H = cv.height, S = Math.min(W, H) * (1 - pad * 2);
   c.clearRect(0, 0, W, H);
   if (bg) { c.fillStyle = bg === "tema" ? fundoTema(cv, t) : bg; c.fillRect(0, 0, W, H); }
-  c.save(); c.translate((W - S) / 2, (H - S) / 2); drawLogo(c, S, MARCA.nome(m), MARCA.logo(m), cor || corEscura(t), m.cidade || "SÃO PAULO"); c.restore();
+  c.save(); c.translate((W - S) / 2, (H - S) / 2); drawLogo(c, S, MARCA.nome(m), MARCA.logo(m), cor || corEscura(t), m.cidade || "BARBEARIA"); c.restore();
 }
 // salva um canvas como PNG no computador de quem está vendo
 function baixarCanvas(cv, nomeArquivo) {
