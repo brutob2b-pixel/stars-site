@@ -11,7 +11,7 @@
 <link rel="stylesheet" href="base.css">
 <style>
 .estudio{display:grid;grid-template-columns:360px minmax(0,1fr);gap:22px;align-items:start}
-.controles{position:sticky;top:84px;padding:18px;display:grid;gap:18px;max-height:calc(100svh - 100px);overflow:auto}
+.controles{position:sticky;top:84px;padding:18px;display:grid;grid-template-columns:minmax(0,1fr);gap:18px;max-height:calc(100svh - 100px);overflow:auto}
 .controles h3{font-size:14px;letter-spacing:.12em;color:var(--muted);margin-bottom:8px}
 .opts{display:grid;gap:8px}
 .opts.tres{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -29,7 +29,7 @@
 .status .dot{width:10px;height:10px;border-radius:50%;background:var(--warn);box-shadow:0 0 0 4px rgba(232,176,75,.2)}
 .status.revisao .dot{background:#7db7ff;box-shadow:0 0 0 4px rgba(125,183,255,.2)}
 
-.palco{display:grid;gap:16px}
+.palco{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
 .palco .tabs{position:sticky;top:76px;z-index:5;padding:8px;border-radius:999px;width:max-content;max-width:100%;overflow-x:auto;flex-wrap:nowrap}
 .vista{padding:22px}
 .vista[hidden]{display:none}
@@ -105,14 +105,14 @@
 .pacote ul{margin:0;padding-left:20px;color:var(--muted);font-size:14px}
 
 @media (max-width:980px){
-  .estudio{grid-template-columns:1fr}
+  .estudio{grid-template-columns:minmax(0,1fr)}
   .controles{position:static;max-height:none}
   .palco .tabs{top:70px}
   .pages{grid-template-columns:1fr 1fr}
   .fluxo{grid-template-columns:1fr 1fr}
 }
 @media (max-width:560px){
-  .logo-grande{grid-template-columns:1fr}
+  .logo-grande{grid-template-columns:minmax(0,1fr)}
   .vista{padding:14px}
   .opts.cinco{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
   .opt i{width:28px;height:28px}

@@ -23,7 +23,7 @@ document.documentElement.classList.add("js");
         <nav aria-label="Páginas" id="menu-site">${LINKS.map(([h, t, k]) => `<a href="${h}"${k === pagina ? ' aria-current="page"' : ""}>${t}</a>`).join("")}</nav>
         <div class="right">
           <span data-top-right style="display:contents"></span>
-          <button class="btn btn-ghost btn-sm menu-btn" type="button" aria-controls="menu-site" aria-expanded="false">Menu</button>
+          <button class="btn btn-ghost btn-sm menu-btn" type="button" aria-controls="menu-site" aria-expanded="false" aria-label="Menu"><span class="burger" aria-hidden="true"></span></button>
         </div>
       </div>
     </header>`);
@@ -38,6 +38,8 @@ document.documentElement.classList.add("js");
   if (tpl) $("[data-top-right]").append(tpl.content.cloneNode(true));
   const menuBtn = $(".menu-btn"), nav = $("#menu-site");
   menuBtn.addEventListener("click", () => { const open = nav.classList.toggle("open"); menuBtn.setAttribute("aria-expanded", open); });
+  nav.addEventListener("click", e => { if (e.target.closest("a")) { nav.classList.remove("open"); menuBtn.setAttribute("aria-expanded", "false"); } });
+  nav.addEventListener("click", e => { if (e.target.closest("a")) { nav.classList.remove("open"); menuBtn.setAttribute("aria-expanded", "false"); } });
   addEventListener("keydown", e => { if (e.key === "Escape" && nav.classList.contains("open")) { nav.classList.remove("open"); menuBtn.setAttribute("aria-expanded", "false"); menuBtn.focus(); } });
 })();
 
@@ -45,8 +47,9 @@ document.documentElement.classList.add("js");
 function revelar(root = document) {
   const els = $$("[data-reveal]:not(.in)", root);
   if (!SITE.anima || !SITE.ST) { els.forEach(e => e.classList.add("in")); return; }
-  SITE.ST.batch(els, { start: "top 92%", once: true, onEnter: b => {
-    SITE.G.fromTo(b, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out", stagger: 0.06 });
+  const toque = matchMedia("(pointer: coarse)").matches; // no celular as entradas são mais curtas e começam antes
+  SITE.ST.batch(els, { start: toque ? "top 98%" : "top 92%", once: true, onEnter: b => {
+    SITE.G.fromTo(b, { opacity: 0, y: toque ? 14 : 24 }, { opacity: 1, y: 0, duration: toque ? 0.45 : 0.8, ease: "power3.out", stagger: toque ? 0.03 : 0.06 });
     b.forEach(e => e.classList.add("in"));
   } });
 }

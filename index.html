@@ -54,7 +54,21 @@ p{margin:0}
 .top nav a{text-decoration:none;color:var(--muted)}
 .top nav a:hover{color:var(--text)}
 .top .btn{min-height:42px;padding:0 18px;font-size:14px}
-@media (max-width:820px){.top nav{display:none}}
+.top .right{display:flex;gap:8px;align-items:center}
+.menu-btn{display:none;width:44px;padding:0;justify-content:center;align-items:center}
+.burger,.burger::before,.burger::after{display:block;width:18px;height:2px;border-radius:2px;background:currentColor;transition:transform .25s}
+.burger{position:relative}
+.burger::before,.burger::after{content:"";position:absolute;left:0}
+.burger::before{top:-6px}.burger::after{top:6px}
+[aria-expanded="true"] .burger{background:transparent}
+[aria-expanded="true"] .burger::before{transform:translateY(6px) rotate(45deg)}
+[aria-expanded="true"] .burger::after{transform:translateY(-6px) rotate(-45deg)}
+@media (max-width:820px){
+  .top nav{display:none;position:absolute;top:64px;left:16px;right:16px;flex-direction:column;gap:0;padding:10px;border-radius:20px;background:rgba(18,16,12,.96);border:1px solid var(--line)}
+  .top nav.open{display:flex}
+  .top nav a{padding:12px 14px;font-size:17px}
+  .menu-btn{display:inline-flex}
+}
 @media (max-width:480px){.logo small{display:none}.top .btn{white-space:nowrap;padding:0 14px}}
 
 /* atmosfera atrás do 3D: luz quente que segue o pote (--gx/--gy, vindos do JS), contraluz verde, vinheta e grão de filme */
@@ -429,7 +443,7 @@ html{scrollbar-gutter:stable}
 <header class="top">
   <div class="wrap">
     <a class="logo" href="#topo"><span data-brand></span><small>private label para barbearias</small></a>
-    <nav aria-label="Seções e páginas">
+    <nav aria-label="Seções e páginas" id="menu-home">
       <a href="#estilos">Estilos</a>
       <a href="#renda-extra">Renda extra</a>
       <a href="shop.html">Loja</a>
@@ -438,9 +452,21 @@ html{scrollbar-gutter:stable}
       <a href="mentoria.html">Mentoria</a>
       <a href="painel.html">Painel</a>
     </nav>
-    <button class="btn" type="button" data-abrir-sim>Simular pedido</button>
+    <div class="right">
+      <button class="btn" type="button" data-abrir-sim>Simular pedido</button>
+      <button class="btn menu-btn" type="button" aria-controls="menu-home" aria-expanded="false" aria-label="Menu"><span class="burger" aria-hidden="true"></span></button>
+    </div>
   </div>
 </header>
+<script>
+(() => {
+  const b = document.querySelector(".menu-btn"), n = document.getElementById("menu-home");
+  const fecha = () => { n.classList.remove("open"); b.setAttribute("aria-expanded", "false"); };
+  b.addEventListener("click", () => b.setAttribute("aria-expanded", n.classList.toggle("open")));
+  n.addEventListener("click", e => { if (e.target.closest("a")) fecha(); });
+  addEventListener("keydown", e => { if (e.key === "Escape") fecha(); });
+})();
+</script>
 
 <div class="atmos" aria-hidden="true"></div>
 <div class="bigword" aria-hidden="true"><span></span></div>
@@ -1723,7 +1749,7 @@ async function initStage(RoomEnvironment) {
     const tg = target();
     const sumiu = introDone && !sim.aberto && fora(cur) && fora(tg);
     if (sumiu && desenhouFora) { for (const key in cur) cur[key] = tg[key]; return; }
-    const k = first ? 1 : 1 - Math.exp(-dt * 6);
+    const k = first ? 1 : 1 - Math.exp(-dt * (toque ? 12 : 6)); // no toque o pote acompanha o dedo mais depressa
     // tampa com peso: abre mais devagar que o resto do movimento
     const kLid = first ? 1 : 1 - Math.exp(-dt * 2.5);
     for (const key in cur) cur[key] += (tg[key] - cur[key]) * (key === "lift" ? kLid : k);
