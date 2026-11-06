@@ -356,7 +356,8 @@ html{scrollbar-gutter:stable}
   .steps li{grid-template-columns:40px 1fr;padding:14px}
   .steps .n{font-size:34px}
   /* tudo cabe numa tela: só o passo atual mostra o texto, e a linha do tempo fica à vista junto */
-  .steps h2{font-size:34px}
+  .steps h2{font-size:28px}
+  .steps .pin .col{padding:16px}
   .steps ol{margin-top:14px;gap:8px}
   .steps li{padding:10px 14px}
   .steps li p{display:none}
@@ -1666,7 +1667,20 @@ async function initStage(RoomEnvironment) {
   const cur = { ...DESK[0] }; let first = true, spin = 0, last = performance.now();
   // a luz quente acompanha o pote, mas não sai da tela quando ele sai (seções de cartões continuam iluminadas)
   const atmos = $(".atmos").style, clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+  // celular: o pote nunca entra na barra do topo nem na caixa de texto; encolhe e centraliza no espaço livre entre as duas
+  const colunas = $$(".col");
+  function encaixa(st) {
+    const pxu = innerHeight / (2 * halfH), topo = $(".top").getBoundingClientRect().bottom + 8;
+    const base = Math.min(innerHeight, ...colunas.map(c => c.getBoundingClientRect()).filter(r => r.bottom > 0 && r.top > topo).map(r => r.top)) - 8;
+    const livre = base - topo;
+    if (livre < 70) return st;
+    const alto = (3 + 1.2 * st.lift) * st.s * pxu, cy = (1 - st.y) / 2 * innerHeight;
+    if (alto <= livre && cy - alto / 2 >= topo && cy + alto / 2 <= base) return st;
+    const s = Math.min(st.s, livre / ((3 + 1.2 * st.lift) * pxu));
+    return { ...st, s, y: -(((topo + livre / 2) / innerHeight) * 2 - 1) };
+  }
   function apply(st) {
+    if (mobile && !sim.aberto) st = encaixa(st);
     pivot.position.set(st.x * halfW, st.y * halfH, 0);
     atmos.setProperty("--gx", clamp((st.x + 1) * 50, 12, 88).toFixed(1) + "%");
     atmos.setProperty("--gy", clamp((1 - st.y) * 50, 15, 85).toFixed(1) + "%");
