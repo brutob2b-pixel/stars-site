@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Painel do parceiro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="base.css">
+<style>
+.head{padding:44px 0 18px;display:grid;gap:12px}
+.head h1{font-size:clamp(40px,5vw,72px)}
+.demo-nota{font-size:13px;color:var(--muted)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:8px 0 16px}
+.kpi{padding:16px 18px;display:grid;gap:4px}
+.kpi b{font:700 40px/1 var(--f-disp);color:var(--accent-2);font-variant-numeric:tabular-nums}
+.kpi span{font-size:13px;color:var(--muted)}
+.kpi .ph{font-size:22px}
+.dois{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;margin-bottom:16px}
+.dois[hidden],[data-so][hidden]{display:none}
+.card{padding:18px;display:grid;gap:12px;align-content:start}
+.card-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.card-head h2{font-size:26px}
+.card-head small{color:var(--muted);font-size:13px}
+
+/* gráfico de barras: uma série, uma cor; valor escrito só na última barra */
+.grafico{position:relative}
+.grafico svg{width:100%;height:auto;display:block;overflow:visible}
+.grafico .grade{stroke:rgba(255,255,255,.07)}
+.grafico .eixo{fill:var(--muted);font:500 12px var(--f-body)}
+.grafico .barra{fill:var(--accent)}
+.grafico .barra.ult{fill:var(--accent-2)}
+.grafico .alvo{fill:transparent}
+.grafico .rot{fill:var(--text);font:600 13px var(--f-body)}
+.dica{position:absolute;pointer-events:none;padding:6px 10px;border-radius:10px;font-size:13px;white-space:nowrap;transform:translate(-50%,-110%);
+  background:rgba(14,13,11,.9);border:1px solid var(--glass-line);box-shadow:var(--glass-shadow)}
+
+.minha-marca{display:grid;grid-template-columns:120px 1fr;gap:14px;align-items:center}
+.minha-marca canvas{width:120px;border-radius:16px;display:block}
+.minha-marca .acoes{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.arte{display:flex;align-items:center;gap:8px;font-size:14px;margin:4px 0}
+.arte i{width:9px;height:9px;border-radius:50%;background:var(--warn)}
+.arte.revisao i{background:#7db7ff}
+
+.layout{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:16px;align-items:start;margin-bottom:16px}
+.lista{display:grid;gap:8px}
+.lista button{text-align:left;padding:14px 16px;border-radius:16px;border:1px solid var(--glass-line);background:var(--glass);box-shadow:var(--glass-shadow);cursor:pointer;display:grid;gap:3px;color:var(--text);font:inherit;
+  -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur)}
+.lista button[aria-pressed="true"]{border-color:var(--accent);box-shadow:var(--glass-shadow),0 0 0 1px var(--accent)}
+.lista small{color:var(--muted)}
+.st{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.st.ok{color:var(--ok)}
+.novo{display:inline-block;margin-left:6px;padding:2px 7px;border-radius:999px;background:var(--accent);color:var(--bg);font:700 10px/1.4 var(--f-body);letter-spacing:.08em;vertical-align:middle}
+.detalhe{padding:22px}
+.detalhe .t{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:baseline;margin-bottom:18px}
+.detalhe .t h2{font-size:30px}
+
+.tl{list-style:none;margin:0;padding:0}
+.tl li{position:relative;display:grid;grid-template-columns:34px 1fr auto;gap:12px;padding:0 0 22px;align-items:start}
+.tl li::before{content:"";position:absolute;left:16px;top:26px;bottom:-2px;width:2px;background:var(--line)}
+.tl li.feito::after{content:"";position:absolute;left:16px;top:26px;bottom:-2px;width:2px;background:var(--accent)}
+.tl li:last-child::before,.tl li:last-child::after{display:none}
+.tl .dot{width:34px;height:34px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:14px;font-weight:700;background:var(--bg);position:relative;z-index:1}
+.tl .feito .dot{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.tl .agora .dot{border-color:var(--accent);color:var(--accent);animation:pulso 1.8s ease-out infinite}
+.tl .nome{padding-top:6px}
+.tl .agora .nome{font-weight:600}
+.tl .futuro .nome{color:var(--muted)}
+.tl .quando{padding-top:6px;font-size:13px;color:var(--muted);white-space:nowrap}
+@keyframes pulso{0%{box-shadow:0 0 0 0 rgba(217,164,65,.6)}100%{box-shadow:0 0 0 12px transparent}}
+.acao{margin-top:4px;padding:14px 16px;border-radius:14px;border:1px dashed var(--glass-line);font-size:14px;color:var(--muted)}
+
+.estoque{display:grid;gap:12px}
+.est{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:4px 12px;align-items:center}
+.est svg.emb{width:44px;grid-row:span 2}
+.est b{font-size:15px}
+.est .nivel{grid-column:2;height:6px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden}
+.est .nivel i{display:block;height:100%;border-radius:6px;background:var(--accent)}
+.est .q{grid-column:2;font-size:13px;color:var(--muted)}
+.est .baixo{color:var(--warn);font-weight:600}
+.est .btn{grid-column:3;grid-row:1/4;min-height:34px;padding:0 12px;font-size:13px}
+.equipe{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.equipe li{display:grid;grid-template-columns:38px 1fr auto;gap:10px;align-items:center;padding:10px;border-radius:14px;background:rgba(255,255,255,.04)}
+.equipe .av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 25%,transparent);color:var(--accent-2);font:700 16px var(--f-disp)}
+.equipe small{display:block;color:var(--muted);font-size:12px}
+.loja-link{display:grid;gap:6px;font-size:14px}
+.loja-link code{padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.06);font-size:13px;overflow-wrap:anywhere}
+
+@media (max-width:980px){
+  .kpis{grid-template-columns:1fr 1fr}
+  .dois,.layout{grid-template-columns:1fr}
+}
+@media (max-width:480px){
+  .kpi b{font-size:32px}
+  .minha-marca{grid-template-columns:84px 1fr}
+  .minha-marca canvas{width:84px}
+  .detalhe{padding:16px}
+  .tl li{grid-template-columns:34px 1fr}
+  .tl .quando{grid-column:2;padding-top:0}
+}
+@media (prefers-reduced-motion:reduce){.tl .agora .dot{animation:none}}
+</style>
+</head>
+<body data-pagina="painel">
+<template data-top><a class="btn btn-solid btn-sm" href="shop.html">Loja <span class="count" data-count>0</span></a></template>
+
+<main class="wrap">
+  <header class="head">
+    <p class="eyebrow">Painel do parceiro</p>
+    <h1 data-titulo></h1>
+    <div class="tabs" role="tablist" aria-label="Ver como">
+      <button type="button" role="tab" data-perfil="barbearia" aria-selected="true">Barbearia parceira</button>
+      <button type="button" role="tab" data-perfil="cliente" aria-selected="false">Cliente final</button>
+    </div>
+    <p class="demo-nota">Demonstração com dados ilustrativos: troque o perfil para ver o que cada pessoa enxerga. No produto real, cada um entra com o próprio acesso.</p>
+  </header>
+
+  <div data-so="barbearia">
+    <div class="kpis">
+      <div class="kpi glass" data-reveal><b data-kpi="andamento">0</b><span>pedidos em andamento</span></div>
+      <div class="kpi glass" data-reveal><b data-kpi="estoque">0</b><span>potes no estoque da casa</span></div>
+      <div class="kpi glass" data-reveal><b data-kpi="vendidos">0</b><span>potes vendidos no mês</span></div>
+      <div class="kpi glass" data-reveal><b class="ph" data-renda>R$ 0</b><span>renda extra do mês</span></div>
+    </div>
+
+    <div class="dois">
+      <section class="card glass" data-reveal aria-labelledby="g-t">
+        <div class="card-head"><h2 id="g-t">Potes vendidos por semana</h2><small>últimas 8 semanas · ilustrativo</small></div>
+        <div class="grafico" data-grafico></div>
+        <table class="sr" data-tabela><caption>Potes vendidos por semana</caption><thead><tr><th>Semana</th><th>Potes</th></tr></thead><tbody></tbody></table>
+      </section>
+      <section class="card glass" data-reveal aria-labelledby="mm-t">
+        <div class="card-head"><h2 id="mm-t">Minha marca</h2></div>
+        <div class="minha-marca">
+          <canvas width="300" height="300" data-logo role="img" aria-label="Logotipo da barbearia"></canvas>
+          <div>
+            <b data-marca-nome></b>
+            <p class="arte" data-arte><i aria-hidden="true"></i><span></span></p>
+            <p class="muted" style="font-size:13px" data-marca-info></p>
+            <div class="acoes"><a class="btn btn-ghost btn-sm" href="marca.html">Estúdio</a><a class="btn btn-ghost btn-sm" href="marketing.html">Marketing</a></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div data-so="cliente" hidden>
+    <div class="card glass" style="margin-bottom:16px"><p>Compras feitas na loja da <strong data-marca-nome></strong>. <a href="shop.html">Comprar de novo</a></p></div>
+  </div>
+
+  <div class="layout">
+    <div class="lista" data-lista aria-label="Pedidos"></div>
+    <section class="panel detalhe" aria-live="polite" data-detalhe></section>
+  </div>
+
+  <section class="card glass" data-so="barbearia" style="margin-bottom:16px" aria-labelledby="mc-t">
+    <div class="card-head"><h2 id="mc-t">Meus cursos</h2><a class="btn btn-ghost btn-sm" href="mentoria.html">Ver Mentoria</a></div>
+    <div data-cursos-lista></div>
+  </section>
+
+  <div class="dois" data-so="barbearia">
+    <section class="card glass" data-reveal aria-labelledby="e-t">
+      <div class="card-head"><h2 id="e-t">Estoque da linha</h2><small>potes no balcão · ilustrativo</small></div>
+      <div class="estoque" data-estoque></div>
+    </section>
+    <section class="card glass" data-reveal aria-labelledby="q-t">
+      <div class="card-head"><h2 id="q-t">Equipe</h2><small>vendas no mês · ilustrativo</small></div>
+      <ul class="equipe" data-equipe></ul>
+      <div class="loja-link"><span class="muted">Lojinha da barbearia para clientes finais:</span><code class="ph">loja/barbearia-dom-corte</code></div>
+    </section>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+<script src="icones.js"></script>
+<script src="marca.js"></script>
+<script src="data.js"></script>
+<script src="site.js"></script>
+<script>
+const { G, anima, ST } = SITE;
+document.title = `Painel do parceiro · ${BRAND}`;
+const m = MARCA.load(), nome = MARCA.nome(m) === "Sua barbearia" ? "Barbearia Dom Corte" : MARCA.nome(m);
+$$("[data-marca-nome]").forEach(e => e.textContent = nome);
+const contarCarrinho = c => Object.keys(c).filter(id => PRODUTOS.some(p => p.id === id)).reduce((s, id) => s + c[id], 0);
+$("[data-count]").textContent = contarCarrinho(carrinhoLer());
+
+// DADOS ILUSTRATIVOS da barbearia de exemplo (não são números de mercado nem de fábrica)
+const VENDAS = [6, 9, 8, 12, 11, 15, 14, 18];
+const ESTOQUE = { pasta: 18, argila: 6, gel: 12, molhado: 0, fibra: 9, cera: 4 };
+const CAPACIDADE = 30, BAIXO = 8;
+// exemplo: pote R$ 35 − R$ 12 da Stars − 15% de comissão = R$ 17,75 para a casa; R$ 5,25 para quem vende
+const POR_POTE = 17.75, COMISSAO_POTE = 5.25;
+// previsão de exemplo: etapas espalhadas no prazo do tipo (lote 30 dias, revenda 5, varejo 3)
+const previsao = (p, i) => dataTxt(new Date(new Date(p.datas[0] + "T12:00:00").getTime() + Math.round(i * ({ lote: 30, revenda: 5, varejo: 3 }[p.tipo] || 5) / (etapasDe(p).length - 1)) * 864e5).toISOString().slice(0, 10));
+const EQUIPE = [["Barbeiro A", 21], ["Barbeiro B", 15], ["Barbeiro C", 11]];
+
+let perfil = new URLSearchParams(location.search).get("perfil") === "cliente" ? "cliente" : "barbearia";
+let sel = null;
+let locais = PEDIDOS.load();
+const todos = () => [...locais, ...STARS_DATA.pedidos];
+const etapasDe = p => ETAPAS[p.tipo] || ETAPAS.revenda;
+const fim = p => p.atual >= etapasDe(p).length - 1;
+const ACOES = {
+  "Arte em revisão com o designer": "O designer vai mandar a arte pelo WhatsApp para você aprovar.",
+  "Pronto para retirar na barbearia": `Retire na barbearia. Endereço: ${ENDERECO_EXEMPLO}.`
+};
+
+/* ---- números do topo ---- */
+function contar(el, alvo) {
+  if (!anima) { el.textContent = alvo; return; }
+  const o = { v: 0 };
+  G.to(o, { v: alvo, duration: 1.2, ease: "power2.out", onUpdate: () => { el.textContent = Math.round(o.v); } });
+}
+function kpis() {
+  contar($('[data-kpi="andamento"]'), todos().filter(p => p.perfil === "barbearia" && !fim(p)).length);
+  contar($('[data-kpi="estoque"]'), Object.values(ESTOQUE).reduce((s, n) => s + n, 0));
+  contar($('[data-kpi="vendidos"]'), VENDAS.slice(-4).reduce((s, n) => s + n, 0));
+  $("[data-renda]").textContent = precoTxt(VENDAS.slice(-4).reduce((s, n) => s + n, 0) * POR_POTE);
+}
+
+/* ---- gráfico ---- */
+function grafico() {
+  const W = 600, H = 220, base = 190, topo = 20, max = 20, n = VENDAS.length, gap = 10, bw = (W - 40 - gap * (n - 1)) / n;
+  const y = v => base - (v / max) * (base - topo);
+  const grade = [0, 5, 10, 15, 20].map(v => `<line class="grade" x1="34" x2="${W}" y1="${y(v)}" y2="${y(v)}"/><text class="eixo" x="26" y="${y(v) + 4}" text-anchor="end">${v}</text>`).join("");
+  const barras = VENDAS.map((v, i) => {
+    const x = 40 + i * (bw + gap), h = base - y(v), r = Math.min(4, h);
+    // canto arredondado só em cima; a barra nasce da linha de base
+    const d = `M${x} ${base}V${y(v) + r}Q${x} ${y(v)} ${x + r} ${y(v)}H${x + bw - r}Q${x + bw} ${y(v)} ${x + bw} ${y(v) + r}V${base}Z`;
+    return `<g data-i="${i}"><path class="barra${i === n - 1 ? " ult" : ""}" d="${d}"/>
+      <rect class="alvo" x="${x - gap / 2}" y="${topo}" width="${bw + gap}" height="${base - topo + 24}"/>
+      <text class="eixo" x="${x + bw / 2}" y="${base + 18}" text-anchor="middle">S${i + 1}</text>
+      ${i === n - 1 ? `<text class="rot" x="${x + bw / 2}" y="${y(v) - 8}" text-anchor="middle">${v}</text>` : ""}</g>`;
+  }).join("");
+  const box = $("[data-grafico]");
+  box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Barras: potes vendidos por semana, de ${VENDAS[0]} a ${VENDAS[n - 1]}">${grade}${barras}</svg><div class="dica" hidden></div>`;
+  $("[data-tabela] tbody").innerHTML = VENDAS.map((v, i) => `<tr><td>Semana ${i + 1}</td><td>${v}</td></tr>`).join("");
+  const dica = $(".dica", box);
+  box.addEventListener("pointermove", e => {
+    const g = e.target.closest("g[data-i]");
+    if (!g) { dica.hidden = true; return; }
+    const i = +g.dataset.i, r = box.getBoundingClientRect(), b = $(".barra", g).getBoundingClientRect();
+    dica.hidden = false; dica.innerHTML = `Semana ${i + 1}: <b>${VENDAS[i]} potes</b>`;
+    dica.style.left = b.left - r.left + b.width / 2 + "px"; dica.style.top = b.top - r.top + "px";
+  });
+  box.addEventListener("pointerleave", () => { dica.hidden = true; });
+  if (anima && ST) G.from($$(".barra", box), { scaleY: 0, transformOrigin: "50% 100%", duration: 0.8, stagger: 0.06, ease: "power3.out",
+    scrollTrigger: { trigger: box, start: "top 90%", once: true } });
+}
+
+/* ---- minha marca ---- */
+function minhaMarca() {
+  pintarLogo($("[data-logo]"), { ...m, nome });
+  let arte = "rascunho"; try { arte = localStorage.getItem("stars-arte") || "rascunho"; } catch { /* sem armazenamento */ }
+  $("[data-arte]").classList.toggle("revisao", arte === "revisao" || arte === "prova");
+  $("[data-arte] span").textContent = { revisao: "Arte em revisão com o designer", prova: "Prova da arte pronta para você", aprovado: "Arte aprovada" }[arte] || "Arte em rascunho";
+  $("[data-marca-info]").textContent = `${MARCA.tema(m).nome} · logotipo ${MARCA.logo(m).nome} · ${MARCA.pomada(m).nome}`;
+}
+
+/* ---- estoque e equipe ---- */
+function estoque() {
+  $("[data-estoque]").innerHTML = POMADAS.map(p => {
+    const q = ESTOQUE[p.id] ?? 0, baixo = q < BAIXO;
+    const st = q === 0 ? "sem estoque" : baixo ? "estoque baixo" : "ok";
+    return `<div class="est">${potinhoAberto(p, MARCA.tema(m))}<b>${p.nome}</b>
+      <div class="nivel" aria-hidden="true"><i style="width:${(q / CAPACIDADE) * 100}%"></i></div>
+      <span class="q"><span class="${baixo ? "baixo" : ""}">${baixo ? "⚠ " : ""}${q} potes · ${st}</span></span>
+      ${baixo ? `<button class="btn btn-ghost" type="button" data-repor="lote-${p.id}" aria-label="Repor ${p.nome}">Repor</button>` : ""}</div>`;
+  }).join("");
+  if (anima && ST) G.from($$(".nivel i"), { scaleX: 0, transformOrigin: "0 50%", duration: 0.9, stagger: 0.05, ease: "power3.out", scrollTrigger: { trigger: "[data-estoque]", start: "top 90%", once: true } });
+  const total = EQUIPE.reduce((s, [, x]) => s + x, 0);
+  $("[data-equipe]").innerHTML = EQUIPE.map(([n, v]) => `<li><span class="av" aria-hidden="true">${n.slice(-1)}</span><span><b>${n}</b><small>${v} potes vendidos · comissão <span class="ph">${precoTxt(v * COMISSAO_POTE)}</span></small></span><span class="muted" style="font-size:13px">${Math.round((v / total) * 100)}%</span></li>`).join("");
+}
+
+/* ---- pedidos ---- */
+function cursos() {
+  const itens = INSCRICOES.load().map(i => [i, CURSOS.find(c => c.id === i.curso)]).filter(([, c]) => c);
+  $("[data-cursos-lista]").innerHTML = itens.length ? `<ul style="list-style:none;margin:0;padding:0;display:grid;gap:10px">${itens.map(([i, c]) => {
+    const t = c.turmas.find(x => x[0] === i.turma) || c.turmas[0];
+    return `<li><strong>${escHTML(c.titulo)}</strong><br><small class="muted">${escHTML(TRILHAS.find(x => x.id === c.trilha).nome)} · turma com início em <span class="ph">${dataTxt(hojeISO(t[1]))}</span> (${escHTML(t[2])})</small></li>`;
+  }).join("")}</ul>` : `<p class="muted">Nenhuma inscrição ainda. <a href="mentoria.html">Ver os cursos</a></p>`;
+}
+function render() {
+  cursos();
+  $$("[data-perfil]").forEach(b => b.setAttribute("aria-selected", b.dataset.perfil === perfil));
+  $$("[data-so]").forEach(el => el.hidden = el.dataset.so !== perfil);
+  $("[data-titulo]").textContent = perfil === "barbearia" ? nome : "Olá, cliente";
+  const lista = todos().filter(p => p.perfil === perfil);
+  if (!lista.some(p => p.id === sel)) sel = lista[0]?.id;
+  $("[data-lista]").innerHTML = lista.map(p => `
+    <button type="button" data-id="${escHTML(p.id)}" aria-pressed="${p.id === sel}">
+      <small>Pedido #${escHTML(p.id)} · ${dataTxt(p.datas[0])}${p.novo ? '<span class="novo">NOVO</span>' : ""}</small>
+      <strong>${escHTML(p.titulo)}</strong>
+      <span class="st ${fim(p) ? "ok" : ""}">${etapasDe(p)[Math.min(p.atual, etapasDe(p).length - 1)]}</span>
+    </button>`).join("");
+  detalhe(lista.find(p => p.id === sel));
+}
+function detalhe(p) {
+  const box = $("[data-detalhe]");
+  if (!p) { box.innerHTML = `<p class="muted">Nenhum pedido ainda. <a href="shop.html">Ir à loja</a></p>`; return; }
+  const et = etapasDe(p), acao = ACOES[et[p.atual]], local = locais.some(x => x.id === p.id);
+  box.innerHTML = `
+    <div class="t"><h2>Pedido #${escHTML(p.id)}</h2><span class="muted">${escHTML(p.titulo)}</span></div>
+    <ol class="tl">${et.map((n, i) => {
+      const cls = i < p.atual || fim(p) ? "feito" : i === p.atual ? "agora" : "futuro";
+      const quando = p.datas[i] ? dataTxt(p.datas[i]) : cls === "futuro" ? `previsão ${previsao(p, i)}` : "";
+      return `<li class="${cls}"${cls === "agora" ? ' aria-current="step"' : ""}><span class="dot" aria-hidden="true">${cls === "feito" ? "✓" : i + 1}</span><span class="nome">${n}</span><span class="quando">${quando}</span></li>`;
+    }).join("")}</ol>
+    ${acao ? `<p class="acao">${acao}</p>` : ""}
+    ${local && !fim(p) ? `<button class="btn btn-ghost btn-sm" type="button" data-avancar="${escHTML(p.id)}" style="margin-top:12px">Avançar etapa (demonstração)</button>` : ""}`;
+  if (anima) G.from($$(".tl li", box), { opacity: 0, x: -12, duration: 0.45, stagger: 0.07, ease: "power3.out" });
+}
+
+document.addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.perfil) { perfil = b.dataset.perfil; render(); ST?.refresh(); }
+  if (b.dataset.id) { sel = b.dataset.id; render(); }
+  if (b.dataset.avancar) {
+    // demonstração: a etapa concluída ganha a data de hoje
+    locais = locais.map(p => p.id !== b.dataset.avancar ? p
+      : { ...p, atual: p.atual + 1, novo: false, datas: p.datas.map((d, i) => i === p.atual + 1 ? hojeISO() : d) });
+    try { localStorage.setItem(PEDIDOS_KEY, JSON.stringify(locais)); } catch { /* sem armazenamento */ }
+    render(); kpis();
+  }
+  if (b.dataset.repor) {
+    const c = carrinhoLer(), next = { ...c, [b.dataset.repor]: (c[b.dataset.repor] || 0) + 1 };
+    try { localStorage.setItem(CART_KEY, JSON.stringify(next)); } catch { /* sem armazenamento */ }
+    $("[data-count]").textContent = contarCarrinho(next);
+    avisar("Lote de reposição no carrinho. Finalize na loja.");
+  }
+});
+
+render(); kpis(); grafico(); minhaMarca(); estoque(); revelar();
+document.fonts.load('700 100px "Playfair Display"').then(minhaMarca);
+</script>
+</body>
+</html>

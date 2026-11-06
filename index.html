@@ -1,0 +1,1710 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Rascunho: não indexar até a busca no INPI e a aprovação do Rafael -->
+<meta name="robots" content="noindex, nofollow">
+<title>Portal — rascunho</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+/* PROVISÓRIO: cores e fontes até o brandbook. Troque só aqui. */
+:root{
+  --bg:#0E0D0B; --bg-2:#17150F; --surface:#1B1710; --line:#3A352C;
+  --text:#F1ECE2; --muted:#A39C90; --accent:#D9A441; --accent-2:#F0C46A;
+  --wa:#25D366; --warn:#E8B04B;
+  --gutter:16px; --maxw:1180px;
+  --f-body:"Barlow",system-ui,sans-serif; --f-disp:"Barlow Condensed","Barlow",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);overflow-x:clip}
+body{font:400 17px/1.55 var(--f-body);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+h1,h2,h3{font-family:var(--f-disp);font-weight:700;line-height:.95;margin:0;letter-spacing:-.01em;text-transform:uppercase}
+h1{font-size:clamp(46px,6.6vw,104px)}
+h2{font-size:clamp(40px,5.6vw,84px)}
+h3{font-size:clamp(24px,2.4vw,32px);line-height:1}
+p{margin:0}
+.muted{color:var(--muted)}
+.eyebrow{font:600 13px/1 var(--f-body);letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--gutter)}
+.btn{display:inline-flex;align-items:center;gap:10px;min-height:52px;padding:0 24px;border-radius:999px;border:1px solid var(--accent);
+  font:600 16px/1 var(--f-body);text-decoration:none;cursor:pointer;background:transparent;color:var(--text);transition:background .2s,color .2s}
+.btn:hover{background:var(--accent);color:var(--bg)}
+.btn-solid{background:var(--accent);color:var(--bg)}
+.btn-solid:hover{background:var(--accent-2)}
+.btn-wa{background:var(--wa);border-color:var(--wa);color:#08130c}
+.btn-wa:hover{background:#4be07f}
+.btn[aria-disabled="true"]{opacity:.55;cursor:not-allowed}
+:focus-visible{outline:2px solid var(--accent-2);outline-offset:3px}
+.tag{display:inline-block;padding:4px 10px;border-radius:999px;border:1px solid var(--warn);color:var(--warn);font:600 12px/1.2 var(--f-body);letter-spacing:.08em;text-transform:uppercase}
+.ph{color:inherit;font-weight:600;text-decoration:underline dotted var(--warn);text-underline-offset:3px}
+
+/* faixa de rascunho */
+.draft{position:relative;z-index:5;background:#3b2a0a;color:#ffd98a;font:500 13px/1.4 var(--f-body);text-align:center;padding:8px var(--gutter)}
+
+/* topo */
+.top{position:sticky;top:0;z-index:4;backdrop-filter:blur(10px);background:color-mix(in srgb,var(--bg) 70%,transparent);border-bottom:1px solid color-mix(in srgb,var(--line) 60%,transparent)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;height:64px;gap:12px}
+.logo{font:700 26px/1 var(--f-disp);letter-spacing:.06em;text-transform:uppercase;text-decoration:none}
+.logo small{display:block;font:500 10px/1.2 var(--f-body);letter-spacing:.14em;color:var(--muted)}
+.top nav{display:flex;gap:22px;font-size:15px}
+.top nav a{text-decoration:none;color:var(--muted)}
+.top nav a:hover{color:var(--text)}
+.top .btn{min-height:42px;padding:0 18px;font-size:14px}
+@media (max-width:820px){.top nav{display:none}}
+@media (max-width:480px){.logo small{display:none}.top .btn{white-space:nowrap;padding:0 14px}}
+
+/* atmosfera atrás do 3D: luz quente que segue o pote (--gx/--gy, vindos do JS), contraluz verde, vinheta e grão de filme */
+.atmos{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(20vmax 20vmax at var(--gx,72%) var(--gy,48%),rgba(240,196,106,.20),transparent 70%),
+    radial-gradient(44vmax 44vmax at var(--gx,72%) var(--gy,48%),rgba(217,164,65,.26),rgba(217,164,65,.09) 45%,transparent 72%),
+    radial-gradient(60vmax 48vmax at 4% 106%,rgba(37,144,72,.20),transparent 62%),
+    radial-gradient(50vmax 35vmax at 96% -6%,rgba(240,196,106,.10),transparent 60%),
+    radial-gradient(130% 95% at 50% 42%,transparent 52%,rgba(0,0,0,.6) 100%)}
+.atmos::after{content:"";position:absolute;inset:0;opacity:.07;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* palavra gigante vazada da seção atual: fica atrás do pote e do texto; o JS troca a palavra */
+/* do lado do pote (a coluna de texto fica à esquerda), para o pote passar na frente das letras */
+.bigword{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;display:flex;align-items:center;justify-content:flex-end}
+.bigword span{display:block;padding-right:2vw;white-space:nowrap;font:700 clamp(140px,22vw,380px)/.8 var(--f-disp);text-transform:uppercase;letter-spacing:-.02em;
+  color:transparent;-webkit-text-stroke:1.5px rgba(217,164,65,.24)}
+.sim-open .bigword{opacity:0}
+@media (prefers-reduced-motion:no-preference){.bigword{transition:opacity .5s}}
+@media (max-aspect-ratio:4/5){.bigword{align-items:flex-start;justify-content:center;padding-top:16svh}.bigword span{padding:0;font-size:36vw;-webkit-text-stroke-width:1px}}
+
+/* palco 3D fixo atrás do conteúdo */
+#stage{position:fixed;inset:0;z-index:0;pointer-events:none}
+/* na chamada final o pote encaixa no resumo de vidro: a camada dele sobe para ficar na frente do vidro */
+.pote-frente #stage{z-index:3}
+#stage canvas{display:block;width:100%;height:100%}
+#stage .fallback{display:none;position:absolute;right:6%;top:50%;width:min(44vw,520px);transform:translateY(-50%)}
+.no-webgl #stage .fallback{display:block}
+main{position:relative;z-index:1}
+
+section{position:relative;min-height:100svh;display:flex;align-items:center;padding:96px 0}
+section>.wrap,.pin>.wrap{width:100%}
+/* contraste: o texto se destaca mesmo quando o pote passa atrás */
+main h1,main h2,main h3,main p,main li{text-shadow:0 1px 2px rgba(0,0,0,.7),0 0 28px rgba(14,13,11,.95)}
+.page *,.btn,.tag{text-shadow:none}
+.col{max-width:540px}
+.right .col{margin-left:auto}
+
+/* 1. promessa */
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero .lead{font-size:clamp(18px,1.6vw,21px);margin:22px 0 28px;max-width:30em}
+.namefield{display:flex;flex-direction:column;gap:8px;margin-bottom:22px;max-width:420px}
+.namefield label{font-size:14px;color:var(--muted)}
+.namefield input{height:54px;border-radius:14px;border:1px solid var(--line);background:var(--bg-2);color:var(--text);padding:0 16px;font:600 18px var(--f-body)}
+.namefield input:focus{border-color:var(--accent);outline:none}
+.ctas{display:flex;flex-wrap:wrap;gap:12px}
+.scrollhint{position:absolute;left:50%;bottom:24px;transform:translateX(-50%);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+
+/* 2. como funciona (fixa na tela enquanto os passos avançam) */
+.steps{display:block;padding:0;min-height:0}
+.js .steps{height:300vh}
+.steps .pin{min-height:100svh;display:flex;align-items:center;padding:96px 0}
+.js .steps .pin{position:sticky;top:0}
+.steps ol{list-style:none;margin:32px 0 0;padding:0;display:grid;gap:14px}
+.steps li{display:grid;grid-template-columns:56px 1fr;gap:16px;padding:18px;border:1px solid var(--line);border-radius:18px;background:color-mix(in srgb,var(--surface) 95%,transparent);transition:opacity .5s,transform .5s,border-color .5s}
+.js .steps li{opacity:.28;transform:translateX(-18px)}
+.js .steps li.on{opacity:1;transform:none;border-color:color-mix(in srgb,var(--accent) 55%,var(--line))}
+.steps .n{font:700 44px/1 var(--f-disp);color:var(--accent)}
+.steps li p{color:var(--muted);margin-top:6px}
+.bar{height:3px;background:var(--line);border-radius:3px;margin-top:22px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--accent)}
+.foot{font-size:13px;color:var(--muted);margin-top:14px}
+/* linha do tempo dos dias: a barra se desenha com a rolagem e cada etapa acende quando a barra passa */
+.tl-marks{position:relative;height:50px;margin-top:-7px}
+.tl-marks span{position:absolute;left:calc(var(--at) * 1%);transform:translateX(-50%);padding-top:18px;font-size:12px;line-height:1.25;color:var(--muted);white-space:nowrap;text-align:center;transition:color .4s}
+.tl-marks span:first-child{transform:none;text-align:left}
+.tl-marks span:last-child{transform:translateX(-100%);text-align:right}
+.tl-marks span::before{content:"";position:absolute;top:0;left:50%;width:11px;height:11px;margin-left:-5px;border-radius:50%;border:2px solid var(--line);background:var(--bg);transition:background .4s,border-color .4s,transform .4s}
+.tl-marks span:first-child::before{left:5px}
+.tl-marks span:last-child::before{left:auto;right:0;margin:0 -0px 0 0}
+.tl-marks span em{display:block;min-height:1.25em;font-style:normal;font-weight:600;color:var(--muted)}
+.tl-marks span.on{color:var(--text)}
+.tl-marks span.on em{color:var(--accent-2)}
+.tl-marks span.on::before{background:var(--accent);border-color:var(--accent);transform:scale(1.25)}
+.tl-day{margin-top:2px;font-size:14px;color:var(--muted)}
+.tl-day b{color:var(--accent-2);font:700 22px var(--f-disp)}
+
+/* 3. simulador */
+/* leque de acabamentos: tampas empilhadas que se abrem quando a seção aparece */
+.swatches{--cw:120px;--sp:96px;position:relative;width:min(100%,380px);height:220px;margin:26px 0 8px}
+@media (max-width:480px){.swatches{--cw:92px;--sp:76px;height:180px}}
+.swatches button{position:absolute;left:calc(50% - var(--cw) / 2);top:14px;width:var(--cw);display:flex;flex-direction:column;align-items:center;gap:8px;padding:0;border:0;background:none;color:var(--muted);font:500 14px var(--f-body);cursor:pointer;transform-origin:50% 150%;
+  transform:rotate(0) translateY(0);transition:transform .9s cubic-bezier(.2,.8,.2,1) calc((var(--i) + 1) * 90ms),color .3s}
+.swatches button canvas{width:var(--cw);height:var(--cw);border-radius:50%;border:2px solid var(--line);box-shadow:0 10px 24px rgba(0,0,0,.5);transition:border-color .3s}
+.swatches.in button{transform:translateX(calc(var(--i) * var(--sp))) rotate(calc(var(--i) * 11deg))}
+.swatches button[aria-pressed="true"]{color:var(--text);z-index:2}
+.swatches.in button[aria-pressed="true"]{transform:translateX(calc(var(--i) * var(--sp))) rotate(calc(var(--i) * 11deg)) translateY(-14px) scale(1.1);transition-delay:0s}
+.swatches button[aria-pressed="true"] canvas{border-color:var(--accent)}
+@media (prefers-reduced-motion:reduce){.swatches button{transform:translateX(calc(var(--i) * var(--sp))) rotate(calc(var(--i) * 11deg));transition:none}}
+
+/* 3b. logotipo base */
+.field{display:flex;flex-direction:column;gap:8px;margin:24px 0 18px;max-width:420px}
+.field label{font-size:14px;color:var(--muted)}
+.field input{height:50px;border-radius:14px;border:1px solid var(--line);background:var(--bg-2);color:var(--text);padding:0 16px;font:600 17px var(--f-body)}
+.field input:focus{border-color:var(--accent);outline:none}
+.logos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.logos button{padding:8px 8px 10px;border-radius:16px;border:1px solid var(--line);background:var(--bg-2);color:var(--text);font:500 14px var(--f-body);cursor:pointer;display:flex;flex-direction:column;gap:8px;align-items:center}
+.logos button[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.logos canvas{width:100%;aspect-ratio:1;border-radius:10px;display:block}
+.aviso{margin-top:18px;padding:14px 16px;border:1px solid color-mix(in srgb,var(--accent) 50%,var(--line));border-radius:14px;font-size:14px;color:var(--muted)}
+.aviso strong{color:var(--text)}
+
+/* 3c. brandbook + INPI */
+.bb{display:block}
+.bb .intro{max-width:640px}
+.pages{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:36px;perspective:1200px}
+.page{aspect-ratio:3/4;background:#F1ECE2;color:#17150F;border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:10px;box-shadow:0 30px 60px -24px rgba(0,0,0,.8);overflow:hidden;
+  transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1);transition-delay:calc(var(--i)*130ms)}
+.js .pages .page{opacity:0;transform:translateY(70px) rotateX(22deg)}
+.js .pages.in .page{opacity:1;transform:none}
+.page h4{margin:0;font:600 11px/1 var(--f-body);letter-spacing:.16em;text-transform:uppercase;color:#6F695F}
+.page .pf{margin-top:auto;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#A39C90;display:flex;justify-content:space-between}
+.page canvas{width:100%;display:block;border-radius:4px}
+.page canvas[data-bb="logo"]{width:74%;margin:0 auto}
+.page canvas[data-bb="neg"]{width:74%;margin:0 auto;aspect-ratio:2/1}
+.cores{display:grid;gap:6px;flex:1}
+.cores div{border-radius:4px;display:flex;align-items:flex-end;padding:6px 8px;font:600 11px var(--f-body);letter-spacing:.06em}
+.tipo .aa{font-size:clamp(54px,6vw,84px);line-height:1}
+.tipo p{font-size:12px;line-height:1.4;word-break:break-all}
+.apps{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:center}
+.apps canvas{border-radius:50%}
+.apps span{font-size:10px;color:#6F695F;text-align:center;display:block;margin-top:4px}
+.recebe{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:36px;padding:0;list-style:none}
+.recebe li{display:flex;gap:12px;align-items:flex-start;padding:16px 18px;border:1px solid var(--line);border-radius:16px;background:color-mix(in srgb,var(--surface) 86%,transparent)}
+.recebe li::before{content:"✓";flex:none;width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--bg);display:grid;place-items:center;font-weight:700;font-size:14px}
+.recebe small{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+.inpi-nota{margin-top:16px;font-size:13px;color:var(--muted);max-width:760px}
+
+/* 4. números */
+.nums .head{display:flex;flex-wrap:wrap;align-items:center;gap:14px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:28px 0 18px}
+.card{padding:20px;border:1px solid var(--line);border-radius:18px;background:color-mix(in srgb,var(--surface) 95%,transparent)}
+.card b{display:block;font:700 clamp(32px,3.6vw,48px)/1 var(--f-disp);color:var(--accent-2)}
+.card>span{display:block;font-size:14px;color:var(--muted);margin-top:8px}
+.calc{margin:0 0 18px;padding:20px;border:1px solid color-mix(in srgb,var(--accent) 45%,var(--line));border-radius:18px;background:color-mix(in srgb,var(--surface) 95%,transparent)}
+.calc label{display:block;font-size:16px}
+.calc label b{color:var(--accent-2);font:700 26px var(--f-disp)}
+.calc input[type=range]{width:100%;height:44px;margin:6px 0 4px;accent-color:var(--accent);cursor:pointer}
+.calc-out{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.calc-out b{display:block;font:700 clamp(28px,3.2vw,40px)/1 var(--f-disp);color:var(--accent-2);font-variant-numeric:tabular-nums}
+.calc-out span{display:block;font-size:13px;color:var(--muted);margin-top:6px}
+.card b,.calc-out b{overflow-wrap:anywhere}
+/* 3a. estilos de pomada */
+.estilos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:24px}
+.estilo{display:grid;grid-template-columns:64px minmax(0,1fr);gap:2px 12px;align-items:center;text-align:left;padding:12px 14px;border-radius:16px;border:1px solid var(--line);color:var(--text);cursor:pointer;font:inherit;transition:border-color .25s}
+.estilo svg{grid-row:span 2;width:64px;display:block}
+.estilo b{font:700 18px/1 var(--f-disp);text-transform:uppercase;letter-spacing:.01em}
+.medidor{display:flex;flex-wrap:wrap;gap:2px 10px;font-size:11px;color:var(--muted);letter-spacing:.04em}
+.medidor span{white-space:nowrap}
+.medidor i{display:inline-block;width:6px;height:6px;border-radius:50%;margin-left:2px;background:var(--line);vertical-align:middle}
+.medidor i.on{background:var(--accent)}
+.estilo:hover{border-color:color-mix(in srgb,var(--accent) 55%,var(--line))}
+.estilo-desc{margin-top:14px;min-height:3em;color:var(--text)}
+.estilo-desc b{color:var(--accent-2)}
+@media (max-width:480px){.estilo{grid-template-columns:40px minmax(0,1fr);padding:10px}.estilo svg{width:40px}.estilo b{font-size:15px}}
+.calc-bar{height:6px;border-radius:6px;background:var(--line);margin-top:16px;overflow:hidden}
+.calc-bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .35s cubic-bezier(.2,.8,.2,1)}
+@media (prefers-reduced-motion:reduce){.calc-bar i{transition:none}}
+.premissas{font-size:14px;color:var(--muted);border-left:2px solid var(--warn);padding-left:14px}
+.premissas ul{margin:6px 0 0;padding-left:18px}
+
+/* portal: mapa de áreas, Suíte, prova social e perguntas */
+.wide{display:block}
+.areas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:36px}
+.area{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:22px;border:1px solid var(--line);border-radius:18px;background:color-mix(in srgb,var(--surface) 95%,transparent);text-decoration:none;transition:border-color .3s,transform .3s}
+.area:hover{border-color:var(--accent);transform:translateY(-4px)}
+.area.feat,.area.l2{grid-column:span 2}
+.area.feat{border-color:color-mix(in srgb,var(--accent) 55%,var(--line))}
+.area p{color:var(--muted);flex:1}
+.area .go{color:var(--accent-2);font-weight:600}
+.tag-ok{display:inline-block;padding:4px 10px;border-radius:999px;border:1px solid var(--accent);color:var(--accent);font:600 12px/1.2 var(--f-body);letter-spacing:.08em;text-transform:uppercase}
+.recebe.one{grid-template-columns:1fr;margin-top:24px}
+#suite .head,#marketing .head{display:flex;flex-wrap:wrap;align-items:center;gap:14px}
+.prova{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:32px}
+.prova figure{margin:0;padding:14px;border:1px solid var(--line);border-radius:18px;background:color-mix(in srgb,var(--surface) 95%,transparent)}
+.prova .foto img{width:100%;height:100%;object-fit:cover;display:block;border-radius:inherit}
+.prova .foto:has(img){padding:0;border-style:solid;overflow:hidden}
+.prova .foto{aspect-ratio:4/3;border-radius:12px;background:var(--bg-2);border:1px dashed var(--line);display:grid;place-items:center;color:var(--warn);font:600 12px var(--f-body);letter-spacing:.1em;text-align:center;padding:8px}
+.prova blockquote{margin:14px 0 8px}
+.prova figcaption{font-size:13px;color:var(--muted)}
+.faq{margin-top:24px;max-width:820px}
+.faq details{border-bottom:1px solid var(--line);padding:16px 0}
+.faq summary{cursor:pointer;font:600 19px/1.3 var(--f-body);list-style:none;display:flex;justify-content:space-between;gap:16px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";color:var(--accent);font-size:24px;line-height:1}
+.faq details[open] summary::after{content:"–"}
+.faq details p{color:var(--muted);margin-top:10px}
+@media (max-width:820px){.areas,.prova{grid-template-columns:1fr}.area.feat,.area.l2{grid-column:auto}}
+@media (prefers-reduced-motion:reduce){.area{transition:none}.area:hover{transform:none}}
+
+/* 5. chamada */
+.cta{justify-content:center;text-align:center;align-items:flex-end}
+.cta .col{margin:0 auto;max-width:640px}
+.cta p{margin:18px auto 28px;color:var(--muted);max-width:34em}
+.cta .note{font-size:13px;margin-top:14px}
+/* resumo do pedido: as linhas entram uma a uma e o botão pulsa depois */
+.resumo{list-style:none;margin:0 auto 26px;padding:6px 18px;max-width:420px;text-align:left;border:1px solid color-mix(in srgb,var(--accent) 45%,var(--line));border-radius:18px}
+.resumo li.slot{justify-content:center;padding:14px 0}
+.resumo .slot div{width:130px;height:96px}
+.resumo li{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid var(--line);opacity:0;transform:translateX(-14px);transition:opacity .6s,transform .6s cubic-bezier(.2,.8,.2,1);transition-delay:calc(var(--k) * 160ms + 300ms)}
+.resumo li:last-child{border-bottom:0}
+.resumo li span{color:var(--muted);font-size:14px}
+.resumo li b{font-weight:600;text-align:right;overflow-wrap:anywhere}
+.resumo.in li{opacity:1;transform:none}
+@keyframes wa-pulse{0%{box-shadow:0 0 0 0 rgba(37,211,102,.55)}70%,100%{box-shadow:0 0 0 18px rgba(37,211,102,0)}}
+.resumo.in + div .btn-wa{animation:wa-pulse 2.2s 1.4s infinite}
+
+footer{position:relative;z-index:1;border-top:1px solid var(--line);padding:28px 0;font-size:13px;color:var(--muted);background:var(--bg)}
+
+/* aparecer na rolagem (o GSAP anima; sem GSAP ou com movimento reduzido, a classe .in mostra direto) */
+.js [data-reveal]{opacity:0;transform:translateY(28px)}
+.js [data-reveal].in{opacity:1;transform:none}
+
+/* ===== Simulação de pedido (demonstração, sem servidor) ===== */
+html{scrollbar-gutter:stable}
+.sim-open{overflow:hidden}
+.sim-open main,.sim-open .top,.sim-open footer,.sim-open .draft{opacity:0;pointer-events:none}
+@media (prefers-reduced-motion:no-preference){main,.top,footer,.draft{transition:opacity .5s}}
+.sim-open #stage{position:fixed;height:100%}
+#sim{position:fixed;inset:0 0 0 auto;margin:0;width:min(460px,100%);height:100%;max-width:none;max-height:none;padding:0;border:0;border-left:1px solid var(--line);
+  background:linear-gradient(180deg,var(--bg-2),var(--bg));color:var(--text);flex-direction:column;box-shadow:-40px 0 80px -30px rgba(0,0,0,.8)}
+#sim[open]{display:flex}
+#sim::backdrop{background:transparent}
+@media (max-width:720px),(max-aspect-ratio:4/5){
+  #sim{inset:auto 0 0 0;width:100%;height:min(64svh,640px);border-left:0;border-top:1px solid var(--line);border-radius:22px 22px 0 0;box-shadow:0 -30px 60px -20px rgba(0,0,0,.8)}
+}
+.sim-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:14px 16px 12px 20px}
+.sim-head strong{display:block;font:700 22px/1 var(--f-disp);letter-spacing:.04em;text-transform:uppercase}
+.demo{display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:4px 10px;border-radius:999px;background:#3b2a0a;color:#ffd98a;font:600 11px/1.2 var(--f-body);letter-spacing:.06em;text-transform:uppercase}
+.demo::before{content:"";width:6px;height:6px;border-radius:50%;background:#ffd98a}
+.sim-x{flex:none;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:none;color:var(--text);font-size:22px;line-height:1;cursor:pointer}
+.sim-x:hover{border-color:var(--accent)}
+.sim-prog{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin:0;padding:0 20px;list-style:none}
+.sim-prog li{font:600 10px/1.2 var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sim-prog li::before{content:"";display:block;height:3px;border-radius:3px;margin-bottom:7px;background:var(--line);transition:background .4s}
+.sim-prog li.on{color:var(--text)}
+.sim-prog li.on::before{background:var(--accent)}
+.sim-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:22px 20px 18px}
+.sim-step h3{font-size:clamp(26px,3vw,34px)}
+.sim-step h3:focus{outline:none}
+.sim-step>p{color:var(--muted);margin-top:8px;font-size:15px}
+.sim-cores,.sim-estilos,.sim-pomadas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:20px}
+.sim-cores button,.sim-estilos button{display:flex;flex-direction:column;align-items:center;gap:10px;padding:14px 8px;border-radius:16px;border:1px solid var(--line);background:var(--bg-2);color:var(--text);font:500 14px/1.2 var(--f-body);cursor:pointer;text-align:center;transition:border-color .25s}
+.sim-cores button:hover,.sim-estilos button:hover{border-color:color-mix(in srgb,var(--accent) 60%,var(--line))}
+.sim-cores button[aria-pressed="true"],.sim-estilos button[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.sim-cores i{width:56px;height:56px;border-radius:50%;border:3px solid var(--ring);background:radial-gradient(circle at 50% 38%,var(--c1),var(--c2));box-shadow:0 8px 18px rgba(0,0,0,.5)}
+.sim-estilos b{font:700 26px/1 var(--f)}
+.sim-pomadas button{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 6px;border-radius:16px;border:1px solid var(--line);color:var(--text);font:500 13px/1.15 var(--f-body);cursor:pointer;text-align:center}
+.sim-pomadas svg{width:70px}
+#sim .field{margin:20px 0 0;max-width:none}
+.sim-nota{margin-top:16px;font-size:13px;color:var(--muted)}
+.sim-resumo{list-style:none;margin:18px 0 0;padding:4px 16px;border:1px solid color-mix(in srgb,var(--accent) 45%,var(--line));border-radius:16px}
+.sim-resumo li{display:flex;justify-content:space-between;gap:16px;padding:11px 0;border-bottom:1px solid var(--line);font-size:15px}
+.sim-resumo li:last-child{border-bottom:0}
+.sim-resumo span{color:var(--muted)}
+.sim-resumo b{font-weight:600;text-align:right;overflow-wrap:anywhere}
+/* WhatsApp de mentira, só para a demonstração */
+.wa-phone{margin-top:18px;border-radius:20px;overflow:hidden;border:1px solid var(--line);background:#0b141a}
+.wa-top{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#1f2c34}
+.wa-top i{width:34px;height:34px;border-radius:50%;background:var(--accent);color:var(--bg);display:grid;place-items:center;font:700 16px var(--f-disp);font-style:normal}
+.wa-top b{display:block;font-size:14px}
+.wa-top small{font-size:12px;color:#8696a0}
+.wa-msgs{display:flex;flex-direction:column;gap:8px;min-height:250px;padding:14px 12px;background:radial-gradient(circle at 20% 10%,#14212a,#0b141a 70%)}
+.wa-msg{max-width:84%;padding:8px 10px 6px;border-radius:10px;font-size:14px;line-height:1.4;color:#e9edef}
+.wa-msg small{display:block;text-align:right;font-size:10px;color:#8696a0;margin-top:2px}
+.wa-msg.eu{align-self:flex-end;background:#005c4b;border-top-right-radius:2px}
+.wa-msg.ela{align-self:flex-start;background:#1f2c34;border-top-left-radius:2px}
+.wa-typing{align-self:flex-start;display:flex;gap:4px;padding:12px;border-radius:10px;background:#1f2c34}
+.wa-typing span{width:6px;height:6px;border-radius:50%;background:#8696a0}
+/* linha do tempo de 30 dias */
+.tl30-dia{display:flex;align-items:baseline;gap:8px;margin-top:14px;color:var(--muted)}
+.tl30-dia b{font:700 64px/1 var(--f-disp);color:var(--accent-2);font-variant-numeric:tabular-nums}
+.tl30{position:relative;list-style:none;margin:10px 0 0;padding:0 0 0 30px}
+.tl30::before,.tl30::after{content:"";position:absolute;left:8px;top:14px;bottom:14px;width:3px;border-radius:3px;background:var(--line)}
+.tl30::after{background:var(--accent);bottom:auto;height:var(--h,0)}
+.tl30 li{position:relative;padding:7px 0;color:var(--muted);transition:color .3s}
+.tl30 li::before{content:"";position:absolute;left:-28px;top:12px;width:13px;height:13px;border-radius:50%;border:2px solid var(--line);background:var(--bg);transition:background .3s,border-color .3s,transform .3s}
+.tl30 li em{display:block;font:600 12px/1.2 var(--f-body);font-style:normal;letter-spacing:.06em;text-transform:uppercase}
+.tl30 li.on{color:var(--text)}
+.tl30 li.on em{color:var(--accent-2)}
+.tl30 li.on::before{background:var(--accent);border-color:var(--accent);transform:scale(1.15)}
+.sim-foot{display:flex;gap:10px;justify-content:space-between;padding:12px 20px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
+.sim-foot .btn{min-height:48px}
+.sim-foot [hidden]{display:none}
+.sim-foot .btn-solid{margin-left:auto}
+@media (prefers-reduced-motion:reduce){.tl30 li,.tl30 li::before,.sim-prog li::before{transition:none}}
+
+/* tela em pé (celular): pote em cima, texto embaixo num cartão legível. Mesma regra no JS (STACK). */
+@media (max-aspect-ratio:4/5){
+  section{align-items:flex-end;padding:56svh 0 40px}
+  .hero{padding-top:30svh;align-items:flex-start}
+  .steps .pin{align-items:flex-end;padding:22svh 0 16px}
+  .cta{padding-top:44svh}
+  .col{max-width:none;padding:20px;border-radius:20px;background:color-mix(in srgb,var(--bg) 84%,transparent);backdrop-filter:blur(6px)}
+  .hero .col{background:none;backdrop-filter:none;padding:0}
+  .cta .col{background:none;backdrop-filter:none;padding:0} /* sem vidro: o pote assenta no cartão de resumo e precisa aparecer nítido */
+  .steps ol{margin-top:20px}
+  .steps li{grid-template-columns:40px 1fr;padding:14px}
+  .steps .n{font-size:34px}
+  /* tudo cabe numa tela: só o passo atual mostra o texto, e a linha do tempo fica à vista junto */
+  .steps h2{font-size:34px}
+  .steps ol{margin-top:14px;gap:8px}
+  .steps li{padding:10px 14px}
+  .steps li p{display:none}
+  .steps li.now p{display:block}
+  .steps .foot{display:none}
+  .grid{grid-template-columns:1fr 1fr}
+  .card{padding:14px}
+  .scrollhint{display:none}
+  .bb,.wide{padding-top:72px}
+  .pages{grid-template-columns:1fr 1fr;gap:12px}
+  .page{padding:12px}
+  .recebe{grid-template-columns:1fr}
+  #stage .fallback{right:auto;left:50%;top:22svh;width:70vw;transform:translate(-50%,-50%)}
+}
+
+/* menos movimento: nada fixo, nada animado */
+@media (prefers-reduced-motion:reduce){
+  .resumo li{opacity:1;transform:none;transition:none}
+  .resumo.in + div .btn-wa{animation:none}
+  .js .steps{height:auto}
+  .js .steps .pin{position:relative}
+  .js .steps li,.js [data-reveal],.js .pages .page{opacity:1;transform:none;transition:none}
+  #stage{position:absolute;height:100svh}
+  html{scroll-behavior:auto}
+}
+
+/* ===== Vidro (estilo iOS): translúcido, desfoca a luz e as letras de trás, borda clara em cima ===== */
+:root{
+  --glass:linear-gradient(140deg,rgba(255,255,255,.10),rgba(255,255,255,.025) 42%,rgba(255,255,255,.06)),rgba(28,24,17,.38);
+  --glass-line:rgba(255,255,255,.13);
+  --glass-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 1px 0 0 rgba(255,255,255,.06),inset 0 -1px 0 rgba(255,255,255,.03),0 20px 44px -20px rgba(0,0,0,.75);
+  --glass-blur:blur(20px) saturate(170%);
+}
+.area,.card,.calc,.steps li,.recebe li,.prova figure,.logos button,.aviso,.resumo,.sim-cores button,.sim-estilos button,.sim-pomadas button,.sim-resumo,.estilo,
+.namefield input,.field input,.wa-phone{
+  background:var(--glass);border-color:var(--glass-line);box-shadow:var(--glass-shadow);
+  -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur)}
+/* destaque dourado continua nos que já eram destaque */
+.area.feat,.calc,.resumo,.sim-resumo,.aviso{border-color:rgba(217,164,65,.42)}
+.steps li.on,.area:hover{border-color:color-mix(in srgb,var(--accent) 60%,var(--glass-line))}
+.sim-cores button[aria-pressed="true"],.sim-estilos button[aria-pressed="true"],.logos button[aria-pressed="true"],.estilo[aria-pressed="true"],.sim-pomadas button[aria-pressed="true"]{border-color:var(--accent);
+  box-shadow:var(--glass-shadow),0 0 0 1px var(--accent),0 0 24px -6px rgba(217,164,65,.5)}
+.namefield input:focus,.field input:focus{border-color:var(--accent)}
+.prova .foto{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.14)}
+/* painel da simulação: uma folha de vidro grande */
+#sim{background:linear-gradient(160deg,rgba(255,255,255,.08),rgba(255,255,255,.02) 40%),rgba(20,18,13,.55);
+  -webkit-backdrop-filter:blur(30px) saturate(170%);backdrop-filter:blur(30px) saturate(170%);
+  border-color:var(--glass-line);box-shadow:inset 1px 0 0 rgba(255,255,255,.12),-40px 0 80px -30px rgba(0,0,0,.8)}
+.sim-head,.sim-foot{border-color:rgba(255,255,255,.08)}
+@media (max-width:720px),(max-aspect-ratio:4/5){#sim{box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 -30px 60px -20px rgba(0,0,0,.8)}}
+@media (max-aspect-ratio:4/5){
+  .col{background:var(--glass);border:1px solid var(--glass-line);box-shadow:var(--glass-shadow);-webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur)}
+  .hero .col,.cta .col{background:none;border:0;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+}
+/* navegador sem desfoque: vidro mais fechado para o texto continuar legível */
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  :root{--glass:linear-gradient(140deg,rgba(255,255,255,.08),rgba(255,255,255,.02)),rgba(28,24,17,.9)}
+  #sim{background:rgba(20,18,13,.96)}
+}
+</style>
+</head>
+<body>
+<div class="draft" role="note"><strong>Demonstração: dados ilustrativos.</strong> Protótipo para apresentação · valores sublinhados são exemplos</div>
+
+<header class="top">
+  <div class="wrap">
+    <a class="logo" href="#topo"><span data-brand></span><small>private label para barbearias</small></a>
+    <nav aria-label="Seções e páginas">
+      <a href="#estilos">Estilos</a>
+      <a href="#renda-extra">Renda extra</a>
+      <a href="shop.html">Loja</a>
+      <a href="marca.html">Estúdio de marca</a>
+      <a href="marketing.html">Marketing</a>
+      <a href="mentoria.html">Mentoria</a>
+      <a href="painel.html">Painel</a>
+    </nav>
+    <button class="btn" type="button" data-abrir-sim>Simular pedido</button>
+  </div>
+</header>
+
+<div class="atmos" aria-hidden="true"></div>
+<div class="bigword" aria-hidden="true"><span></span></div>
+<div id="stage" aria-hidden="true">
+  <img class="fallback" src="img/jar_classic.webp" alt="">
+</div>
+
+<main>
+  <!-- 1. Promessa principal -->
+  <section class="hero" id="topo" data-state="0">
+    <div class="wrap">
+      <div class="col">
+        <p class="eyebrow" data-reveal>Barbearias e salões · São Paulo capital</p>
+        <h1 style="margin-top:16px">Marca própria, sistema e marketing para a sua <em>barbearia</em>.</h1>
+        <p class="lead" data-reveal>Monte o pote com o nome da sua casa, venda e ganhe renda extra, e acompanhe tudo na Suíte UP. Para barbearias e salões de São Paulo capital.</p>
+        <div class="namefield" data-reveal>
+          <label for="nome">Escreva o nome da sua barbearia e veja no pote</label>
+          <input id="nome" maxlength="28" autocomplete="organization" placeholder="Ex.: Barbearia do Zé">
+        </div>
+        <div class="ctas" data-reveal>
+          <button class="btn btn-solid" type="button" data-abrir-sim>Simular pedido</button>
+          <a class="btn" href="#areas">Ver tudo que entregamos</a>
+        </div>
+      </div>
+    </div>
+    <span class="scrollhint">Role para explorar</span>
+  </section>
+
+  <!-- 1b. Mapa de áreas: o portal que amarra tudo -->
+  <section class="wide" id="areas" data-state="1">
+    <div class="wrap">
+      <p class="eyebrow" data-reveal>Tudo num só lugar</p>
+      <h2 data-reveal style="margin-top:14px">O que entregamos para a sua barbearia</h2>
+      <p class="muted" data-reveal style="margin-top:18px;max-width:40em">Cada área terá a sua página. Você começa pelo pote e liga o resto quando fizer sentido.</p>
+      <div class="areas">
+        <a class="area feat" href="#como-funciona" data-reveal><span class="tag-ok">Disponível</span><h3>Private label</h3><p>Monte o pote com a sua marca no simulador 3D, feche pelo WhatsApp e receba o lote de <span data-lote></span> unidades em até <span data-prazo></span> dias*.</p><span class="go">Ver como funciona →</span></a>
+        <a class="area" href="#estilos" data-reveal><span class="tag-ok">Disponível</span><h3>Seis estilos</h3><p>Argila, pasta, gel, efeito molhado, fibra e cera black.</p><span class="go">Ver os estilos →</span></a>
+        <a class="area" href="marca.html" data-reveal><span class="tag-ok">Protótipo</span><h3>Estúdio de marca</h3><p>Logotipo, cores, rótulo e a linha inteira com o nome da casa.</p><span class="go">Abrir o estúdio →</span></a>
+        <a class="area" href="shop.html" data-reveal><span class="tag-ok">Protótipo</span><h3>Loja</h3><p>Marca própria e mais de 30 itens para a bancada, num carrinho só.</p><span class="go">Ir à loja →</span></a>
+        <a class="area" href="marketing.html" data-reveal><span class="tag-ok">Protótipo</span><h3>Marketing</h3><p>Posts prontos com a sua marca, materiais de balcão e mensagens.</p><span class="go">Ver o kit →</span></a>
+        <a class="area" href="painel.html" data-reveal><span class="tag-ok">Protótipo</span><h3>Painel do parceiro</h3><p>Pedidos dia a dia, estoque da linha e vendas da lojinha.</p><span class="go">Abrir painel →</span></a>
+        <a class="area l2" href="mentoria.html" data-reveal><span class="tag-ok">Protótipo</span><h3>Mentoria</h3><p>Cursos em quatro trilhas: gestão, marketing, branding e técnicas de corte e barba.</p><span class="go">Ver os cursos →</span></a>
+        <a class="area" href="#renda-extra" data-reveal><span class="tag">Hipótese</span><h3>Renda extra</h3><p>Quanto cada pote vendido pode deixar na barbearia.</p><span class="go">Fazer a conta →</span></a>
+        <a class="area l2" href="#suite" data-reveal><span class="tag">Em adaptação</span><h3>Suíte UP</h3><p>Sistemas e BI da UP Co. adaptados para barbearias.</p><span class="go">Saber mais →</span></a>
+      </div>
+      <p class="foot" style="margin-top:18px">* Lote mínimo e prazo dependem da confirmação da fábrica.</p>
+    </div>
+  </section>
+
+  <!-- 2. Private label: como funciona em 3 passos -->
+  <section class="steps" id="como-funciona" data-state="2">
+    <div class="pin">
+      <div class="wrap" style="width:100%">
+        <div class="col">
+          <p class="eyebrow">Private label · como funciona</p>
+          <h2 style="margin-top:14px">Da tela ao balcão em 3 passos</h2>
+          <ol>
+            <li><span class="n">1</span><div><h3>Monte no simulador 3D</h3><p>Escolha o pote e a tampa e suba a sua arte, ou comece por um logotipo base. Você vê o resultado antes de pagar.</p></div></li>
+            <li><span class="n">2</span><div><h3>Feche pelo WhatsApp</h3><p>A IA responde na hora e a equipe confirma arte, quantidade e entrega com você.</p></div></li>
+            <li><span class="n">3</span><div><h3>Receba o lote</h3><p><span data-lote></span> unidades com a sua marca em até <span data-prazo></span> dias*, prontas para vender.</p></div></li>
+          </ol>
+          <div class="tl" role="img" aria-label="Linha do tempo: pedido no dia 0, arte aprovada, produção e entrega em até 30 dias">
+            <div class="bar"><i></i></div>
+            <div class="tl-marks" aria-hidden="true">
+              <span style="--at:0" data-at="0"><em>Dia 0</em>Pedido</span>
+              <span style="--at:30" data-at="30"><em></em>Arte aprovada</span>
+              <span style="--at:60" data-at="60"><em></em>Produção</span>
+              <span style="--at:100" data-at="100"><em>Dia <b data-prazo></b>*</em>Entrega</span>
+            </div>
+            <p class="tl-day" aria-hidden="true">Dia <b data-day>0</b> de <span data-prazo></span></p>
+          </div>
+          <p class="foot">* Lote mínimo, etapas e prazo dependem da confirmação da fábrica.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Simulador 3D como porta de entrada -->
+  <section id="simulador" data-state="3">
+    <div class="wrap">
+      <div class="col">
+        <p class="eyebrow" data-reveal>Simulador 3D</p>
+        <h2 data-reveal style="margin-top:14px">Veja o pote antes de ele existir</h2>
+        <p class="muted" data-reveal style="margin-top:18px">Gire, troque o acabamento e coloque a sua arte. Quando ficar do seu jeito, é só mandar para a equipe.</p>
+        <div class="swatches" role="group" aria-label="Acabamento do rótulo" data-reveal></div>
+        <div class="ctas" data-reveal>
+          <a class="btn btn-solid" data-sim target="_blank" rel="noopener">Abrir o simulador completo</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3a. Linha de estilos de pomada -->
+  <section id="estilos" data-state="3a">
+    <div class="wrap">
+      <div class="col">
+        <p class="eyebrow" data-reveal>Linha de pomadas</p>
+        <h2 data-reveal style="margin-top:14px">Seis estilos, um para cada corte</h2>
+        <p class="muted" data-reveal style="margin-top:18px">Da argila seca ao gel espelhado. Escolha quais entram na sua linha: a massa muda no pote na hora.</p>
+        <div class="estilos" role="group" aria-label="Estilo da pomada" data-reveal></div>
+        <p class="estilo-desc" aria-live="polite" data-reveal></p>
+        <p class="foot" data-reveal>Fragrâncias e lote mínimo de cada estilo: <span class="ph">amadeirada, cítrica ou neutra · 150 potes por estilo</span>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3b. Logotipo base (gerador automático, não é IA) -->
+  <section id="logotipo" data-state="4">
+    <div class="wrap">
+      <div class="col">
+        <p class="eyebrow" data-reveal>Ainda não tem logotipo?</p>
+        <h2 data-reveal style="margin-top:14px">Comece com um logotipo base</h2>
+        <p class="muted" data-reveal style="margin-top:18px">Escreva o nome da barbearia, escolha um estilo e veja na hora como ele fica no pote.</p>
+        <div class="field" data-reveal>
+          <label for="nome2">Nome da barbearia</label>
+          <input id="nome2" maxlength="28" autocomplete="organization" placeholder="Ex.: Barbearia do Zé">
+        </div>
+        <div class="logos" role="group" aria-label="Estilo do logotipo" data-reveal></div>
+        <p class="aviso" data-reveal><strong>Isto é um rascunho automático.</strong> No projeto real, um designer gráfico especializado em marcas revisa, ajusta e finaliza o seu logotipo com você antes de ir para a produção.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3c. Brandbook + INPI -->
+  <section class="bb" id="brandbook" data-state="5">
+    <div class="wrap">
+      <div class="intro">
+        <p class="eyebrow" data-reveal>O que vem junto</p>
+        <h2 data-reveal style="margin-top:14px">A sua marca pronta para crescer</h2>
+        <p class="muted" data-reveal style="margin-top:18px">Além do pote, você recebe o brandbook da sua marca: o guia com logotipo, cores, tipografia e aplicações para usar no balcão, no Instagram e na fachada.</p>
+      </div>
+      <div class="pages" data-reveal aria-label="Prévia do brandbook">
+        <article class="page" style="--i:0"><h4>01 · Logotipo</h4><canvas data-bb="logo" width="600" height="600"></canvas><canvas data-bb="neg" width="600" height="300"></canvas><div class="pf"><span data-bb-nome></span><span>1</span></div></article>
+        <article class="page" style="--i:1"><h4>02 · Cores</h4><div class="cores" data-bb="cores"></div><div class="pf"><span data-bb-nome></span><span>2</span></div></article>
+        <article class="page tipo" style="--i:2"><h4>03 · Tipografia</h4><div class="aa" data-bb="aa">Aa</div><strong data-bb="fonte"></strong><p data-bb="alfa">ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789</p><div class="pf"><span data-bb-nome></span><span>3</span></div></article>
+        <article class="page" style="--i:3"><h4>04 · Aplicações</h4><div class="apps"><div><canvas data-bb="tampa" width="400" height="400"></canvas><span>Tampa do pote</span></div><div><canvas data-bb="perfil" width="400" height="400"></canvas><span>Foto do Instagram</span></div></div><div class="pf"><span data-bb-nome></span><span>4</span></div></article>
+      </div>
+      <p class="muted" style="font-size:13px;margin-top:14px">Prévia montada automaticamente a partir das suas escolhas. O brandbook final é feito pelo designer.</p>
+      <ul class="recebe" data-reveal>
+        <li><div>Logotipo finalizado por designer de marcas<small>Revisado e ajustado com você.</small></div></li>
+        <li><div>Brandbook da sua marca<small>Logotipo, cores, tipografia e aplicações.</small></div></li>
+        <li><div>Passo a passo para registrar no INPI<small>O que pedir, quanto custa a taxa e onde acompanhar.</small></div></li>
+        <li><div>Assessoria opcional da equipe para o registro<small>Valor: <span class="ph">R$ 590 + taxas do INPI</span></small></div></li>
+      </ul>
+      <p class="inpi-nota" data-reveal>O registro é feito no INPI e depende da análise do órgão: ninguém pode garantir a aprovação. Antes do pedido, é feita uma busca para ver se já existe marca parecida.</p>
+    </div>
+  </section>
+
+  <!-- 4. Renda extra (hipóteses) -->
+  <section class="nums" id="renda-extra" data-state="6">
+    <div class="wrap">
+      <div class="col">
+        <div class="head" data-reveal><p class="eyebrow">Renda extra</p><span class="tag" data-hipotese>Hipótese · a confirmar</span></div>
+        <h2 data-reveal style="margin-top:14px">Quanto pode ficar na barbearia</h2>
+        <div class="grid" data-reveal>
+          <div class="card"><b data-count="porPote" data-fmt="brl"></b><span>para a casa a cada pote vendido</span></div>
+          <div class="card"><b data-count="barbeiroPote" data-fmt="brl"></b><span>de comissão para quem vende</span></div>
+          <div class="card"><b data-count="mes" data-fmt="brl0"></b><span>por mês com <span data-cadeiras></span> cadeiras</span></div>
+          <div class="card"><b data-count="ano" data-fmt="brl0"></b><span>por ano no mesmo ritmo</span></div>
+        </div>
+        <div class="calc" data-reveal>
+          <label for="potes">Se vocês venderem <b data-potes></b> potes por semana</label>
+          <input id="potes" type="range" min="1" max="40" step="1" value="14">
+          <div class="calc-out">
+            <div><b data-calc="mes"></b><span>por mês para a casa</span></div>
+            <div><b data-calc="ano"></b><span>por ano</span></div>
+            <div><b data-calc="barb"></b><span>de comissão por mês para quem vende</span></div>
+          </div>
+          <div class="calc-bar" aria-hidden="true"><i></i></div>
+        </div>
+        <div class="premissas" data-reveal>
+          <strong>Conta de simulação, não é promessa de ganho.</strong> Premissas:
+          <ul data-premissas></ul>
+          <p style="margin-top:8px">Barbearias piloto: <span class="ph">3 casas em Pinheiros, 41 potes vendidos no 1º mês</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4b. Suíte UP: sistemas e BI -->
+  <section id="suite" data-state="7">
+    <div class="wrap">
+      <div class="col">
+        <div class="head" data-reveal><p class="eyebrow">Sistemas e BI</p><span class="tag">Em adaptação</span></div>
+        <h2 data-reveal style="margin-top:14px">A Suíte UP, feita para barbearias</h2>
+        <p class="muted" data-reveal style="margin-top:18px">A Suíte da UP Co., com 11 módulos, está sendo adaptada para barbearias e salões. A ideia: pedidos, vendas e resultados da casa num só painel, com os números que ajudam a decidir.</p>
+        <ul class="recebe one" data-reveal>
+          <li><div>Painel de números da barbearia<small>Vendas do pote, renda extra e movimento. Indicadores: <span class="ph">potes vendidos, ticket médio, comissão por barbeiro e reposição</span></small></div></li>
+          <li><div>Módulos da versão para barbearias<small>Lista: <span class="ph">Agenda, Caixa, Estoque, Comissões, Clientes e BI (6 dos 11 módulos da Suíte)</span></small></div></li>
+          <li><div>Consultoria para implantar<small>Valor e formato: <span class="ph">R$ 1.200, implantação em 2 encontros</span></small></div></li>
+        </ul>
+        <div class="ctas" data-reveal><a class="btn btn-solid" href="painel.html">Ver o painel de exemplo</a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4c. Marketing -->
+  <section id="marketing" data-state="8">
+    <div class="wrap right">
+      <div class="col">
+        <div class="head" data-reveal><p class="eyebrow">Marketing</p><span class="tag">Em definição</span></div>
+        <h2 data-reveal style="margin-top:14px">Ajuda para vender o pote</h2>
+        <p class="muted" data-reveal style="margin-top:18px">Ter o produto na prateleira é metade do caminho. Ajudamos a casa a divulgar e a atender quem pergunta.</p>
+        <ul class="recebe one" data-reveal>
+          <li><div>Mockup do pote com o nome da sua barbearia<small>Pronto para postar e mostrar ao cliente.</small></div></li>
+          <li><div>Conteúdo para o Instagram<small>Fotos 3D, posts e vídeos com o seu produto.</small></div></li>
+          <li><div>Atendimento no WhatsApp com IA<small>Responde na hora; a equipe acompanha.</small></div></li>
+          <li><div>Pacotes e valores<small><span class="ph">a partir de R$ 297/mês</span></small></div></li>
+        </ul>
+        <div class="ctas" data-reveal style="margin-top:18px"><a class="btn btn-solid" href="marketing.html">Ver o kit de marketing</a><a class="btn" href="marca.html">Abrir o Estúdio de marca</a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4d. Prova social e perguntas frequentes -->
+  <section class="wide" id="perguntas" data-state="9">
+    <div class="wrap">
+      <p class="eyebrow" data-reveal>Quem já usa</p>
+      <h2 data-reveal style="margin-top:14px">Barbearias de São Paulo</h2>
+      <div class="prova" data-reveal>
+        <figure><div class="foto"><img src="img/fotos/prova-prateleira.webp" alt="Prateleira atrás do espelho com potes de pomada pretos, navalha e pincel de barba" loading="lazy"></div><blockquote>“<span class="ph">Os potes ficam na prateleira atrás da cadeira e o cliente pergunta sozinho. No primeiro mês vendi mais do que esperava.</span>”</blockquote><figcaption><span class="ph">Marcos Almeida · Barbearia Navalha Dourada, Pinheiros</span></figcaption></figure>
+        <figure><div class="foto"><img src="img/fotos/prova-balcao.webp" alt="Barbeiro posicionando um pote de pomada no expositor do balcão" loading="lazy"></div><blockquote>“<span class="ph">Ter o nome da barbearia no pote mudou a conversa: o cliente leva e ainda marca o perfil da casa no Instagram.</span>”</blockquote><figcaption><span class="ph">Diego Souza · Casa do Fade, Vila Madalena</span></figcaption></figure>
+        <figure><div class="foto"><img src="img/fotos/prova-bancada.webp" alt="Bancada de trabalho com pote de pomada aberto, tesoura, pente e máquina" loading="lazy"></div><blockquote>“<span class="ph">Eu já usava a pomada no corte. Agora ela também vira renda extra no balcão, sem eu precisar de estoque grande.</span>”</blockquote><figcaption><span class="ph">Rafael Costa · Barbearia Ponto Certo, Tatuapé</span></figcaption></figure>
+      </div>
+      <h2 data-reveal style="margin-top:72px;font-size:clamp(34px,4.4vw,60px)">Perguntas frequentes</h2>
+      <div class="faq" data-reveal>
+        <details><summary>Qual o pedido mínimo?</summary><p>O lote inicial é de <span data-lote></span> unidades por produto. <span class="ph">[CONFIRMAR COM A FÁBRICA]</span></p></details>
+        <details><summary>Quanto tempo leva?</summary><p>Até <span data-prazo></span> dias depois da aprovação da arte, com cada etapa visível no painel do pedido. <span class="ph">[CONFIRMAR COM A FÁBRICA]</span></p></details>
+        <details><summary>Preciso ter a arte pronta?</summary><p>Não. Você parte de um logotipo base e coloca a sua marca no simulador; um designer finaliza antes da produção.</p></details>
+        <details><summary>E a Anvisa?</summary><p><span class="ph">[RESPOSTA DEPENDE DO MODELO REGULATÓRIO: FABRICANTE TITULAR OU NOTIFICAÇÃO POR MARCA]</span></p></details>
+        <details><summary>Quem fabrica e entrega?</summary><p>Fábrica parceira, com entrega direta na barbearia em São Paulo capital. <span class="ph">[FÁBRICA, LOCAL, PRAZO E CUSTO DE ENTREGA]</span></p></details>
+        <details><summary>Como pago?</summary><p>Entrada para iniciar a produção e o restante na entrega. <span class="ph">[CONDIÇÃO E FORMA DE PAGAMENTO]</span></p></details>
+        <details><summary>A Suíte UP já está disponível?</summary><p>Está em adaptação para barbearias e salões. <span class="ph">[PREVISÃO]</span></p></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Chamada para o WhatsApp -->
+  <section class="cta" id="contato" data-state="10">
+    <div class="wrap" style="width:100%">
+      <div class="col">
+        <h2 data-reveal>Vamos colocar a sua marca no balcão?</h2>
+        <p data-reveal>Fale com a equipe no WhatsApp. A IA tira as dúvidas na hora e uma pessoa da equipe acompanha o seu pedido do começo ao fim.</p>
+        <ul class="resumo" data-reveal aria-label="Resumo do seu pedido">
+          <li class="slot" style="--k:0" aria-hidden="true"><div></div></li>
+          <li style="--k:0"><span>Marca</span><b data-r-nome></b></li>
+          <li style="--k:1"><span>Acabamento</span><b data-r-tema></b></li>
+          <li style="--k:2"><span>Lote</span><b><span data-lote></span> unidades</b></li>
+          <li style="--k:3"><span>Prazo</span><b>até <span data-prazo></span> dias</b></li>
+        </ul>
+        <div class="ctas" data-reveal style="justify-content:center"><a class="btn btn-wa" data-wa target="_blank" rel="noopener">Chamar no WhatsApp</a><button class="btn" type="button" data-abrir-sim>Simular pedido</button></div>
+        <p class="note muted" data-wa-note hidden>Número do WhatsApp: <span class="ph">(11) 90000-0000</span> · botão desligado na demonstração</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Simulação de pedido: tudo acontece no navegador, nada é enviado -->
+<dialog id="sim" aria-labelledby="sim-titulo">
+  <div class="sim-head">
+    <div><strong id="sim-titulo">Simular pedido</strong><span class="demo">Demonstração: dados ilustrativos</span></div>
+    <button class="sim-x" type="button" data-sim-fechar aria-label="Fechar simulação">×</button>
+  </div>
+  <ol class="sim-prog" aria-label="Etapas da simulação">
+    <li>Cor</li><li>Estilo</li><li>Marca</li><li>Revisar</li><li>WhatsApp</li><li>30 dias</li>
+  </ol>
+  <div class="sim-body">
+    <div class="sim-step" data-passo="0">
+      <h3 tabindex="-1">Escolha a cor do pote</h3>
+      <p>O pote muda na hora.</p>
+      <div class="sim-cores" role="group" aria-label="Cor do pote"></div>
+    </div>
+    <div class="sim-step" data-passo="estilo" hidden>
+      <h3 tabindex="-1">Escolha o estilo da pomada</h3>
+      <p>A massa no pote muda na hora.</p>
+      <div class="sim-pomadas" role="group" aria-label="Estilo da pomada"></div>
+    </div>
+    <div class="sim-step" data-passo="1" hidden>
+      <h3 tabindex="-1">Coloque a sua marca</h3>
+      <p>Escreva o nome da barbearia e escolha um estilo de logotipo.</p>
+      <div class="field">
+        <label for="sim-nome">Nome da barbearia</label>
+        <input id="sim-nome" maxlength="28" autocomplete="organization" placeholder="Ex.: Barbearia do Zé">
+      </div>
+      <div class="sim-estilos" role="group" aria-label="Estilo do logotipo"></div>
+      <p class="sim-nota">Rascunho automático. No pedido real, um designer finaliza o logotipo com você.</p>
+    </div>
+    <div class="sim-step" data-passo="2" hidden>
+      <h3 tabindex="-1">Confira o pedido</h3>
+      <p>Revise antes de enviar para a equipe.</p>
+      <ul class="sim-resumo">
+        <li><span>Marca</span><b data-s="nome"></b></li>
+        <li><span>Cor do pote</span><b data-s="cor"></b></li>
+        <li><span>Pomada</span><b data-s="pomada"></b></li>
+        <li><span>Logotipo</span><b data-s="estilo"></b></li>
+        <li><span>Lote</span><b><span data-lote></span> unidades</b></li>
+        <li><span>Valor do lote</span><b class="ph">R$ 1.800,00</b></li>
+        <li><span>Entrega</span><b>até <span data-prazo></span> dias*</b></li>
+      </ul>
+      <p class="sim-nota">* Prazo ilustrativo. Lote, valor e prazo dependem da confirmação da fábrica.</p>
+    </div>
+    <div class="sim-step" data-passo="3" hidden>
+      <h3 tabindex="-1">Pedido enviado pelo WhatsApp</h3>
+      <p>A IA responde na hora e a equipe acompanha.</p>
+      <div class="wa-phone" aria-live="polite">
+        <div class="wa-top"><i aria-hidden="true" data-brand-ini></i><div><b><span data-brand></span> · atendimento</b><small>online</small></div></div>
+        <div class="wa-msgs"></div>
+      </div>
+      <p class="sim-nota">Simulação: nenhuma mensagem é enviada.</p>
+    </div>
+    <div class="sim-step" data-passo="4" hidden>
+      <h3 tabindex="-1">Do pedido ao balcão</h3>
+      <p>Cada etapa aparece no painel do parceiro.</p>
+      <p class="tl30-dia" aria-hidden="true"><b data-tl-dia>0</b>de <span data-prazo></span> dias</p>
+      <ol class="tl30"></ol>
+      <p class="sim-nota">Datas ilustrativas. Etapas e prazos a confirmar com a fábrica.</p>
+    </div>
+  </div>
+  <div class="sim-foot">
+    <button class="btn" type="button" data-sim-voltar>Voltar</button>
+    <button class="btn btn-solid" type="button" data-sim-seguir>Continuar</button>
+  </div>
+</dialog>
+
+<footer>
+  <div class="wrap">© <span data-brand></span> · Razão social e CNPJ: <span class="ph">Stars Comércio de Cosméticos Ltda. · CNPJ 00.000.000/0001-00</span> · Visual provisório até o brandbook.<br>Valores e prazos são estimativas e dependem da confirmação da fábrica; produtos cosméticos regularizados na Anvisa: <span class="ph">grau 1, notificação em andamento</span>.<br>Cartola 3D: “<a href="https://sketchfab.com/3d-models/top-hat-acc9845b7c48479c9b23d93d3643612f" rel="noopener">Top hat</a>” por Filip, licença <a href="https://creativecommons.org/licenses/by/4.0/" rel="noopener">CC BY 4.0</a>.</div>
+</footer>
+
+<script src="marca.js"></script>
+<script src="hat-data.js"></script>
+<!-- GSAP: movimento. Se a CDN falhar, a página aparece sem animação. -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/SplitText.min.js"></script>
+<script type="importmap">
+{"imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.184.0/build/three.module.js",
+  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.184.0/examples/jsm/"
+}}
+</script>
+
+<script>
+/* ===== TROQUE AQUI ===== */
+// Nome provisório: só publicar depois da busca de anterioridade no INPI.
+const BRAND = "Stars";
+// Só dígitos com DDD, ex.: "11999999999". Enquanto for placeholder, o botão fica desligado.
+const WHATSAPP_NUMERO = "[PLACEHOLDER]";
+const SIMULADOR_URL = "https://brutob2b-pixel.github.io/Veleiros/";
+// Números de EXEMPLO (hipóteses do HANDOFF v4.1) para a demonstração; "confirmado" segue false até o sócio e a fábrica.
+// (Hipóteses do HANDOFF v4.1, para quando confirmar: pote 35, Stars 12, 150 atendimentos, conversão 0.10, lote 150.)
+const NUMEROS = {
+  confirmado: false,
+  precoCliente: 35,     // R$ do pote para o cliente final (mercado)
+  precoStars: 12,       // R$ que a barbearia paga por pote (fábrica)
+  comissao: 0.15,       // fatia de quem vende (decisão do modelo)
+  atendimentos: 150,   // por barbeiro, por mês (mercado)
+  conversao: 0.10,      // fração de clientes que compram (mercado)
+  cadeiras: 4,
+  lote: 150,            // unidades por lote (fábrica)
+  prazoDias: 30         // entrega: ilustrativo na demonstração (fábrica confirma)
+};
+/* ======================= */
+document.documentElement.classList.add("js");
+</script>
+
+<script type="module">
+const N = NUMEROS;
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+/* ---- textos que dependem das constantes ---- */
+document.title = `${BRAND} — a sua marca no balcão`;
+$$("[data-brand]").forEach(e => e.textContent = BRAND);
+$$("[data-brand-ini]").forEach(e => e.textContent = BRAND[0]);
+$$("[data-lote]").forEach(e => { e.textContent = N.lote ?? "[PLACEHOLDER]"; e.classList.add("ph"); });
+$$("[data-prazo]").forEach(e => e.textContent = N.prazoDias);
+$$("[data-cadeiras]").forEach(e => e.textContent = N.cadeiras);
+$("[data-hipotese]").hidden = N.confirmado;
+$("[data-sim]").href = SIMULADOR_URL;
+
+// se algum número voltar a null, a conta mostra [PLACEHOLDER] em vez de inventar
+const PH = '<span class="ph">[PLACEHOLDER]</span>';
+const brl = (v, d = 2) => Number.isFinite(v) ? v.toLocaleString("pt-BR", { style: "currency", currency: "BRL", minimumFractionDigits: d, maximumFractionDigits: d }) : "R$ [PLACEHOLDER]";
+const num = N.precoCliente ?? NaN, comissaoPote = num * N.comissao;
+const porPote = num - (N.precoStars ?? NaN) - comissaoPote;
+const potesMes = N.cadeiras * (N.atendimentos ?? NaN) * (N.conversao ?? NaN);
+const CONTA = { porPote, barbeiroPote: comissaoPote, mes: porPote * potesMes, ano: porPote * potesMes * 12 };
+if (N.precoCliente === 35 && N.precoStars === 12 && N.atendimentos === 150 && N.conversao === 0.1)
+  console.assert(Math.abs(CONTA.porPote - 17.75) < 1e-9 && Math.abs(CONTA.mes - 1065) < 1e-9, "conta de renda extra mudou");
+$("[data-premissas]").innerHTML = [
+  `pote vendido a ${N.precoCliente == null ? "R$ " + PH : brl(N.precoCliente, 0)} para o cliente`,
+  `barbearia paga ${N.precoStars == null ? "R$ " + PH : brl(N.precoStars, 0)} por pote (custo de fábrica a confirmar)`,
+  `${Math.round(N.comissao * 100)}% de comissão para quem vende`,
+  `${N.atendimentos ?? PH} atendimentos por barbeiro por mês`,
+  `1 venda a cada ${N.conversao ? Math.round(1 / N.conversao) : PH} clientes`
+].map(t => `<li>${t}</li>`).join("");
+
+const fmt = { brl: v => brl(v), brl0: v => brl(Math.round(v), 0) };
+
+/* calculadora: os valores deslizam até o novo resultado quando o controle se move */
+const potesIn = $("#potes"), semanasMes = 52 / 12, MAX_POTES = 40;
+potesIn.max = MAX_POTES; potesIn.value = Number.isFinite(potesMes) ? Math.round(potesMes / semanasMes) : 14;
+const calcEl = k => $(`[data-calc="${k}"]`), calcBar = $(".calc-bar i");
+const calcAlvo = () => { const pt = +potesIn.value, mes = porPote * pt * semanasMes; return { pt, mes, ano: mes * 12, barb: comissaoPote * pt * semanasMes }; };
+let calcShown = { mes: 0, ano: 0, barb: 0 }, calcRaf = 0;
+function calcPaint(alvo) {
+  $("[data-potes]").textContent = alvo.pt;
+  ["mes", "ano", "barb"].forEach(k => calcEl(k).textContent = k === "barb" ? brl(calcShown[k]) : brl(calcShown[k], 0));
+  // sem números confirmados a barra ainda acompanha o controle, só para mostrar o movimento
+  calcBar.style.width = (Number.isFinite(alvo.mes) ? alvo.mes / (porPote * MAX_POTES * semanasMes) : alvo.pt / MAX_POTES) * 100 + "%";
+}
+function calcUpdate() {
+  const alvo = calcAlvo();
+  if (reduce) { calcShown = { mes: alvo.mes, ano: alvo.ano, barb: alvo.barb }; calcPaint(alvo); return; }
+  cancelAnimationFrame(calcRaf);
+  const passo = () => {
+    let perto = true;
+    for (const k of ["mes", "ano", "barb"]) { calcShown[k] += (alvo[k] - calcShown[k]) * 0.2; if (Math.abs(alvo[k] - calcShown[k]) > 0.5) perto = false; }
+    if (perto) calcShown = { mes: alvo.mes, ano: alvo.ano, barb: alvo.barb };
+    calcPaint(alvo);
+    if (!perto) calcRaf = requestAnimationFrame(passo);
+  };
+  passo();
+}
+potesIn.addEventListener("input", calcUpdate);
+calcUpdate();
+function countUp(el) {
+  const end = CONTA[el.dataset.count], f = fmt[el.dataset.fmt];
+  if (reduce) { el.textContent = f(end); return; }
+  const t0 = performance.now(), dur = 1400;
+  const tick = now => {
+    const p = Math.min(1, (now - t0) / dur);
+    el.textContent = f(end * (1 - Math.pow(1 - p, 3)));
+    if (p < 1) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+$$("[data-count]").forEach(e => e.textContent = fmt[e.dataset.fmt](CONTA[e.dataset.count]));
+
+/* ---- WhatsApp ---- */
+const nomeInput = $("#nome");
+const waBtn = $("[data-wa]");
+const waOk = /^\d{10,13}$/.test(WHATSAPP_NUMERO);
+function updateResumo() {
+  $("[data-r-nome]").textContent = nomeInput.value.trim() || "Sua barbearia";
+  $("[data-r-tema]").textContent = tema.nome;
+}
+function updateWa() {
+  if (!waOk) { waBtn.removeAttribute("href"); waBtn.setAttribute("aria-disabled", "true"); $("[data-wa-note]").hidden = false; return; }
+  const nome = nomeInput.value.trim();
+  const msg = nome ? `Oi! Quero o pote com a marca ${nome}, acabamento ${tema.nome}.` : "Oi! Quero colocar a minha marca no pote.";
+  const num = WHATSAPP_NUMERO.length <= 11 ? "55" + WHATSAPP_NUMERO : WHATSAPP_NUMERO;
+  waBtn.href = `https://wa.me/${num}?text=${encodeURIComponent(msg)}`;
+}
+
+/* ---- movimento com GSAP (sem GSAP ou com movimento reduzido, tudo aparece parado) ---- */
+const G = window.gsap, ST = window.ScrollTrigger, anima = !!G && !reduce;
+if (G) G.registerPlugin(...[ST, window.SplitText].filter(Boolean));
+const revelar = el => { el.classList.add("in"); $$("[data-count]", el).forEach(countUp); };
+if (anima && ST) {
+  ST.batch("[data-reveal]", { start: "top 88%", once: true, onEnter: els => {
+    G.fromTo(els, { opacity: 0, y: 28 }, { opacity: 1, y: 0, duration: 0.9, ease: "power3.out", stagger: 0.08 });
+    els.forEach(revelar);
+  } });
+} else $$("[data-reveal]").forEach(revelar);
+// título principal: palavras sobem de dentro de cada linha
+if (anima && window.SplitText) document.fonts.ready.then(() => {
+  SplitText.create(".hero h1", { type: "lines,words", mask: "lines", linesClass: "ln", autoSplit: true,
+    onSplit: s => G.from(s.words, { yPercent: 110, duration: 1.1, ease: "power4.out", stagger: 0.045, delay: 0.15 }) });
+  ST?.refresh();
+});
+
+/* ---- palavra gigante ao fundo: troca quando a seção chega ao meio da tela ---- */
+const PALAVRAS = { topo: "Balcão", areas: "Portal", "como-funciona": "30 dias", simulador: "3D", estilos: "Estilos", logotipo: "Logo", brandbook: "Marca",
+  "renda-extra": "Renda", suite: "Suíte", marketing: "Venda", perguntas: "Dúvidas", contato: "Vamos" };
+const bigSpan = $(".bigword span");
+let bigAtual = "";
+function trocarPalavra(txt, dir = 1) {
+  if (!txt || txt === bigAtual) return;
+  bigAtual = txt;
+  if (!anima) { bigSpan.textContent = txt; return; }
+  G.timeline({ overwrite: true })
+    .to(bigSpan, { yPercent: -40 * dir, autoAlpha: 0, duration: 0.3, ease: "power2.in" })
+    .call(() => { bigSpan.textContent = txt; })
+    .fromTo(bigSpan, { yPercent: 40 * dir, autoAlpha: 0 }, { yPercent: 0, autoAlpha: 1, duration: 0.7, ease: "power3.out" });
+}
+bigSpan.textContent = bigAtual = PALAVRAS.topo;
+if (ST) $$("[data-state]").forEach(sec => ST.create({ trigger: sec, start: "top 55%", end: "bottom 55%",
+  onToggle: s => s.isActive && trocarPalavra(PALAVRAS[sec.id], s.direction) }));
+// deriva lenta para o lado conforme a rolagem (só com movimento liberado)
+if (anima && ST) G.to(".bigword", { xPercent: -8, ease: "none", scrollTrigger: { start: 0, end: "max", scrub: 1 } });
+
+/* ---- passos fixos na tela ---- */
+const stepsSec = $("#como-funciona"), stepItems = $$("li", stepsSec), bar = $(".bar i", stepsSec),
+  marks = $$(".tl-marks span", stepsSec), dayEl = $("[data-day]", stepsSec);
+function updateSteps(prog) {
+  if (reduce) { stepItems.forEach(li => li.classList.add("on", "now")); marks.forEach(m => m.classList.add("on")); dayEl.textContent = N.prazoDias; bar.style.width = "100%"; return; }
+  const r = stepsSec.getBoundingClientRect();
+  const p = prog ?? Math.min(1, Math.max(0, -r.top / (r.height - innerHeight)));
+  const active = Math.min(2, Math.floor(p * 3.2));
+  stepItems.forEach((li, i) => { li.classList.toggle("on", i <= active); li.classList.toggle("now", i === active); });
+  const q = Math.min(1, p / 0.78); // a linha fecha um pouco antes de o bloco soltar, para a entrega ser vista
+  bar.style.width = (q * 100).toFixed(1) + "%";
+  marks.forEach(m => m.classList.toggle("on", q * 100 >= +m.dataset.at));
+  dayEl.textContent = Math.round(q * N.prazoDias);
+}
+
+/* ---- marca salva neste navegador (a mesma do Estúdio, do Marketing e da Loja) ---- */
+const MARCA_SALVA = MARCA.load();
+nomeInput.value = $("#nome2").value = MARCA_SALVA.nome;
+let tema = MARCA.tema(MARCA_SALVA), pomada = MARCA.pomada(MARCA_SALVA);
+const salvarMarca = () => MARCA.save({ ...MARCA.load(), nome: nomeInput.value.trim(), tema: tema.id, logo: estilo.id, pomada: pomada.id });
+
+/* ---- acabamentos: o leque mostra os 3 primeiros; a simulação mostra todos ---- */
+const LEQUE = TEMAS.slice(0, 3);
+let spinKick = 0; // radianos de giro extra ao trocar o acabamento
+const sw = $(".swatches");
+function escolherTema(t) {
+  tema = t; spinKick = 2.1;
+  $$("button", sw).forEach((x, i) => x.setAttribute("aria-pressed", LEQUE[i] === t));
+  redrawAll();
+}
+LEQUE.forEach((t, i) => {
+  const b = document.createElement("button");
+  b.type = "button"; b.setAttribute("aria-pressed", t === tema);
+  b.style.setProperty("--i", i - 1);
+  b.innerHTML = `<canvas width="240" height="240" aria-hidden="true"></canvas>${t.nome}`;
+  b.onclick = () => escolherTema(t);
+  sw.append(b);
+});
+
+/* ---- logotipo base: desenho automático por modelos (não é IA; o designer finaliza) ---- */
+/* ---- estilos de pomada: cartões da seção e botões da simulação usam a mesma escolha ---- */
+const medidor = (rot, n) => `<span>${rot}${Array.from({ length: 5 }, (_, k) => `<i class="${k < n ? "on" : ""}"></i>`).join("")}</span>`;
+const estilosBox = $(".estilos");
+POMADAS.forEach(p => {
+  const b = document.createElement("button");
+  b.type = "button"; b.className = "estilo"; b.dataset.pomada = p.id;
+  b.setAttribute("aria-label", `${p.nome}: fixação ${p.fix} de 5, brilho ${p.brilho} de 5`);
+  b.innerHTML = `${potinhoAberto(p)}<b>${p.nome}</b><span class="medidor" aria-hidden="true">${medidor("Fixação", p.fix)}${medidor("Brilho", p.brilho)}</span>`;
+  b.onclick = () => escolherPomada(p);
+  estilosBox.append(b);
+});
+function escolherPomada(p) {
+  pomada = p; spinKick = 1.2;
+  $$("[data-pomada]").forEach(b => b.setAttribute("aria-pressed", b.dataset.pomada === p.id));
+  $(".estilo-desc").innerHTML = `<b>${p.nome}.</b> ${p.desc}`;
+  aplicarPomada3D(p); redrawAll();
+}
+$$("[data-pomada]").forEach(b => b.setAttribute("aria-pressed", b.dataset.pomada === pomada.id));
+$(".estilo-desc").innerHTML = `<b>${pomada.nome}.</b> ${pomada.desc}`;
+
+const ESTILOS = LOGOS; // desenho do logotipo: marca.js
+let estilo = MARCA.logo(MARCA_SALVA);
+const nomeAtual = () => nomeInput.value.trim() || "Sua barbearia";
+const corEscura = () => ({ text: tema.text, ring: tema.ring, sub: tema.sub });
+const corClara = () => ({ text: "#17150F", ring: tema.ring === "#C9CDD3" ? "#6F737A" : "#A8772A", sub: "#6F695F" });
+function pintar(cv, bg, cor, pad = 0.08) {
+  const c = cv.getContext("2d"), W = cv.width, H = cv.height, S = Math.min(W, H) * (1 - pad * 2);
+  c.clearRect(0, 0, W, H);
+  c.fillStyle = bg; c.fillRect(0, 0, W, H);
+  c.save(); c.translate((W - S) / 2, (H - S) / 2); drawLogo(c, S, nomeAtual(), estilo, cor); c.restore();
+}
+const fundoTema = cv => { const c = cv.getContext("2d"), g = c.createRadialGradient(cv.width / 2, cv.height * 0.4, 10, cv.width / 2, cv.height / 2, cv.width * 0.7); g.addColorStop(0, tema.bg1); g.addColorStop(1, tema.bg2); return g; };
+
+const logosBox = $(".logos");
+ESTILOS.forEach((e, i) => {
+  const b = document.createElement("button");
+  b.type = "button"; b.setAttribute("aria-pressed", e === estilo);
+  b.innerHTML = `<canvas width="360" height="360" aria-hidden="true"></canvas>${e.nome}`;
+  b.onclick = () => { estilo = e; $$("button", logosBox).forEach(x => x.setAttribute("aria-pressed", x === b)); redrawAll(); };
+  logosBox.append(b);
+});
+function drawMarca() {
+  $$("button", sw).forEach((b, i) => {
+    const cv = $("canvas", b), c = cv.getContext("2d"), keep = tema; tema = TEMAS[i];
+    pintar(cv, fundoTema(cv), corEscura(), 0.2);
+    c.strokeStyle = tema.ring; c.lineWidth = 8; c.beginPath(); c.arc(120, 120, 112, 0, 7); c.stroke(); tema = keep;
+  });
+  $$("button", logosBox).forEach((b, i) => {
+    const cv = $("canvas", b), keep = estilo; estilo = ESTILOS[i];
+    pintar(cv, fundoTema(cv), corEscura(), 0.06); estilo = keep;
+  });
+  const logo = $('[data-bb="logo"]'); pintar(logo, fundoTema(logo), corEscura());
+  pintar($('[data-bb="neg"]'), "#F1ECE2", corClara(), 0.02);
+  ["tampa", "perfil"].forEach(k => {
+    const cv = $(`[data-bb="${k}"]`), c = cv.getContext("2d");
+    pintar(cv, k === "tampa" ? fundoTema(cv) : "#17150F", corEscura(), 0.16);
+    if (k === "tampa") { c.strokeStyle = tema.ring; c.lineWidth = 10; c.beginPath(); c.arc(200, 200, 186, 0, 7); c.stroke(); }
+  });
+  $('[data-bb="cores"]').innerHTML = [["Fundo", tema.bg1, tema.text], ["Destaque", tema.ring, "#17150F"], ["Texto", tema.text, "#17150F"], ["Apoio", tema.sub, "#17150F"]]
+    .map(([n, hex, fg]) => `<div style="background:${hex};color:${fg}">${n} · ${hex.toUpperCase()}</div>`).join("");
+  $('[data-bb="aa"]').style.fontFamily = estilo.css;
+  $('[data-bb="fonte"]').textContent = estilo.fonte;
+  $('[data-bb="alfa"]').style.fontFamily = estilo.css;
+  $$("[data-bb-nome]").forEach(e => e.textContent = nomeAtual());
+}
+
+/* ---- Simular pedido: cor → marca → confirmação → WhatsApp → 30 dias. Sem servidor, nada é enviado. ---- */
+const dlg = $("#sim"), passos = $$(".sim-step", dlg), prog = $$(".sim-prog li", dlg);
+const btnVoltar = $("[data-sim-voltar]", dlg), btnSeguir = $("[data-sim-seguir]", dlg), simNome = $("#sim-nome");
+const ROTULOS = ["Continuar", "Continuar", "Continuar", "Confirmar pedido", "Ver os 30 dias", "Concluir"];
+// etapas do lote (ilustrativas; a fábrica confirma), em dias a partir do pedido
+const ETAPAS = [[0, "Pedido recebido"], [2, "Arte em revisão com o designer"], [4, "Arte aprovada por você"], [6, "Em produção na fábrica"],
+  [23, "Controle de qualidade"], [26, "Enviado"], [N.prazoDias, "Entregue na barbearia"]];
+const sim = { aberto: false, passo: 0, ocupado: false, tl: null };
+let stageRefresh = () => {}; // o palco 3D troca isto; com movimento reduzido ele redesenha sob demanda
+
+// botões da simulação reaproveitam os da página (mesma lógica de tema e estilo)
+TEMAS.forEach((t, i) => {
+  const b = document.createElement("button");
+  b.type = "button"; b.setAttribute("aria-pressed", t === tema);
+  b.style.cssText = `--c1:${t.bg1};--c2:${t.bg2};--ring:${t.ring}`;
+  b.innerHTML = `<i aria-hidden="true"></i>${t.nome}`;
+  b.onclick = () => { escolherTema(t); syncSim(); };
+  $(".sim-cores", dlg).append(b);
+});
+POMADAS.forEach(p => {
+  const b = document.createElement("button");
+  b.type = "button"; b.dataset.pomada = p.id; b.setAttribute("aria-pressed", p === pomada);
+  b.innerHTML = `${potinhoAberto(p)}${p.nome}`;
+  b.onclick = () => { escolherPomada(p); syncSim(); };
+  $(".sim-pomadas", dlg).append(b);
+});
+ESTILOS.forEach((e, i) => {
+  const b = document.createElement("button");
+  b.type = "button"; b.setAttribute("aria-pressed", e === estilo);
+  b.innerHTML = `<b style="--f:${e.css.replace(/"/g, "'")}" aria-hidden="true">Aa</b>${e.nome}`;
+  b.onclick = () => { $$("button", logosBox)[i].click(); syncSim(); };
+  $(".sim-estilos", dlg).append(b);
+});
+simNome.addEventListener("input", () => { nomeInput.value = simNome.value; nomeInput.dispatchEvent(new Event("input")); syncSim(); });
+function syncSim() {
+  $$(".sim-cores button", dlg).forEach((b, i) => b.setAttribute("aria-pressed", TEMAS[i] === tema));
+  $$(".sim-estilos button", dlg).forEach((b, i) => b.setAttribute("aria-pressed", ESTILOS[i] === estilo));
+  $('[data-s="nome"]', dlg).textContent = nomeAtual();
+  $('[data-s="cor"]', dlg).textContent = tema.nome;
+  $('[data-s="pomada"]', dlg).textContent = pomada.nome;
+  $('[data-s="estilo"]', dlg).textContent = estilo.nome;
+  stageRefresh();
+}
+
+const hora = (min = 0) => new Date(Date.now() + min * 60000).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+function mostrarWhatsApp() {
+  const box = $(".wa-msgs", dlg), nome = esc(nomeAtual());
+  const msgs = [
+    ["eu", `Oi! Quero a ${pomada.nome} com a marca <b>${nome}</b>, pote ${tema.nome}, logotipo ${estilo.nome}.`],
+    ["ela", `Oi! Recebi o pedido <b>#DEMO-1044</b> 🙌 Um designer vai revisar a arte de ${nome} e te mando a prévia por aqui.`],
+    ["ela", `Você acompanha cada etapa no painel do parceiro. Entrega em até ${N.prazoDias} dias*.`]
+  ];
+  box.innerHTML = msgs.map(([q, t], i) => `<div class="wa-msg ${q}">${t}<small>${hora(i)}${q === "eu" ? " ✓✓" : ""}</small></div>`).join("");
+  if (!anima) return;
+  const els = $$(".wa-msg", box), digit = document.createElement("div");
+  digit.className = "wa-typing"; digit.innerHTML = "<span></span><span></span><span></span>";
+  G.set(els, { autoAlpha: 0, y: 12, scale: 0.96, transformOrigin: "left bottom" });
+  G.set(els[0], { transformOrigin: "right bottom" });
+  const pop = { autoAlpha: 1, y: 0, scale: 1, duration: 0.45, ease: "back.out(1.6)" };
+  const digitando = (tl, antes) => tl.call(() => { box.insertBefore(digit, antes); G.fromTo(digit, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.2 }); })
+    .to(digit.children, { y: -4, duration: 0.3, stagger: 0.12, yoyo: true, repeat: 3, ease: "sine.inOut" })
+    .call(() => digit.remove());
+  const tl = sim.tl = G.timeline({ delay: 0.3 }).to(els[0], pop);
+  digitando(tl, els[1]); tl.to(els[1], pop);
+  digitando(tl, els[2]); tl.to(els[2], pop);
+}
+function mostrarTempo() {
+  const ol = $(".tl30", dlg), diaEl = $("[data-tl-dia]", dlg);
+  const hoje = Date.now(), data = d => new Date(hoje + d * 864e5).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" });
+  $$("li", ol).forEach(li => li.remove());
+  ol.insertAdjacentHTML("beforeend", ETAPAS.map(([d, t]) => `<li data-d="${d}"><em>Dia ${d} · ${data(d)}</em>${t}</li>`).join(""));
+  const lis = $$("li", ol);
+  const pintar = d => {
+    diaEl.textContent = Math.round(d);
+    lis.forEach(li => li.classList.toggle("on", d >= +li.dataset.d));
+    // a barra anda entre o centro de uma bolinha e o da próxima
+    const cy = li => li.offsetTop + 18;
+    let y = cy(lis[0]);
+    for (let k = 0; k < lis.length - 1; k++) {
+      const a = +lis[k].dataset.d, b = +lis[k + 1].dataset.d;
+      if (d >= a) y = cy(lis[k]) + (cy(lis[k + 1]) - cy(lis[k])) * Math.min(1, (d - a) / (b - a));
+    }
+    ol.style.setProperty("--h", y - 14 + "px");
+  };
+  if (!anima) { pintar(N.prazoDias); return; }
+  const o = { d: 0 }; pintar(0);
+  sim.tl = G.to(o, { d: N.prazoDias, duration: 4.2, ease: "power1.inOut", delay: 0.3, onUpdate: () => pintar(o.d) });
+}
+
+function irPara(i) {
+  if (sim.ocupado || i < 0 || i >= passos.length) return;
+  sim.tl?.kill(); sim.tl = null;
+  const de = passos[sim.passo], para = passos[i], dir = i >= sim.passo ? 1 : -1;
+  sim.passo = i;
+  prog.forEach((li, k) => { li.classList.toggle("on", k <= i); li.toggleAttribute("aria-current", k === i); });
+  btnVoltar.hidden = i === 0 || i === passos.length - 1;
+  btnSeguir.textContent = ROTULOS[i];
+  // nome de exemplo para a demonstração não travar em "Sua barbearia"
+  if (i === 2 && !nomeInput.value.trim()) { simNome.value = "Barbearia Dom Corte"; simNome.dispatchEvent(new Event("input")); }
+  simNome.value = nomeInput.value;
+  syncSim();
+  const entrar = () => {
+    passos.forEach(p => p.hidden = p !== para);
+    $(".sim-body", dlg).scrollTop = 0;
+    $("h3", para).focus({ preventScroll: true });
+    if (i === 4) mostrarWhatsApp();
+    if (i === 5) mostrarTempo();
+  };
+  if (!anima || de === para) { entrar(); return; }
+  sim.ocupado = true;
+  G.to(de, { autoAlpha: 0, x: -24 * dir, duration: 0.22, ease: "power2.in", onComplete: () => {
+    G.set(de, { clearProps: "all" }); entrar();
+    G.fromTo(para, { autoAlpha: 0, x: 24 * dir }, { autoAlpha: 1, x: 0, duration: 0.45, ease: "power3.out", clearProps: "all", onComplete: () => { sim.ocupado = false; } });
+  } });
+}
+const emFolha = () => matchMedia("(max-width:720px),(max-aspect-ratio:4/5)").matches;
+function abrirSim() {
+  if (sim.aberto) return;
+  sim.aberto = true; sim.passo = 0; sim.ocupado = false;
+  document.documentElement.classList.add("sim-open");
+  dispatchEvent(new Event("sim:abrir"));
+  dlg.showModal();
+  irPara(0);
+  if (anima) G.fromTo(dlg, emFolha() ? { yPercent: 100 } : { xPercent: 100 }, { xPercent: 0, yPercent: 0, duration: 0.7, ease: "power4.out" });
+}
+function fecharSim() {
+  if (!sim.aberto) return;
+  const fim = () => { sim.tl?.kill(); dlg.close(); G?.set(dlg, { clearProps: "transform" }); };
+  sim.aberto = false;
+  document.documentElement.classList.remove("sim-open");
+  stageRefresh();
+  if (anima) G.to(dlg, { ...(emFolha() ? { yPercent: 100 } : { xPercent: 100 }), duration: 0.45, ease: "power3.in", onComplete: fim });
+  else fim();
+}
+$$("[data-abrir-sim]").forEach(b => b.addEventListener("click", abrirSim));
+$("[data-sim-fechar]", dlg).addEventListener("click", fecharSim);
+dlg.addEventListener("cancel", e => { e.preventDefault(); fecharSim(); }); // tecla Esc
+btnVoltar.addEventListener("click", () => irPara(sim.passo - 1));
+btnSeguir.addEventListener("click", () => sim.passo === passos.length - 1 ? fecharSim() : irPara(sim.passo + 1));
+
+/* ---- 3D ---- */
+let redraw = () => {};
+let aplicarPomada3D = () => {};
+const redrawAll = () => { drawMarca(); redraw(); updateResumo(); updateWa(); salvarMarca(); };
+drawMarca(); updateResumo(); updateWa();
+const fontes = ['700 100px "Playfair Display"', '700 100px "Barlow Condensed"', '600 40px "Barlow"'];
+Promise.all(fontes.map(f => document.fonts.load(f))).then(() => redrawAll());
+
+let THREE;
+try {
+  THREE = await import("three");
+  const { RoomEnvironment } = await import("three/addons/environments/RoomEnvironment.js");
+  await initStage(RoomEnvironment);
+} catch (err) {
+  console.warn("3D indisponível, usando imagem:", err);
+  document.documentElement.classList.add("no-webgl");
+}
+
+// os dois campos de nome ficam sincronizados
+const nome2 = $("#nome2");
+[nomeInput, nome2].forEach(inp => inp.addEventListener("input", () => {
+  (inp === nomeInput ? nome2 : nomeInput).value = inp.value;
+  updateWa(); redrawAll();
+}));
+if (anima && ST) ST.create({ trigger: stepsSec, start: "top top", end: "bottom bottom", onUpdate: s => updateSteps(s.progress), onRefresh: s => updateSteps(s.progress) });
+if (anima && ST) ST.create({ trigger: "#contato", start: "top 40%", end: "bottom top", toggleClass: { targets: document.documentElement, className: "pote-frente" } });
+else { addEventListener("scroll", () => updateSteps(), { passive: true }); addEventListener("resize", () => updateSteps()); }
+updateSteps();
+
+async function initStage(RoomEnvironment) {
+  const stage = $("#stage");
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.05;
+  stage.prepend(renderer.domElement);
+
+  const scene = new THREE.Scene();
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
+  camera.position.set(0, 0, 10);
+  const key = new THREE.DirectionalLight(0xfff1d6, 2.2); key.position.set(4, 6, 6); scene.add(key);
+  const rim = new THREE.DirectionalLight(0xd9a441, 1.4); rim.position.set(-6, 2, -4); scene.add(rim);
+
+  /* pote: corpo + faixa lateral + tampa com rótulo */
+  // Escala real (pote de pomada): Ø 89,1 mm = R 1,3, então 1 unidade = 34,27 mm. Corpo 22 mm (BODY_H), tampa 19 mm (LID_H).
+  // A volta mede ~280 mm; a tarja (190 x 17 mm) cobre só ~68% dela e o resto é o pote liso. Ver drawBand.
+  const R = 1.3, BODY_H = 0.64, LID_H = 0.55, SEG = 128;
+  const black = new THREE.MeshPhysicalMaterial({ color: 0x0b0b0b, roughness: 0.28, clearcoat: 1, clearcoatRoughness: 0.15, side: THREE.DoubleSide });
+  const lathe = pts => new THREE.LatheGeometry(pts.map(([x, y]) => new THREE.Vector2(x, y)), SEG);
+  const mkCanvas = (w, h) => Object.assign(document.createElement("canvas"), { width: w, height: h });
+
+  const jar = new THREE.Group();
+  const pivot = new THREE.Group(); pivot.add(jar); scene.add(pivot);
+  jar.position.y = -(BODY_H + LID_H) / 2;
+
+  // corpo oco: parede externa, borda e parede interna até o fundo
+  const RIN = R - 0.08, FILL = BODY_H - 0.17;
+  jar.add(new THREE.Mesh(lathe([[0, 0], [R - 0.06, 0], [R, 0.05], [R, BODY_H - 0.02], [R - 0.02, BODY_H],
+    [RIN, BODY_H], [RIN, 0.1], [0, 0.1]]), black));
+  const smear = makeSmear(RIN - 0.002, FILL - 0.06, BODY_H - 0.01); jar.add(smear);
+  const cream = makeCream(RIN - 0.003); cream.position.y = FILL; jar.add(cream);
+  // cada estilo de pomada muda cor, brilho e relevo da massa
+  aplicarPomada3D = p => {
+    const m = cream.material;
+    m.color.set(p.cor); m.roughness = p.rough; m.clearcoat = p.coat; m.envMapIntensity = p.brilho >= 4 ? 0.95 : 0.45;
+    cream.scale.y = p.relevo; smear.material.color.set(p.cor);
+    stageRefresh();
+  };
+  aplicarPomada3D(pomada);
+
+  // a tampa fica no pivot (não gira com o pote) para abrir sempre para trás, mostrando a pomada
+  const lid = new THREE.Group(); pivot.add(lid);
+  const lidSpin = new THREE.Group(); lid.add(lidSpin);
+  lidSpin.add(new THREE.Mesh(lathe([[R + 0.04, 0], [R + 0.04, LID_H - 0.07], [R - 0.02, LID_H], [0, LID_H]]), black));
+
+  /* entrada: cartola de boca para baixo cobre o pote, "cozinha", a varinha toca, sai fumaça e o pote surge.
+     Rolar a página ou digitar o nome pula para a fumaça. Com movimento reduzido, nada disso aparece. */
+  let HAT_Y = -0.66; // altura da base da cartola no pote; recalculada para centralizar o modelo
+  const hat = new THREE.Group(); hat.position.y = HAT_Y; hat.rotation.y = -0.45; pivot.add(hat); // 3/4: laço à direita, de frente
+
+  // texturas de relevo: fibra do feltro e nervuras do gorgurão (só relevo, sem cor)
+  const bumpTex = (w, h, rep, fill) => {
+    const cv = mkCanvas(w, h), c = cv.getContext("2d"), im = c.createImageData(w, h);
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { const v = fill(x, y), i = (y * w + x) * 4; im.data.set([v, v, v, 255], i); }
+    c.putImageData(im, 0, 0);
+    const t = new THREE.CanvasTexture(cv); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(rep[0], rep[1]);
+    return t;
+  };
+  const feltBump = bumpTex(128, 128, [10, 5], () => 90 + Math.random() * 80);
+  const ribAcross = bumpTex(8, 4, [160, 1], x => 128 + 110 * Math.sin(x / 8 * 6.283)); // nervuras do debrum
+  const ribAround = bumpTex(4, 8, [1, 11], (x, y) => 128 + 110 * Math.sin(y / 8 * 6.283)); // nervuras horizontais da fita
+
+  const felt = new THREE.MeshPhysicalMaterial({ color: 0x040404, roughness: 0.92, metalness: 0, sheen: 0.7, sheenRoughness: 0.5,
+    sheenColor: new THREE.Color(0x2a2a2a), bumpMap: feltBump, bumpScale: 0.35, side: THREE.DoubleSide });
+  const trimMat = new THREE.MeshPhysicalMaterial({ color: 0x0d0d0d, roughness: 0.6, bumpMap: ribAcross, bumpScale: 1.2, sheen: 0.6, sheenColor: new THREE.Color(0x555555) });
+  const greenMat = new THREE.MeshPhysicalMaterial({ color: 0x0b3c1a, roughness: 0.7, metalness: 0, bumpMap: ribAround, bumpScale: 0.9,
+    sheen: 0.25, sheenColor: new THREE.Color(0x1d5a30), side: THREE.DoubleSide });
+
+  // aba: baixa na frente e atrás, enrolada e levantada nas laterais (eixo x da cartola)
+  const BR0 = 1.44, BR1 = 1.78;
+  const brim = (x, y, z) => {
+    const r = Math.hypot(x, z), c = Math.cos(2 * Math.atan2(z, x));
+    const w = Math.pow(Math.min(1, Math.max(0, (r - BR0) / (BR1 - BR0))), 2.2);
+    const k = 1 - 0.07 * w * Math.max(0, c) / Math.max(r, 0.01);
+    return [x * k, y + w * (c > 0 ? 0.34 * c : 0.09 * c), z * k];
+  };
+  const warp = (g, only) => {
+    const p = g.attributes.position;
+    for (let i = 0; i < p.count; i++) if (!only || p.getY(i) < 0.2) p.setXYZ(i, ...brim(p.getX(i), p.getY(i), p.getZ(i)));
+    g.computeVertexNormals(); return g;
+  };
+  // copa: cintura no meio, abre um pouco no topo, tampo plano com quina arredondada
+  const profile = [[1.44, 0], [1.52, 0], [1.6, 0], [1.68, 0], [1.72, 0], [1.76, 0.015], [1.77, 0.04], [1.74, 0.065], [1.66, 0.07], [1.58, 0.072], [1.5, 0.078],
+    [1.46, 0.09], [1.44, 0.4], [1.405, 0.85], [1.43, 1.3], [1.47, 1.62], [1.46, 1.7], [1.4, 1.725], [0, 1.725]];
+  hat.add(new THREE.Mesh(warp(new THREE.LatheGeometry(profile.map(([x, y]) => new THREE.Vector2(x, y)), 160), true), felt));
+  // debrum de gorgurão no fio da aba
+  const trimGeo = new THREE.TorusGeometry(1.745, 0.035, 12, 200); trimGeo.rotateX(Math.PI / 2); trimGeo.translate(0, 0.037, 0);
+  hat.add(new THREE.Mesh(warp(trimGeo, false), trimMat));
+  // fita verde canelada logo acima da aba
+  const ribbon = new THREE.Mesh(new THREE.CylinderGeometry(1.45, 1.47, 0.32, 128, 1, true), greenMat); ribbon.position.y = 0.28; hat.add(ribbon);
+  // laço plano e estruturado, costurado na copa, do lado direito
+  const bow = new THREE.Group(); hat.add(bow); bow.position.y = 0.28;
+  const part = (w, h, d, x, z, ry) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), greenMat); m.position.set(x, 0, z); m.rotation.y = ry; bow.add(m); };
+  part(0.07, 0.34, 0.12, 1.5, 0, 0);
+  part(0.045, 0.27, 0.26, 1.48, 0.19, -0.13);
+  part(0.045, 0.27, 0.26, 1.48, -0.19, 0.13);
+
+  // cartola de verdade (modelo "Top hat" de Filip, Sketchfab, CC BY 4.0): feltro preto e fita verde pintados aqui.
+  // Se o arquivo não carregar, fica a cartola de código acima.
+  const HAT_W = 3.4;
+  let hatTop = HAT_Y + 1.725;
+  try {
+    const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js");
+    const holder = new THREE.Group();
+    const bin = Uint8Array.from(atob(window.TOP_HAT_B64), c => c.charCodeAt(0));
+    holder.add((await new GLTFLoader().parseAsync(bin.buffer, "")).scene);
+    holder.traverse(o => {
+      if (!o.isMesh) return;
+      const old = o.material, ribbon = /ribbon/i.test(o.name + old.name);
+      o.material = new THREE.MeshPhysicalMaterial({ map: old.map, normalMap: old.normalMap, side: THREE.DoubleSide, metalness: 0,
+        color: ribbon ? 0x259048 : 0x2b2b2b, roughness: ribbon ? 0.7 : 0.92, sheen: ribbon ? 0.25 : 0.7, sheenRoughness: 0.5,
+        sheenColor: new THREE.Color(ribbon ? 0x1d5a30 : 0x2a2a2a) });
+    });
+    let box = new THREE.Box3().setFromObject(holder);
+    holder.scale.setScalar(HAT_W / Math.max(box.max.x - box.min.x, box.max.z - box.min.z));
+    box = new THREE.Box3().setFromObject(holder);
+    const mid = box.getCenter(new THREE.Vector3());
+    holder.position.set(-mid.x, -box.min.y, -mid.z);
+    hat.clear(); hat.add(holder);
+    const alto = box.max.y - box.min.y;
+    HAT_Y = -alto / 2 + 0.15; hat.position.y = HAT_Y; // centrada na altura do pote, para não passar do cabeçalho
+    hatTop = HAT_Y + alto;
+  } catch (err) { console.warn("Cartola em arquivo indisponível, usando a de código:", err); }
+
+  // luz só da cena da cartola: chave suave no alto à esquerda e contraluz que desenha a silhueta
+  const hatLights = reduce ? [] : [
+    new THREE.DirectionalLight(0xfff2dd, 1.1), new THREE.DirectionalLight(0xcfe3ff, 1.6)
+  ];
+  if (hatLights.length) { hatLights[0].position.set(-5, 7, 4); hatLights[1].position.set(2, 3, -6); }
+  hatLights.forEach(l => { l.userData.base = l.intensity; scene.add(l); });
+
+  const wand = new THREE.Group(); pivot.add(wand);
+  const wandMat = new THREE.MeshPhysicalMaterial({ color: 0x121212, roughness: 0.3, clearcoat: 1 });
+  const whiteMat = new THREE.MeshStandardMaterial({ color: 0xf1ece2, roughness: 0.5 });
+  const wBody = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 1.6, 16), wandMat); wBody.position.y = 0.8;
+  const wTip = new THREE.Mesh(new THREE.CylinderGeometry(0.038, 0.038, 0.22, 16), whiteMat); wTip.position.y = 0.11;
+  const wEnd = new THREE.Mesh(new THREE.CylinderGeometry(0.038, 0.038, 0.22, 16), whiteMat); wEnd.position.y = 1.49;
+  wand.add(wBody, wTip, wEnd); wand.rotation.z = -0.7; wand.visible = false;
+
+  const puffCv = mkCanvas(64, 64), pg = puffCv.getContext("2d");
+  const pgr = pg.createRadialGradient(32, 32, 2, 32, 32, 32);
+  pgr.addColorStop(0, "rgba(255,255,255,1)"); pgr.addColorStop(0.5, "rgba(255,255,255,.55)"); pgr.addColorStop(1, "rgba(255,255,255,0)");
+  pg.fillStyle = pgr; pg.fillRect(0, 0, 64, 64);
+  const puffTex = new THREE.CanvasTexture(puffCv);
+  const puffs = [];
+  function puff(pos, vel, size, life, birth, color = 0xe6e1d8, peak = 0.85) {
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: puffTex, color, transparent: true, depthTest: false, depthWrite: false, opacity: 0 }));
+    sp.renderOrder = 10; sp.visible = false; pivot.add(sp);
+    puffs.push({ sp, pos, vel, size, life, birth, peak });
+  }
+
+  const T = { cook: 0.3, wand: 2.0, tap1: 3.0, tap2: 3.4, burst: 3.9, end: 5.6 };
+  let introT = 0, introDone = reduce, pop = 1, burstSpawned = false;
+  const skipIntro = () => { if (introT < T.burst - 0.45) introT = T.burst - 0.45; };
+  if (reduce) { hat.visible = false; }
+  else {
+    jar.visible = lid.visible = false;
+    nomeInput.addEventListener("input", skipIntro, { once: true });
+    addEventListener("sim:abrir", skipIntro);
+    addEventListener("scroll", () => { if (scrollY > 40) skipIntro(); }, { passive: true });
+  }
+  const sstep = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+  const bump = (x, w) => Math.exp(-((x / w) ** 2));
+  const backOut = x => 1 + 2.7 * (x - 1) ** 3 + 1.7 * (x - 1) ** 2;
+
+  function stepIntro(dt) {
+    introT += dt;
+    const t = introT;
+    // cozinhando: chacoalha cada vez mais forte
+    const amp = sstep(T.cook, T.tap1, t);
+    const hit = bump(t - T.tap1, 0.09) + bump(t - T.tap2, 0.09);
+    hat.rotation.z = amp * 0.07 * Math.sin(t * 23);
+    hat.rotation.x = amp * 0.05 * Math.sin(t * 17 + 1);
+    hat.position.y = HAT_Y + amp * 0.07 * Math.abs(Math.sin(t * 9));
+    hat.scale.set(1 + 0.03 * hit, 1 + amp * 0.025 * Math.sin(t * 19) - 0.1 * hit, 1 + 0.03 * hit);
+    // fumacinhas saindo de baixo da aba enquanto cozinha
+    if (t > T.cook && t < T.tap2 && Math.random() < dt * 7 * (0.3 + amp)) {
+      const a = Math.random() * 6.28;
+      puff(new THREE.Vector3(Math.cos(a) * 1.7, -0.5, Math.sin(a) * 1.7), new THREE.Vector3(Math.cos(a) * 0.5, 0.7, Math.sin(a) * 0.5), 0.5, 1.3, t, 0xcfc9bd, 0.35);
+    }
+    // varinha: entra, dá dois toques, abana e sai com a fumaça
+    const wIn = sstep(T.wand, T.tap1 - 0.15, t), out = sstep(T.burst, T.burst + 0.3, t);
+    wand.visible = t > T.wand - 0.05 && out < 1;
+    wand.position.set(3.4 - 3.05 * wIn + out * 2, hatTop + 1.55 - 1.15 * wIn + out * 1.5 - 0.3 * hit, 0.5);
+    wand.rotation.z = -0.7 + 0.12 * Math.sin(t * 10) * sstep(T.tap2, T.burst, t);
+    if (!burstSpawned && t >= T.tap1 - 0.02 && !puffs.some(p => p.tag === 1)) {
+      for (const bt of [T.tap1, T.tap2]) for (let i = 0; i < 6; i++) {
+        const a = Math.random() * 6.28;
+        puff(new THREE.Vector3(0.35, hatTop + 0.04, 0.2), new THREE.Vector3(Math.cos(a) * 0.8, 0.6 + Math.random() * 0.6, Math.sin(a) * 0.8), 0.22, 0.6, bt, 0xf0c46a, 1);
+      }
+      puffs.forEach(p => p.tag = 1);
+    }
+    // o toque final: fumaça, cartola some, pote surge com um tranco
+    if (t >= T.burst) {
+      if (!burstSpawned) {
+        burstSpawned = true;
+        for (let i = 0; i < 36; i++) {
+          const a = Math.random() * 6.28, r = 0.4 + Math.random() * 1.4;
+          puff(new THREE.Vector3(Math.cos(a) * 0.4, 0, Math.sin(a) * 0.4), new THREE.Vector3(Math.cos(a) * r, 0.4 + Math.random() * 1.6, Math.sin(a) * r), 1.2 + Math.random() * 0.8, 1.5 + Math.random() * 0.8, T.burst + Math.random() * 0.15, 0xe6e1d8, 0.9);
+        }
+      }
+      const g = (t - T.burst) / 0.2;
+      hat.visible = g < 1; hat.scale.setScalar(Math.max(0.01, 1 - g) * 1.1);
+      hatLights.forEach(l => { l.intensity = l.userData.base * (1 - sstep(T.burst, T.end, t)); });
+      jar.visible = lid.visible = true;
+      pop = 0.55 + 0.45 * backOut(Math.min(1, (t - T.burst) / 0.7));
+    }
+    for (const p of puffs) {
+      const age = t - p.birth;
+      p.sp.visible = age > 0 && age < p.life;
+      if (!p.sp.visible) continue;
+      const k = age / p.life, m = 1 - Math.exp(-age * 2.2);
+      p.sp.position.set(p.pos.x + p.vel.x * m, p.pos.y + p.vel.y * m, p.pos.z + p.vel.z * m);
+      p.sp.scale.setScalar(p.size * (0.5 + 1.6 * Math.sqrt(k)));
+      p.sp.material.opacity = p.peak * (1 - k) ** 1.5 * Math.min(1, age * 8);
+    }
+    if (t >= T.end) {
+      introDone = true; pop = 1; hat.visible = wand.visible = false; hatLights.forEach(l => { l.visible = false; });
+      puffs.forEach(p => { p.sp.visible = false; });
+    }
+  }
+
+  /* pomada da foto de referência: marfim, brilhante, redemoinhos em relevo e subindo na parede */
+  function makeCream(rIn) {
+    const g = new THREE.RingGeometry(0.0001, rIn, 256, 80);
+    const p = g.attributes.position;
+    const bump = (x, y, cx, cy, w, h) => h * Math.exp(-((x - cx) ** 2 + (y - cy) ** 2) / w);
+    const smooth = (a, b, v) => { const t = Math.min(1, Math.max(0, (v - a) / (b - a))); return t * t * (3 - 2 * t); };
+    for (let i = 0; i < p.count; i++) {
+      const x = p.getX(i), y = p.getY(i), u = Math.hypot(x, y) / rIn, t = Math.atan2(y, x);
+      const swirl = Math.sin(t * 2 + u * 9) * 0.06 * (1 - u * 0.4);
+      // dobras da espátula: cristas finas e encaracoladas
+      const ridges = (Math.sin(t * 5 - u * 14 + Math.sin(t * 3) * 1.5) * 0.026
+        + Math.sin(t * 9 + u * 22 + Math.cos(t * 2) * 2) * 0.012) * smooth(0.08, 0.35, u);
+      const peaks = bump(x, y, 0.25, -0.1, 0.08, 0.12) + bump(x, y, -0.35, 0.3, 0.05, 0.09) + bump(x, y, 0.5, 0.45, 0.03, 0.07);
+      const dip = bump(x, y, -0.1, -0.45, 0.06, -0.08) + bump(x, y, 0.05, 0.1, 0.02, -0.05);
+      const edge = smooth(0.78, 1, u) * (0.07 + 0.04 * Math.sin(t * 3 + 0.7));
+      p.setZ(i, swirl + ridges + peaks + dip + edge);
+    }
+    // sombra falsa nas dobras: quanto mais baixo, mais escuro e quente (dá peso e profundidade)
+    const zs = Array.from({ length: p.count }, (_, i) => p.getZ(i));
+    const zMin = Math.min(...zs), zMax = Math.max(...zs), col = new Float32Array(p.count * 3);
+    zs.forEach((z, i) => {
+      const v = 0.62 + 0.38 * smooth(0, 1, (z - zMin) / (zMax - zMin));
+      col.set([v, v * 0.96, v * 0.88], i * 3);
+    });
+    g.setAttribute("color", new THREE.BufferAttribute(col, 3));
+    g.rotateX(-Math.PI / 2);
+    g.computeVertexNormals();
+    return new THREE.Mesh(g, new THREE.MeshPhysicalMaterial({
+      color: 0xe3d6bc, vertexColors: true, roughness: 0.4, envMapIntensity: 0.45, clearcoat: 1, clearcoatRoughness: 0.05
+    }));
+  }
+  // parede interna com marcas de pomada arrastada, mais fortes embaixo
+  function makeSmear(r, y0, y1) {
+    const cv = mkCanvas(1024, 256), c = cv.getContext("2d");
+    c.fillStyle = "#0b0b0b"; c.fillRect(0, 0, 1024, 256);
+    let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    for (let i = 0; i < 26; i++) {
+      const x = rnd() * 1024, w = 30 + rnd() * 120, h = 60 + rnd() * 190;
+      const g = c.createLinearGradient(0, 256, 0, 256 - h);
+      g.addColorStop(0, "rgba(244,236,220,.95)"); g.addColorStop(1, "rgba(244,236,220,0)");
+      c.fillStyle = g; c.beginPath(); c.ellipse(x, 256, w / 2, h, 0, Math.PI, 2 * Math.PI); c.fill();
+    }
+    const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace;
+    return new THREE.Mesh(lathe([[r, y0], [r, y1]]),
+      new THREE.MeshPhysicalMaterial({ map: tex, roughness: 0.3, clearcoat: 0.8, side: THREE.DoubleSide }));
+  }
+
+  const topCv = mkCanvas(2048, 2048), // 2048: cabe a arte da tampa; o desenho padrão (base 1024) é escalado 2x em drawTop
+     bandCv = mkCanvas(4096, Math.round(4096 * (BODY_H - 0.08) / (2 * Math.PI * R))); // mesma proporção da faixa no pote (volta x altura)
+  const topTex = new THREE.CanvasTexture(topCv), bandTex = new THREE.CanvasTexture(bandCv);
+  [topTex, bandTex].forEach(t => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; });
+
+  const top = new THREE.Mesh(new THREE.CircleGeometry(R - 0.06, SEG),
+    new THREE.MeshPhysicalMaterial({ map: topTex, roughness: 0.35, clearcoat: 0.8, clearcoatRoughness: 0.2 }));
+  top.rotation.x = -Math.PI / 2; top.position.y = LID_H + 0.002; lidSpin.add(top);
+
+  const band = new THREE.Mesh(new THREE.CylinderGeometry(R + 0.004, R + 0.004, BODY_H - 0.08, SEG, 1, true),
+    new THREE.MeshPhysicalMaterial({ map: bandTex, roughness: 0.3, clearcoat: 0.6 }));
+  band.position.y = BODY_H / 2 + 0.02; jar.add(band);
+
+  // sombra suave no chão
+  const shCv = mkCanvas(256, 256), sg = shCv.getContext("2d");
+  const grad = sg.createRadialGradient(128, 128, 10, 128, 128, 128);
+  grad.addColorStop(0, "rgba(0,0,0,.65)"); grad.addColorStop(1, "rgba(0,0,0,0)");
+  sg.fillStyle = grad; sg.fillRect(0, 0, 256, 256);
+  const shadow = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 4.2),
+    new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(shCv), transparent: true, depthWrite: false }));
+  shadow.rotation.x = -Math.PI / 2; shadow.position.y = -0.01; jar.add(shadow);
+
+  // tampa: aros do pote + o logotipo base escolhido no centro
+  function drawTop() {
+    const c = topCv.getContext("2d"), S = 1024, m = S / 2;
+    // arte clara de papel: menos verniz, senão o reflexo da luz estoura a tampa para branco
+    Object.assign(top.material, tampa ? { roughness: 0.6, clearcoat: 0.2 } : { roughness: 0.35, clearcoat: 0.8 });
+    if (tampa) { // arte completa da tampa (rotulo-vetorizador) ocupa o disco todo; os aros e o texto padrão saem
+      c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, 2048, 2048);
+      c.drawImage(tampa, 0, 0, 2048, 2048);
+      c.setTransform(2, 0, 0, 2, 0, 0); // logotipo da marca sobre o mapa, no centro (base 1024)
+      const L = 430;
+      const f = c.createRadialGradient(m, m, L * 0.3, m, m, L * 0.62); // fundo escuro suave: o logo dourado não some no mapa
+      f.addColorStop(0, "rgba(14,11,8,.78)"); f.addColorStop(1, "rgba(14,11,8,0)");
+      c.fillStyle = f; c.fillRect(m - L, m - L, 2 * L, 2 * L);
+      c.save(); c.translate(m - L / 2, m - L / 2);
+      c.shadowColor = "rgba(0,0,0,.45)"; c.shadowBlur = 16;
+      drawLogo(c, L, nomeAtual(), estilo, corEscura());
+      c.restore(); c.setTransform(1, 0, 0, 1, 0, 0);
+      topTex.needsUpdate = true; return;
+    }
+    c.setTransform(2, 0, 0, 2, 0, 0);
+    const g = c.createRadialGradient(m, m * 0.8, 40, m, m, m);
+    g.addColorStop(0, tema.bg1); g.addColorStop(1, tema.bg2);
+    c.fillStyle = g; c.fillRect(0, 0, S, S);
+    c.strokeStyle = tema.ring; c.lineWidth = 22; c.beginPath(); c.arc(m, m, m - 30, 0, 7); c.stroke();
+    c.lineWidth = 4; c.beginPath(); c.arc(m, m, m - 66, 0, 7); c.stroke();
+    const L = 660;
+    c.save(); c.translate(m - L / 2, m - L / 2 - 20);
+    c.shadowColor = "rgba(0,0,0,.55)"; c.shadowBlur = 14;
+    drawLogo(c, L, nomeAtual(), estilo, corEscura());
+    c.restore();
+    c.textAlign = "center"; c.textBaseline = "middle";
+    c.fillStyle = tema.sub; c.font = `600 34px "Barlow", sans-serif`;
+    c.letterSpacing = "9px"; c.fillText(pomada.rotulo, m + 4, m + 360); c.letterSpacing = "0px";
+    topTex.needsUpdate = true;
+  }
+  function drawBand() {
+    const c = bandCv.getContext("2d"), W = bandCv.width, H = bandCv.height, k = H / 256;
+    const nome = nomeAtual().toUpperCase();
+    if (tarja) { // arte pronta (exportar-3d.js): o nome vai dentro da moldura
+      const a = tarja.cfg.nome, mmPorUn = 44.55 / R;
+      const volta = 2 * Math.PI * 44.55, faixa = (BODY_H - 0.08) * mmPorUn; // mm
+      const tw = W * tarja.cfg.largura_mm / volta, th = H * tarja.cfg.altura_mm / faixa, y0 = (H - th) / 2;
+      c.fillStyle = "#0b0b0b"; c.fillRect(0, 0, W, H); // o pote liso (mesma cor do corpo)
+      c.textAlign = "center"; c.textBaseline = "middle"; c.fillStyle = "#1f4e52";
+      const tam = fit(c, nome, a.w * tw, a.h * th * 0.7, estilo.css);
+      c.font = `700 ${tam}px ${estilo.css}`;
+      for (const ox of [-tw / 2, W - tw / 2]) { // centrada na frente (u = 0): metade em cada ponta, emendando na costura
+        c.drawImage(tarja.img, ox, y0, tw, th);
+        c.fillText(nome, ox + a.cx * tw, y0 + a.cy * th + tam * 0.04);
+      }
+      bandTex.needsUpdate = true;
+      return;
+    }
+    const g = c.createLinearGradient(0, 0, 0, H); g.addColorStop(0, tema.bg1); g.addColorStop(1, tema.bg2);
+    c.fillStyle = g; c.fillRect(0, 0, W, H);
+    c.fillStyle = tema.ring; c.fillRect(0, 18 * k, W, 5 * k); c.fillRect(0, H - 23 * k, W, 5 * k);
+    c.textAlign = "center"; c.textBaseline = "middle"; c.fillStyle = tema.text;
+    const size = fit(c, nome, W / 3 - 120, 100 * k, estilo.css);
+    c.font = `700 ${size}px ${estilo.css}`;
+    for (let i = 0; i < 3; i++) {
+      c.fillText(nome, W / 3 * (i + 0.5), H / 2 + 4);
+      c.fillStyle = tema.ring; c.beginPath(); c.arc(W / 3 * i, H / 2, 8, 0, 7); c.fill(); c.fillStyle = tema.text;
+    }
+    bandTex.needsUpdate = true;
+  }
+  // stageRefresh só vira render() no fim do initStage, quando câmera e posições já existem
+  redraw = () => { drawTop(); drawBand(); stageRefresh(); };
+  // tarja pronta vinda de rotulo-vetorizador (node exportar-3d.js); sem ela, vale a faixa padrão
+  let tarja = null, tampa = null;
+  new Promise((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = no; i.src = "img/tampa-pomada.webp"; })
+    .then((img) => { tampa = img; redraw(); }).catch(() => {}); // sem o arquivo, vale a tampa padrão
+  Promise.all([
+    fetch("img/tarja-pomada.json").then(r => r.ok ? r.json() : Promise.reject(r.status)),
+    new Promise((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = no; i.src = "img/tarja-pomada.png"; }),
+  ]).then(([cfg, img]) => { tarja = { cfg, img }; redraw(); }).catch(() => {});
+  redraw();
+
+  /* estados do pote por seção: x em fração da meia-largura visível, y em fração da meia-altura */
+  const DESK = [
+    { x: 0.5, y: -0.05, s: 1.15, rx: 0.55, lift: 0, lx: 0 },
+    { x: 1.7, y: 0, s: 0.8, rx: 0.6, lift: 0, lx: 0 },     // áreas: pote sai pela direita para liberar os cartões
+    { x: 0.45, y: -0.05, s: 0.85, rx: 0.65, lift: 0.6, lx: 1 },
+    { x: 0.48, y: 0, s: 1.3, rx: 0.62, lift: 0, lx: 0 },
+    { x: 0.45, y: -0.05, s: 1.2, rx: 0.72, lift: 0.6, lx: 1 },  // estilos: tampa aberta mostrando a massa
+    { x: 0.5, y: 0, s: 1.25, rx: 0.85, lift: 0, lx: 0 },   // logotipo: tampa de frente para ver a marca
+    // brandbook: pote sai pela direita para liberar a tela; o texto fica sempre à esquerda, então ele nunca cruza
+    { x: 1.7, y: 0, s: 0.8, rx: 0.6, lift: 0, lx: 0 },
+    { x: 0.5, y: 0, s: 0.95, rx: 0.3, lift: 0, lx: 0 },
+    { x: 0.5, y: 0, s: 1.1, rx: 0.5, lift: 0, lx: 0 },     // suíte
+    { x: -0.5, y: 0, s: 1.1, rx: 0.6, lift: 0, lx: 0 },    // marketing: texto à direita, pote à esquerda
+    { x: 1.7, y: 0, s: 0.8, rx: 0.6, lift: 0, lx: 0 },     // prova e perguntas
+    { x: 0, y: 0.6, s: 0.6, rx: 0.75, lift: 0.15, lx: 1 }
+  ];
+  const MOB = [
+    { x: 0, y: 0.46, s: 0.58, rx: 0.55, lift: 0, lx: 0 },
+    { x: 0, y: 2.2, s: 0.5, rx: 0.85, lift: 0, lx: 0 },
+    { x: -0.2, y: 0.5, s: 0.45, rx: 0.65, lift: 0.55, lx: 1 },
+    { x: 0, y: 0.5, s: 0.68, rx: 0.65, lift: 0, lx: 0 },
+    { x: -0.15, y: 0.55, s: 0.55, rx: 0.75, lift: 0.5, lx: 1 },
+    { x: 0, y: 0.52, s: 0.62, rx: 0.85, lift: 0, lx: 0 },
+    { x: 0, y: 2.2, s: 0.5, rx: 0.85, lift: 0, lx: 0 },
+    { x: 0, y: 0.62, s: 0.45, rx: 0.3, lift: 0, lx: 0 },
+    { x: 0, y: 0.5, s: 0.6, rx: 0.5, lift: 0, lx: 0 },
+    { x: 0, y: 0.5, s: 0.6, rx: 0.6, lift: 0, lx: 0 },
+    { x: 0, y: 2.2, s: 0.5, rx: 0.85, lift: 0, lx: 0 },
+    { x: 0, y: 0.55, s: 0.55, rx: 0.75, lift: 0.15, lx: 1 }
+  ];
+  const sections = $$("[data-state]");
+  let anchors = [], halfH = 1, halfW = 1, mobile = false;
+
+  function resize() {
+    const w = innerWidth, h = innerHeight;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h; camera.updateProjectionMatrix();
+    halfH = camera.position.z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+    halfW = halfH * camera.aspect;
+    mobile = matchMedia("(max-aspect-ratio: 4/5)").matches;
+    // ponto da rolagem em que cada seção está centralizada na tela
+    anchors = sections.map(s => s.offsetTop + s.offsetHeight / 2 - h / 2);
+    stageRefresh();
+  }
+  addEventListener("resize", resize);
+  resize();
+
+  // no fim da página o pote encolhe e assenta na vaga do cartão de resumo, seguindo-a na rolagem
+  const slot = $(".resumo .slot div");
+  function dockState(fallback) {
+    if (!slot) return fallback;
+    const r = slot.getBoundingClientRect(), pxPerUnit = innerHeight / (2 * halfH);
+    return { x: ((r.left + r.width / 2) / innerWidth) * 2 - 1, y: -(((r.top + r.height / 2) / innerHeight) * 2 - 1),
+      s: (r.width * 0.5) / (R * pxPerUnit), rx: 0.6, lift: 0, lx: 0 };
+  }
+  // simulação aberta: o pote ocupa o espaço livre ao lado do painel (computador) ou acima dele (celular)
+  const POSE = [{ rx: 0.55, lift: 0 }, { rx: 0.7, lift: 0.5 }, { rx: 0.9, lift: 0 }, { rx: 0.65, lift: 0.45 }, { rx: 0.6, lift: 0 }, { rx: 0.6, lift: 0 }];
+  function simState() {
+    const r = dlg.getBoundingClientRect(), pxu = innerHeight / (2 * halfH), lado = r.left > innerWidth * 0.3;
+    const cx = lado ? r.left / 2 : innerWidth / 2, cy = lado ? innerHeight / 2 : Math.max(60, r.top / 2 + 10);
+    const livre = lado ? Math.min(r.left * 0.6, innerHeight * 0.55) : Math.min(r.top * 0.62, innerWidth * 0.62);
+    const P = POSE[sim.passo] || POSE[0];
+    return { x: (cx / innerWidth) * 2 - 1, y: -((cy / innerHeight) * 2 - 1), s: livre / (2 * R * pxu), rx: P.rx, lift: P.lift, lx: lado ? -1 : 1 };
+  }
+  const ease = t => t * t * (3 - 2 * t);
+  function target() {
+    if (sim.aberto) return simState();
+    const S0 = mobile ? MOB : DESK, S = [...S0.slice(0, -1), dockState(S0[S0.length - 1])], y = reduce ? 0 : scrollY;
+    let i = 0;
+    while (i < anchors.length - 1 && y >= anchors[i + 1]) i++;
+    const a = S[i], b = S[Math.min(i + 1, S.length - 1)];
+    const span = anchors[i + 1] - anchors[i];
+    const t = i >= anchors.length - 1 || !span ? 0 : ease(Math.min(1, Math.max(0, (y - anchors[i]) / span)));
+    const o = {};
+    for (const k in a) o[k] = a[k] + (b[k] - a[k]) * t;
+    // no meio da troca o pote encolhe e, se muda de lado, desce: assim não passa por cima do texto
+    const mid = Math.sin(Math.PI * t);
+    o.s *= 1 - 0.5 * mid;
+    if (a.x * b.x < 0) o.y -= 0.55 * mid;
+    return o;
+  }
+
+  // o pote acompanha o mouse de leve (só com mouse de verdade e sem movimento reduzido)
+  const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
+  if (!reduce && matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    addEventListener("pointermove", e => { mouse.tx = (e.clientX / innerWidth) * 2 - 1; mouse.ty = (e.clientY / innerHeight) * 2 - 1; }, { passive: true });
+  }
+  const cur = { ...DESK[0] }; let first = true, spin = 0, last = performance.now();
+  // a luz quente acompanha o pote, mas não sai da tela quando ele sai (seções de cartões continuam iluminadas)
+  const atmos = $(".atmos").style, clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+  function apply(st) {
+    pivot.position.set(st.x * halfW, st.y * halfH, 0);
+    atmos.setProperty("--gx", clamp((st.x + 1) * 50, 12, 88).toFixed(1) + "%");
+    atmos.setProperty("--gy", clamp((1 - st.y) * 50, 15, 85).toFixed(1) + "%");
+    // em tela estreita o pote não pode passar de ~30% da largura, senão cobre o texto
+    pivot.scale.setScalar((mobile ? st.s : Math.min(st.s, 0.3 * halfW / R)) * pop);
+    pivot.rotation.x = st.rx + mouse.y * 0.12;
+    // abre de lado: sobe e tomba para o lado oposto ao texto (lx), deixando a pomada à vista
+    lid.position.set(st.lx * st.lift * 1.7, jar.position.y + BODY_H + st.lift * 0.8, 0);
+    lid.rotation.z = -st.lx * st.lift * 0.75;
+  }
+  function render() {
+    apply(target());
+    jar.rotation.y = lidSpin.rotation.y = -0.6;
+    renderer.render(scene, camera);
+  }
+
+  if (reduce) { stageRefresh = render; render(); return; }
+
+  // o navegador já pausa requestAnimationFrame com a aba escondida
+  function loop(now = performance.now()) {
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    const tg = target();
+    const k = first ? 1 : 1 - Math.exp(-dt * 6);
+    // tampa com peso: abre mais devagar que o resto do movimento
+    const kLid = first ? 1 : 1 - Math.exp(-dt * 2.5);
+    for (const key in cur) cur[key] += (tg[key] - cur[key]) * (key === "lift" ? kLid : k);
+    first = false;
+    apply(cur);
+    const kick = spinKick * (1 - Math.exp(-dt * 4)); spinKick -= kick;
+    spin += dt * 0.25 + kick;
+    const km = 1 - Math.exp(-dt * 5); mouse.x += (mouse.tx - mouse.x) * km; mouse.y += (mouse.ty - mouse.y) * km;
+    if (!introDone) stepIntro(dt);
+    jar.rotation.y = lidSpin.rotation.y = -0.6 + spin + scrollY * 0.0022 + mouse.x * 0.4;
+    renderer.render(scene, camera);
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+</script>
+</body>
+</html>

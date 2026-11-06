@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>UP·Vault — Financeiro</title>
+  <script src="config.js"></script>
+  <script src="nav.js"></script>
+  <script src="suite-data.js"></script>
+  <script src="demo-data.js"></script>
+  <style>
+    .vault-content { flex:1;overflow-y:auto;padding:20px 28px 28px; }
+    .metrics-grid { display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px; }
+    .metric-card { background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px 18px;cursor:pointer;transition:border-color .15s; }
+    .metric-card:hover { border-color:var(--teal); }
+    .metric-card.active { border-color:var(--teal);background:var(--teal-12); }
+    .metric-label { font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin-bottom:10px; }
+    .metric-value { font-family:'Syne',sans-serif;font-weight:800;font-size:26px;letter-spacing:-.04em;color:var(--text); }
+    .metric-sub { font-size:12px;color:var(--muted);margin-top:4px; }
+    .metric-trend { font-size:11px;margin-top:6px;display:flex;align-items:center;gap:3px; }
+    .trend-up { color:var(--green); }
+    .trend-down { color:var(--red); }
+
+    .section-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:12px; }
+    .section-title { font-family:'Syne',sans-serif;font-weight:700;font-size:14px;letter-spacing:-.02em;color:var(--text); }
+
+    .two-col { display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px; }
+    .card { background:var(--bg2);border:1px solid var(--border);border-radius:10px; }
+    .card-header { padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between; }
+    .card-title { font-size:13px;font-weight:600;font-family:'Syne',sans-serif;letter-spacing:-.01em; }
+    .card-body { padding:12px 16px; }
+
+    .tx-item { display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04); }
+    .tx-item:last-child { border-bottom:none; }
+    .tx-info { flex:1; }
+    .tx-desc { font-size:13px;color:var(--text);font-weight:500; }
+    .tx-meta { font-size:11px;color:var(--dim);margin-top:2px; }
+    .tx-value { font-size:13px;font-weight:600;font-family:'Syne',sans-serif; }
+    .tx-value.receita { color:var(--green); }
+    .tx-value.despesa { color:var(--red); }
+
+    .progress-bar-wrap { margin-bottom:14px; }
+    .progress-label { display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:5px; }
+    .progress-bar { height:6px;background:var(--bg3);border-radius:3px;overflow:hidden; }
+    .progress-fill { height:100%;border-radius:3px;transition:width .6s ease; }
+
+    .ai-insight-card { background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:12px; }
+    .ai-insight-header { display:flex;align-items:center;gap:8px;margin-bottom:8px; }
+    .ai-insight-badge { font-size:10px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:3px; }
+    .badge-saudavel { background:var(--green-12);color:var(--green); }
+    .badge-atencao  { background:var(--amber-12);color:var(--amber); }
+    .badge-critica  { background:var(--red-12);color:var(--red); }
+    .ai-insight-text { font-size:13px;color:var(--muted);line-height:1.6; }
+    .ai-insight-action { font-size:12px;color:var(--teal);margin-top:6px; }
+
+    .modal-overlay { position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:1000;backdrop-filter:blur(4px); }
+    .modal-overlay.hidden { display:none; }
+    .modal { background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px;width:440px;max-width:90vw; }
+    .modal-title { font-family:'Syne',sans-serif;font-weight:700;font-size:16px;letter-spacing:-.02em;margin-bottom:20px; }
+    .form-group { margin-bottom:14px; }
+    .form-label { display:block;font-size:12px;color:var(--muted);margin-bottom:5px; }
+    .form-row { display:grid;grid-template-columns:1fr 1fr;gap:12px; }
+    .form-actions { display:flex;gap:8px;justify-content:flex-end;margin-top:20px; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .spin { animation:spin 1s linear infinite; }
+  </style>
+</head>
+<body>
+<div class="suite-layout">
+  <aside id="suite-sidebar" class="suite-sidebar"></aside>
+  <main class="suite-main">
+    <div class="module-header">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div>
+          <h1 class="module-title">UP <span class="dash">—</span> Vault</h1>
+          <p class="module-subtitle">Controle financeiro · caixa e resultados</p>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:4px;">
+          <input class="input" id="month-pick" type="month" style="width:auto;" onchange="changeMonth(this.value)" title="Mês de referência"/>
+          <button class="btn btn-ghost" id="btn-ai" onclick="runAIAnalysis()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Análise IA
+          </button>
+          <button class="btn btn-primary" onclick="openModal('modal-tx')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nova transação
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="vault-content">
+      <!-- Métricas -->
+      <div class="metrics-grid">
+        <div class="metric-card" id="card-saldo">
+          <div class="metric-label">Saldo atual</div>
+          <div class="metric-value" id="val-saldo">—</div>
+          <div class="metric-sub" id="sub-saldo">Caixa disponível</div>
+        </div>
+        <div class="metric-card" id="card-receitas">
+          <div class="metric-label">Receitas do mês</div>
+          <div class="metric-value" id="val-receitas">—</div>
+          <div class="metric-trend trend-up" id="trend-receitas"></div>
+        </div>
+        <div class="metric-card" id="card-despesas">
+          <div class="metric-label">Despesas do mês</div>
+          <div class="metric-value" id="val-despesas">—</div>
+          <div class="metric-trend" id="trend-despesas"></div>
+        </div>
+        <div class="metric-card" id="card-resultado">
+          <div class="metric-label">Resultado</div>
+          <div class="metric-value" id="val-resultado">—</div>
+          <div class="metric-sub">Recebido − pago no mês</div>
+        </div>
+      </div>
+
+      <!-- Meta do mês -->
+      <div class="card" style="margin-bottom:24px;">
+        <div class="card-header">
+          <div class="card-title">Meta do mês</div>
+          <span id="meta-pct-label" style="font-size:12px;color:var(--muted);"></span>
+        </div>
+        <div class="card-body">
+          <div class="progress-bar-wrap">
+            <div class="progress-label">
+              <span>Realizado</span>
+              <span id="meta-pct">0%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="meta-bar" style="background:var(--teal);width:0%"></div></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--dim);">
+            <span id="meta-realizado"></span>
+            <span id="meta-valor"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Análise IA -->
+      <div id="ai-insight-area" style="margin-bottom:24px;display:none;">
+        <div class="section-header"><div class="section-title">Análise IA</div></div>
+        <div id="ai-insight-content"></div>
+      </div>
+
+      <!-- Listas -->
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Receitas</div>
+            <button class="btn btn-ghost btn-sm" onclick="openModal('modal-tx', 'receita')">+ Adicionar</button>
+          </div>
+          <div class="card-body" id="list-receitas"></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Despesas</div>
+            <button class="btn btn-ghost btn-sm" onclick="openModal('modal-tx', 'despesa')">+ Adicionar</button>
+          </div>
+          <div class="card-body" id="list-despesas"></div>
+        </div>
+      </div>
+
+      <!-- Contas a pagar em 7 dias -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Pendentes — a pagar e a receber</div>
+          <span id="contas7d-total" style="font-size:13px;font-weight:600;color:var(--red);font-family:'Syne',sans-serif;"></span>
+        </div>
+        <div class="card-body" id="list-contas7d">
+          <div style="font-size:13px;color:var(--dim);text-align:center;padding:16px;">Nenhuma conta próxima do vencimento</div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal Transação (nova / editar) -->
+<div class="modal-overlay hidden" id="modal-tx" onclick="closeModalBg(event,'modal-tx')">
+  <div class="modal">
+    <div class="modal-title" id="tx-modal-title">Nova transação</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Tipo</label>
+        <select class="input" id="tx-tipo" onchange="syncTxLabels()">
+          <option value="receita">Receita</option>
+          <option value="despesa">Despesa</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Situação</label>
+        <select class="input" id="tx-status" onchange="syncTxLabels()">
+          <option value="pago" id="tx-status-pago">Recebido</option>
+          <option value="pendente" id="tx-status-pend">A receber</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Descrição</label><input class="input" id="tx-desc" type="text" placeholder="Ex: Mensalidade cliente X"/></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Valor (R$)</label><input class="input" id="tx-valor" type="number" min="0" step="0.01" placeholder="0"/></div>
+      <div class="form-group"><label class="form-label" id="tx-data-label">Data</label><input class="input" id="tx-data" type="date"/></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Categoria</label>
+      <select class="input" id="tx-cat">
+        <option>Serviços prestados</option><option>Vendas de produtos</option><option>Software / Ferramentas</option>
+        <option>Marketing</option><option>Pessoal</option><option>Impostos</option><option>Infraestrutura</option><option>Outros</option>
+      </select>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-ghost danger" id="btn-delete-tx" onclick="deleteTx()" style="margin-right:auto;">Excluir</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-tx')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveTx()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script>
+const { U } = Suite;
+const esc = U.esc;
+const fmt = U.fmtBRL;
+const STAR = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+
+let txs = [];
+let month = U.monthKey();
+let editTxId = null;
+
+async function init() {
+  document.getElementById('month-pick').value = month;
+  txs = await store.load('transacoes');
+  render();
+}
+
+async function refresh() { txs = await store.load('transacoes'); render(); }
+
+function changeMonth(v) { if (v) { month = v; render(); } }
+
+function txRow(t, actions = '') {
+  return `
+    <div class="tx-item">
+      <div class="tx-info" onclick="openEditTx('${t.id}')" style="cursor:pointer;" title="Clique para editar">
+        <div class="tx-desc">${esc(t.descricao)}</div>
+        <div class="tx-meta">${esc(t.categoria)} · ${U.fmtDate(t.data)}</div>
+      </div>
+      ${actions}
+      <div class="tx-value ${t.tipo}">${t.tipo === 'receita' ? '+' : '-'} ${fmt(t.valor)}</div>
+    </div>`;
+}
+
+function render() {
+  const f = Suite.finance(txs, month);
+  const today = U.today();
+  const pctMeta = f.meta > 0 ? Math.round(f.receitasMes / f.meta * 100) : 0;
+  const barPct = Math.min(100, pctMeta);
+
+  document.getElementById('val-saldo').textContent     = fmt(f.saldo);
+  document.getElementById('val-saldo').style.color     = f.saldo < 0 ? 'var(--red)' : '';
+  document.getElementById('sub-saldo').textContent     = `A receber ${fmt(f.aReceber)} · a pagar ${fmt(f.aPagar)}`;
+  document.getElementById('val-receitas').textContent  = fmt(f.receitasMes);
+  document.getElementById('val-despesas').textContent  = fmt(f.despesasMes);
+  document.getElementById('trend-receitas').textContent = U.monthLabel(month);
+  document.getElementById('trend-despesas').textContent = U.monthLabel(month);
+  document.getElementById('val-resultado').textContent = fmt(f.resultadoMes);
+  document.getElementById('val-resultado').style.color = f.resultadoMes >= 0 ? 'var(--green)' : 'var(--red)';
+
+  document.getElementById('meta-pct').textContent = pctMeta + '%';
+  document.getElementById('meta-bar').style.width = barPct + '%';
+  document.getElementById('meta-bar').style.background = pctMeta >= 80 ? 'var(--green)' : pctMeta >= 50 ? 'var(--teal)' : 'var(--amber)';
+  document.getElementById('meta-realizado').textContent = fmt(f.receitasMes) + ' recebidos em ' + U.monthLabel(month).toLowerCase();
+  document.getElementById('meta-valor').textContent     = 'Meta: ' + fmt(f.meta);
+  document.getElementById('meta-pct-label').textContent = pctMeta + '% da meta';
+
+  const doMes = tipo => txs.filter(t => t.tipo === tipo && Suite.isPago(t) && U.monthKey(t.data) === month).sort((a, b) => b.data.localeCompare(a.data));
+  const empty = msg => `<div style="font-size:13px;color:var(--dim);text-align:center;padding:16px;">${msg}</div>`;
+  const renderList = (list, el, msg) => { document.getElementById(el).innerHTML = list.length ? list.map(t => txRow(t)).join('') : empty(msg); };
+  renderList(doMes('receita'), 'list-receitas', 'Nenhuma receita recebida neste mês');
+  renderList(doMes('despesa'), 'list-despesas', 'Nenhuma despesa paga neste mês');
+
+  // Pendentes: tudo que ainda não foi pago/recebido, do vencimento mais próximo ao mais distante
+  const pend = txs.filter(t => !Suite.isPago(t)).sort((a, b) => a.data.localeCompare(b.data));
+  document.getElementById('contas7d-total').textContent = f.contas7dTotal > 0 ? `${fmt(f.contas7dTotal)} a pagar em até 7 dias` : '';
+  document.getElementById('list-contas7d').innerHTML = pend.length
+    ? pend.map(t => {
+        const dias = U.daysBetween(today, t.data);
+        const quando = dias < 0 ? `<span style="color:var(--red);">vencida há ${-dias} dia${dias !== -1 ? 's' : ''}</span>` : dias === 0 ? `<span style="color:var(--amber);">vence hoje</span>` : `vence em ${dias} dia${dias !== 1 ? 's' : ''}`;
+        return `
+        <div class="tx-item">
+          <div class="tx-info" onclick="openEditTx('${t.id}')" style="cursor:pointer;" title="Clique para editar">
+            <div class="tx-desc">${esc(t.descricao)}</div>
+            <div class="tx-meta">${t.tipo === 'receita' ? 'A receber' : 'A pagar'} · ${U.fmtDate(t.data)} · ${quando}</div>
+          </div>
+          <button class="btn btn-ghost btn-sm" style="margin-right:12px;" onclick="settleTx('${t.id}')">${t.tipo === 'receita' ? 'Marcar recebido' : 'Marcar pago'}</button>
+          <div class="tx-value ${t.tipo}">${fmt(t.valor)}</div>
+        </div>`;
+      }).join('')
+    : empty('Nenhuma conta pendente ✓');
+}
+
+async function runAIAnalysis() {
+  const btn = document.getElementById('btn-ai');
+  btn.disabled = true;
+  btn.innerHTML = `<svg class="spin" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Analisando…`;
+  const f = Suite.finance(txs, month);
+
+  try {
+    const r = await window.callClaude({
+      systemPrompt:`Você é analista financeiro de ${CLIENT_CONFIG.empresa} (${CLIENT_CONFIG.setor}). Seja direto. O dono não é contador. Use só os números recebidos — não invente valores. Retorne APENAS JSON: {"situacao":"saudavel|atencao|critica","resumo":"...","alerta":"... ou vazio","acao":"..."}`,
+      userPayload:{ periodo:U.monthLabel(month), hoje:U.today(), receitas_recebidas:f.receitasMes, despesas_pagas:f.despesasMes, resultado:f.resultadoMes, saldo_atual:f.saldo, a_receber:f.aReceber, a_pagar:f.aPagar, contas_a_pagar_7d:f.contas7dTotal, meta_mes:f.meta,
+        maiores_despesas: txs.filter(t => t.tipo === 'despesa' && U.monthKey(t.data) === month).sort((a,b)=>b.valor-a.valor).slice(0,5).map(t=>({ descricao:t.descricao, valor:t.valor, categoria:t.categoria })) },
+      mockResponse: JSON.stringify({ situacao:'saudavel', resumo:'Mês bem encaminhado: receita acima de 80% da meta, margem perto de 40% e caixa confortável.', alerta:'O Simples Nacional (R$ 12.400) vence em 2 dias — o saldo cobre, mas confirme o pagamento.', acao:'A 2ª parcela da Lemos Advocacia (R$ 36 mil) fecha a meta do mês. Confirme o recebimento na data.' })
+    });
+    const ai = U.parseAIJson(r);
+    const situacao = ['saudavel','atencao','critica'].includes(ai.situacao) ? ai.situacao : 'atencao';
+    const labels = { saudavel:'Situação saudável', atencao:'Atenção necessária', critica:'Situação crítica' };
+    document.getElementById('ai-insight-content').innerHTML = `
+      <div class="ai-insight-card">
+        <div class="ai-insight-header">
+          <span class="ai-insight-badge badge-${situacao}">${labels[situacao]}</span>
+          <span style="font-size:11px;color:var(--dim);">Análise IA · ${U.monthLabel(month)} · agora</span>
+        </div>
+        <div class="ai-insight-text">${esc(ai.resumo)}</div>
+        ${ai.alerta ? `<div class="ai-insight-text" style="color:var(--amber);margin-top:6px;">⚠ ${esc(ai.alerta)}</div>` : ''}
+        ${ai.acao ? `<div class="ai-insight-action">→ ${esc(ai.acao)}</div>` : ''}
+      </div>`;
+    document.getElementById('ai-insight-area').style.display = 'block';
+    toast('Análise gerada', 'success');
+  } catch (e) { toast(e.message, 'error'); }
+
+  btn.disabled = false;
+  btn.innerHTML = `${STAR} Análise IA`;
+}
+
+// ── Modal ────────────────────────────────────────────────────
+function syncTxLabels() {
+  const receita = document.getElementById('tx-tipo').value === 'receita';
+  const pendente = document.getElementById('tx-status').value === 'pendente';
+  document.getElementById('tx-status-pago').textContent = receita ? 'Recebido' : 'Pago';
+  document.getElementById('tx-status-pend').textContent = receita ? 'A receber' : 'A pagar';
+  document.getElementById('tx-data-label').textContent  = pendente ? 'Vencimento' : (receita ? 'Data do recebimento' : 'Data do pagamento');
+}
+
+function openModal(id, tipo) {
+  editTxId = null;
+  document.getElementById('tx-modal-title').textContent = 'Nova transação';
+  document.getElementById('tx-tipo').value = tipo || 'receita';
+  document.getElementById('tx-status').value = 'pago';
+  document.getElementById('tx-data').value = U.today();
+  document.getElementById('tx-desc').value = '';
+  document.getElementById('tx-valor').value = '';
+  document.getElementById('btn-delete-tx').style.display = 'none';
+  syncTxLabels();
+  document.getElementById(id).classList.remove('hidden');
+  document.getElementById('tx-desc').focus();
+}
+
+function openEditTx(id) {
+  const t = txs.find(x => x.id === id);
+  if (!t) return;
+  editTxId = id;
+  document.getElementById('tx-modal-title').textContent = 'Editar transação';
+  document.getElementById('tx-tipo').value = t.tipo;
+  document.getElementById('tx-status').value = Suite.isPago(t) ? 'pago' : 'pendente';
+  document.getElementById('tx-data').value = t.data;
+  document.getElementById('tx-desc').value = t.descricao;
+  document.getElementById('tx-valor').value = t.valor;
+  const cat = document.getElementById('tx-cat');
+  if (![...cat.options].some(o => o.value === t.categoria)) cat.add(new Option(t.categoria, t.categoria));
+  cat.value = t.categoria;
+  document.getElementById('btn-delete-tx').style.display = '';
+  syncTxLabels();
+  document.getElementById('modal-tx').classList.remove('hidden');
+}
+
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+function closeModalBg(e,id) { if(e.target.classList.contains('modal-overlay')) closeModal(id); }
+
+async function saveTx() {
+  const desc  = document.getElementById('tx-desc').value.trim();
+  const valor = parseFloat(document.getElementById('tx-valor').value);
+  const data  = document.getElementById('tx-data').value;
+  if (!desc || !(valor > 0)) { toast('Preencha descrição e um valor maior que zero', 'warn'); return; }
+  if (!data) { toast('Informe a data', 'warn'); return; }
+  const fields = { tipo:document.getElementById('tx-tipo').value, status:document.getElementById('tx-status').value, descricao:desc, valor, data, categoria:document.getElementById('tx-cat').value };
+  const id = editTxId;
+  await store.mutate('transacoes', list => {
+    if (id) { const t = list.find(x => x.id === id); if (t) Object.assign(t, fields); }
+    else list.unshift({ id: U.uid('t'), criado_em: new Date().toISOString(), ...fields });
+  });
+  closeModal('modal-tx');
+  await refresh();
+  toast(`${fields.tipo === 'receita' ? 'Receita' : 'Despesa'} ${id ? 'atualizada' : 'registrada'}`, 'success');
+}
+
+// Baixa de conta pendente: vira lançamento efetivo na data de hoje
+async function settleTx(id) {
+  await store.mutate('transacoes', list => {
+    const t = list.find(x => x.id === id);
+    if (t) { t.vencimento = t.data; t.data = U.today(); t.status = 'pago'; }
+  });
+  await refresh();
+  toast('Baixa registrada com a data de hoje', 'success');
+}
+
+async function deleteTx() {
+  const id = editTxId;
+  if (!id || !confirm('Excluir esta transação? Esta ação não pode ser desfeita.')) return;
+  await store.mutate('transacoes', list => list.filter(x => x.id !== id));
+  closeModal('modal-tx');
+  await refresh();
+  toast('Transação excluída', 'success');
+}
+
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal('modal-tx'); });
+init();
+</script>
+</body>
+</html>

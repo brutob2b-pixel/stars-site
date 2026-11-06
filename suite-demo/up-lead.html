@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>UP·Lead — CRM & Vendas</title>
+  <meta name="author" content="Rafael Barros — UP Co."/>
+  <script src="config.js"></script>
+  <script src="nav.js"></script>
+  <script src="suite-data.js"></script>
+  <script src="demo-data.js"></script>
+  <style>
+    .lead-body { flex:1;display:flex;flex-direction:column;overflow:hidden; }
+    .lead-tabs { display:flex;align-items:center;border-bottom:1px solid var(--border);padding:0 28px;margin-top:16px;flex-shrink:0; }
+    .lead-tab { padding:10px 16px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s,border-color .15s;display:flex;align-items:center;gap:6px;user-select:none; }
+    .lead-tab:hover { color:var(--text); }
+    .lead-tab.active { color:var(--text);border-bottom-color:var(--teal); }
+    .tab-count { font-size:10px;font-weight:500;background:var(--bg3);color:var(--muted);padding:1px 6px;border-radius:10px; }
+    .lead-tab.active .tab-count { background:var(--teal-12);color:var(--teal); }
+    .lead-panels { flex:1;overflow:hidden; }
+    .lead-panel { display:none;height:100%; }
+    .lead-panel.active { display:flex; }
+
+    /* Conversas */
+    .conv-list { width:280px;min-width:280px;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden; }
+    .conv-search { padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0; }
+    .conv-search-wrap { position:relative; }
+    .conv-search-wrap svg { position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--dim);pointer-events:none; }
+    .conv-search-input { background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 10px 6px 32px;font-size:13px;color:var(--text);width:100%; }
+    .conv-search-input:focus { border-color:var(--teal);outline:none; }
+    .conv-search-input::placeholder { color:var(--dim); }
+    .conv-filters { display:flex;padding:8px 16px;border-bottom:1px solid var(--border);flex-shrink:0; }
+    .conv-filter { font-size:11px;font-weight:500;padding:4px 10px;color:var(--muted);cursor:pointer;border-radius:4px;transition:all .15s; }
+    .conv-filter:hover { color:var(--text); }
+    .conv-filter.active { background:var(--teal-12);color:var(--teal); }
+    .conv-items { flex:1;overflow-y:auto; }
+    .conv-item { padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s; }
+    .conv-item:hover { background:rgba(255,255,255,.02); }
+    .conv-item.active { background:var(--teal-12); }
+    .conv-item-top { display:flex;align-items:center;justify-content:space-between;margin-bottom:4px; }
+    .conv-item-name { font-size:13px;font-weight:500;color:var(--text); }
+    .conv-item-time { font-size:11px;color:var(--dim); }
+    .conv-item-preview { font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:6px; }
+    .conv-item-meta { display:flex;align-items:center;gap:6px; }
+
+    .conv-chat { flex:1;display:flex;flex-direction:column;overflow:hidden; }
+    .conv-chat-header { padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0; }
+    .conv-chat-name { font-family:'Syne',sans-serif;font-weight:700;font-size:15px;letter-spacing:-.02em; }
+    .conv-messages { flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px; }
+    .msg { max-width:72%;display:flex;flex-direction:column;gap:2px; }
+    .msg.inbound { align-self:flex-start; }
+    .msg.outbound { align-self:flex-end; }
+    .msg-bubble { padding:9px 13px;border-radius:12px;font-size:13px;line-height:1.5; }
+    .msg.inbound .msg-bubble { background:var(--bg3);color:var(--text);border-bottom-left-radius:3px; }
+    .msg.outbound .msg-bubble { background:var(--teal-22);color:var(--text);border-bottom-right-radius:3px; }
+    .msg-time { font-size:10px;color:var(--dim);padding:0 4px; }
+    .msg.outbound .msg-time { align-self:flex-end; }
+    .conv-input-area { padding:12px 20px;border-top:1px solid var(--border);flex-shrink:0; }
+    .conv-input-row { display:flex;gap:8px;align-items:flex-end; }
+    .conv-textarea { flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:13px;color:var(--text);resize:none;min-height:38px;max-height:120px;line-height:1.5;transition:border-color .15s;font-family:'DM Sans',sans-serif; }
+    .conv-textarea:focus { border-color:var(--teal);outline:none; }
+    .conv-textarea::placeholder { color:var(--dim); }
+    .btn-send { background:var(--teal);color:#fff;border:none;border-radius:8px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity .15s;flex-shrink:0; }
+    .btn-send:hover { opacity:.85; }
+    .conv-actions-row { display:flex;align-items:center;gap:8px;margin-top:8px; }
+
+    .conv-contact-panel { width:256px;min-width:256px;border-left:1px solid var(--border);overflow-y:auto;padding:16px; }
+    .contact-panel-title { font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:12px; }
+    .contact-score-bar { height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;margin:6px 0 12px; }
+    .contact-score-fill { height:100%;background:var(--teal);border-radius:2px;transition:width .6s ease; }
+    .contact-field { margin-bottom:12px; }
+    .contact-field-label { font-size:11px;color:var(--dim);margin-bottom:3px; }
+    .contact-field-value { font-size:13px;color:var(--text); }
+    .ai-box { background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;margin-top:12px; }
+    .ai-box-label { font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);margin-bottom:8px;display:flex;align-items:center;gap:5px; }
+    .ai-box-text { font-size:12px;color:var(--muted);line-height:1.6; }
+
+    /* Contatos */
+    .contacts-panel { flex:1;flex-direction:column;overflow:hidden; }
+    .contacts-toolbar { padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-bottom:1px solid var(--border); }
+    .contacts-table-wrap { flex:1;overflow-y:auto;padding:0 24px 24px; }
+    table.leads-table { width:100%;border-collapse:collapse;margin-top:8px; }
+    .leads-table th { text-align:left;font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);padding:8px 12px;border-bottom:1px solid var(--border); }
+    .leads-table td { padding:11px 12px;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;color:var(--text); }
+    .leads-table tr:hover td { background:rgba(255,255,255,.02); }
+    .priority-dots { display:flex;gap:3px; }
+    .priority-dot { width:6px;height:6px;border-radius:50%;background:var(--border); }
+    .priority-dot.filled { background:var(--teal); }
+
+    /* Pipeline */
+    .pipeline-panel { flex:1;flex-direction:column;overflow:hidden; }
+    .pipeline-toolbar { padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-bottom:1px solid var(--border); }
+    .pipeline-board { flex:1;display:flex;gap:12px;padding:16px 24px;overflow-x:auto;overflow-y:hidden; }
+    .pipeline-col { min-width:210px;width:210px;display:flex;flex-direction:column;gap:8px; }
+    .pipeline-col-header { display:flex;align-items:center;justify-content:space-between;padding:0 4px;margin-bottom:4px; }
+    .pipeline-col-title { font-size:12px;font-weight:500;color:var(--muted);display:flex;align-items:center;gap:6px; }
+    .pipeline-col-dot { width:6px;height:6px;border-radius:50%; }
+    .pipeline-col-count { font-size:11px;color:var(--dim); }
+    .pipeline-card { background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px;cursor:grab;transition:border-color .15s,transform .1s; }
+    .pipeline-card:hover { border-color:var(--teal);transform:translateY(-1px); }
+    .pipeline-card.dragging { opacity:.5;cursor:grabbing; }
+    .pipeline-col.drag-over { background:var(--teal-12);border-radius:8px; }
+    .pipeline-card-name { font-size:13px;font-weight:500;color:var(--text);margin-bottom:4px; }
+    .pipeline-card-company { font-size:12px;color:var(--muted);margin-bottom:8px; }
+    .pipeline-card-footer { display:flex;align-items:center;justify-content:space-between; }
+    .pipeline-card-value { font-size:13px;font-weight:500;color:var(--teal);font-family:'Syne',sans-serif; }
+
+    /* Modal */
+    .modal-overlay { position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:1000;backdrop-filter:blur(4px); }
+    .modal-overlay.hidden { display:none; }
+    .modal { background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px;width:440px;max-width:90vw; }
+    .modal-title { font-family:'Syne',sans-serif;font-weight:700;font-size:16px;letter-spacing:-.02em;margin-bottom:20px;color:var(--text); }
+    .form-group { margin-bottom:14px; }
+    .form-label { display:block;font-size:12px;color:var(--muted);margin-bottom:5px; }
+    .form-actions { display:flex;gap:8px;justify-content:flex-end;margin-top:20px; }
+    .empty-state { display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:8px;color:var(--dim); }
+    .empty-state p { font-size:13px; }
+  </style>
+</head>
+<body>
+<div class="suite-layout">
+  <aside id="suite-sidebar" class="suite-sidebar"></aside>
+  <main class="suite-main">
+    <div class="module-header">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div>
+          <h1 class="module-title">UP <span class="dash">—</span> Lead</h1>
+          <p class="module-subtitle">CRM & vendas · pipeline comercial</p>
+        </div>
+        <button class="btn btn-primary" onclick="openNewLeadModal()" style="margin-top:4px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Novo lead
+        </button>
+      </div>
+    </div>
+
+    <div class="lead-tabs">
+      <div class="lead-tab active" onclick="switchTab('conversas',this)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Conversas <span class="tab-count" id="count-conversas">3</span>
+      </div>
+      <div class="lead-tab" onclick="switchTab('contatos',this)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        Contatos <span class="tab-count" id="count-contatos">3</span>
+      </div>
+      <div class="lead-tab" onclick="switchTab('pipeline',this)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="5" height="18"/><rect x="10" y="8" width="5" height="13"/><rect x="17" y="5" width="5" height="16"/></svg>
+        Pipeline <span class="tab-count" id="count-pipeline">R$ 42k</span>
+      </div>
+    </div>
+
+    <div class="lead-panels">
+
+      <!-- CONVERSAS -->
+      <div id="panel-conversas" class="lead-panel active">
+        <div class="conv-list">
+          <div class="conv-search">
+            <div class="conv-search-wrap">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input class="conv-search-input" type="text" placeholder="Buscar conversa…" oninput="filterConversas(this.value)"/>
+            </div>
+          </div>
+          <div class="conv-filters">
+            <div class="conv-filter active" onclick="filterStatus('all',this)">Todas</div>
+            <div class="conv-filter" onclick="filterStatus('open',this)">Abertas</div>
+            <div class="conv-filter" onclick="filterStatus('pending',this)">Pendentes</div>
+            <div class="conv-filter" onclick="filterStatus('resolved',this)">Resolvidas</div>
+          </div>
+          <div class="conv-items" id="conv-items-list"></div>
+        </div>
+
+        <div class="conv-chat">
+          <div class="conv-chat-header">
+            <div>
+              <div class="conv-chat-name" id="conv-chat-name">Selecione uma conversa</div>
+              <div style="font-size:12px;color:var(--muted)" id="conv-chat-sub"></div>
+            </div>
+            <div style="display:flex;gap:8px;" id="conv-header-actions"></div>
+          </div>
+          <div class="conv-messages" id="conv-messages">
+            <div class="empty-state">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" style="color:var(--dim)"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <p>Selecione uma conversa</p>
+            </div>
+          </div>
+          <div class="conv-input-area" id="conv-input-area" style="display:none;">
+            <div class="conv-input-row">
+              <textarea class="conv-textarea" id="conv-textarea" placeholder="Escreva a mensagem… (Enter registra no histórico)" rows="1" onkeydown="handleTextareaKey(event)" oninput="autoResizeTextarea(this)"></textarea>
+              <button class="btn-send" onclick="sendMessage()" title="Registrar no histórico (não envia)">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              </button>
+            </div>
+            <div class="conv-actions-row">
+              <button class="btn btn-ghost btn-sm" id="btn-suggest" onclick="suggestResponse()">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                Sugerir resposta
+              </button>
+              <button class="btn btn-ghost btn-sm" id="btn-resolve" onclick="markResolved()">Resolver</button>
+              <select class="input" id="msg-dir" style="width:auto;padding:5px 10px;font-size:12px;margin-left:auto;" title="Como a seta registra a mensagem no histórico">
+                <option value="outbound">Registrar como enviada</option>
+                <option value="inbound">Registrar como recebida do lead</option>
+              </select>
+              <button class="btn btn-primary btn-sm" onclick="sendWhatsApp()">Enviar no WhatsApp ↗</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="conv-contact-panel">
+          <div class="contact-panel-title">Contato</div>
+          <div id="contact-panel-content">
+            <div class="empty-state" style="height:auto;padding-top:40px;"><p style="color:var(--dim);">Selecione uma conversa</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTATOS -->
+      <div id="panel-contatos" class="lead-panel">
+        <div class="contacts-panel">
+          <div class="contacts-toolbar">
+            <div style="position:relative;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--dim)"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input class="input" style="padding-left:32px;width:240px;" type="text" placeholder="Buscar contato…" oninput="filterContatos(this.value)"/>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <select class="input" style="width:auto;padding:7px 12px;" onchange="filterTemperatura(this.value)">
+                <option value="">Todas temperaturas</option>
+                <option value="quente">Quente</option>
+                <option value="morno">Morno</option>
+                <option value="frio">Frio</option>
+              </select>
+              <button class="btn btn-primary btn-sm" onclick="openNewLeadModal()">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Novo lead
+              </button>
+            </div>
+          </div>
+          <div class="contacts-table-wrap">
+            <table class="leads-table">
+              <thead>
+                <tr>
+                  <th>Nome</th><th>Canal</th><th>Temperatura</th>
+                  <th>Prioridade</th><th>Próximo passo</th><th>Adicionado</th><th></th>
+                </tr>
+              </thead>
+              <tbody id="contatos-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PIPELINE -->
+      <div id="panel-pipeline" class="lead-panel">
+        <div class="pipeline-panel">
+          <div class="pipeline-toolbar">
+            <div style="font-size:13px;color:var(--muted);">
+              <span id="pipeline-total-value" style="color:var(--text);font-weight:600;font-family:'Syne',sans-serif;"></span>
+              <span> em pipeline</span>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="openNewDealModal()">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Novo deal
+            </button>
+          </div>
+          <div class="pipeline-board" id="pipeline-board"></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Modal Lead (novo / editar) -->
+<div class="modal-overlay hidden" id="modal-new-lead" onclick="closeModalOnBackdrop(event,'modal-new-lead')">
+  <div class="modal">
+    <div class="modal-title" id="lead-modal-title">Novo lead</div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Nome</label><input class="input" id="new-lead-nome" type="text" placeholder="Nome do contato"/></div>
+      <div class="form-group"><label class="form-label">WhatsApp (com DDD)</label><input class="input" id="new-lead-telefone" type="tel" placeholder="(11) 99999-0000"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Canal de entrada</label>
+        <select class="input" id="new-lead-canal">
+          <option>WhatsApp</option><option>Instagram DM</option><option>Formulário</option><option>Google Ads</option><option>Indicação</option><option>LinkedIn</option><option>Outro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Temperatura</label>
+        <select class="input" id="new-lead-temp">
+          <option value="auto">Classificar com IA</option><option value="quente">Quente</option><option value="morno">Morno</option><option value="frio">Frio</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group" id="new-lead-msg-group"><label class="form-label">Mensagem inicial</label><textarea class="input" id="new-lead-mensagem" rows="3" placeholder="O que o lead disse…" style="resize:vertical;"></textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Próximo passo</label><input class="input" id="new-lead-passo" type="text" placeholder="Ex: ligar amanhã às 10h"/></div>
+      <div class="form-group"><label class="form-label">Post de origem (UP·Post)</label><select class="input" id="new-lead-post"></select></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-new-lead')">Cancelar</button>
+      <button class="btn btn-primary" id="btn-save-lead" onclick="saveLead()">Salvar lead</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Deal (novo / editar) -->
+<div class="modal-overlay hidden" id="modal-new-deal" onclick="closeModalOnBackdrop(event,'modal-new-deal')">
+  <div class="modal">
+    <div class="modal-title" id="deal-modal-title">Novo deal</div>
+    <div class="form-group"><label class="form-label">Título</label><input class="input" id="new-deal-titulo" type="text" placeholder="Ex: Implementação UP Co. Suite"/></div>
+    <div class="form-group"><label class="form-label">Contato</label><select class="input" id="new-deal-lead"></select></div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Etapa</label>
+        <select class="input" id="new-deal-stage"></select>
+      </div>
+      <div class="form-group"><label class="form-label">Valor estimado (R$)</label><input class="input" id="new-deal-valor" type="number" min="0" step="0.01" placeholder="2800"/></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-ghost danger" id="btn-delete-deal" onclick="deleteDeal()" style="margin-right:auto;">Excluir</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-new-deal')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveDeal()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script>
+const { U } = Suite;
+const esc = U.esc;
+const STAR = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+const SPIN = `<svg class="spin" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>`;
+const TEMPS = ['quente', 'morno', 'frio'];
+const PRIORIDADE = { quente: 5, morno: 3, frio: 2 };
+
+// ── ESTADO ───────────────────────────────────────────────────
+const state = { leads:[], pipeline:[], posts:[], activeConvId:null, convFilter:'all', convSearch:'', contFilter:'', contTempFilter:'', dragDealId:null, editLeadId:null, editDealId:null };
+
+async function reload() {
+  [state.leads, state.pipeline, state.posts] = await Promise.all([store.load('leads'), store.load('pipeline'), store.load('posts')]);
+}
+
+function renderAll() {
+  renderConversas(); renderContatos(); renderPipeline();
+  if (state.activeConvId) renderConv();
+}
+
+async function refresh() { await reload(); renderAll(); }
+
+async function init() {
+  await refresh();
+  state.ai = (await Suite.aiStatus()).ai;
+}
+
+const activeLead = () => state.leads.find(x => x.id === state.activeConvId);
+
+// Post de origem: o código que vem na mensagem (link rastreado do UP·Post) vale como certeza;
+// o que é escolhido à mão no cadastro fica marcado como "informado".
+function detectPost(text) {
+  const found = Suite.POST.extractCode(text);
+  return found && state.posts.some(p => p.codigo === found.codigo) ? found : null;
+}
+const postLabel = l => l.post_codigo ? `<a href="up-post.html" class="badge badge-teal" title="${l.post_origem === 'codigo' ? 'Código veio na mensagem' : 'Informado no cadastro'}">${esc(l.post_codigo)}${l.post_origem === 'codigo' ? '' : ' · informado'}</a>` : '';
+
+// ── TABS ─────────────────────────────────────────────────────
+function switchTab(name, el) {
+  document.querySelectorAll('.lead-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.lead-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+}
+
+// ── CONVERSAS ────────────────────────────────────────────────
+function renderConversas() {
+  let leads = state.leads;
+  if (state.convFilter !== 'all') leads = leads.filter(l => l.status === state.convFilter);
+  if (state.convSearch) leads = leads.filter(l => l.nome.toLowerCase().includes(state.convSearch.toLowerCase()));
+  document.getElementById('conv-items-list').innerHTML = leads.map(l => `
+    <div class="conv-item ${l.id === state.activeConvId ? 'active' : ''}" onclick="selectConv('${l.id}')">
+      <div class="conv-item-top"><span class="conv-item-name">${esc(l.nome)}</span><span class="conv-item-time">${U.fmtDate(l.criado_em).slice(0,5)}</span></div>
+      <div class="conv-item-preview">${esc(l.historico.slice(-1)[0]?.text || '—')}</div>
+      <div class="conv-item-meta"><span class="badge badge-${esc(l.temperatura)}">${esc(l.temperatura)}</span><span style="font-size:11px;color:var(--dim);">${esc(l.canal)}${l.status === 'resolved' ? ' · resolvido' : ''}</span></div>
+    </div>`).join('') || `<div class="empty-block">${state.leads.length ? 'Nenhuma conversa neste filtro' : '<strong>Nenhum lead ainda</strong>Cadastre o primeiro em "Novo lead".'}</div>`;
+  document.getElementById('count-conversas').textContent = state.leads.filter(l => l.status !== 'resolved').length;
+}
+
+function filterConversas(q) { state.convSearch = q; renderConversas(); }
+function filterStatus(f, el) {
+  state.convFilter = f;
+  document.querySelectorAll('.conv-filter').forEach(e => e.classList.remove('active'));
+  el.classList.add('active');
+  renderConversas();
+}
+
+function selectConv(id) {
+  state.activeConvId = id;
+  document.getElementById('conv-textarea').value = '';
+  renderConversas();
+  renderConv();
+}
+
+function renderConv() {
+  const l = activeLead();
+  const msgs = document.getElementById('conv-messages');
+  if (!l) { // lead excluído
+    state.activeConvId = null;
+    document.getElementById('conv-chat-name').textContent = 'Selecione uma conversa';
+    document.getElementById('conv-chat-sub').textContent = '';
+    document.getElementById('conv-header-actions').innerHTML = '';
+    document.getElementById('conv-input-area').style.display = 'none';
+    msgs.innerHTML = `<div class="empty-state"><p>Selecione uma conversa</p></div>`;
+    document.getElementById('contact-panel-content').innerHTML = `<div class="empty-state" style="height:auto;padding-top:40px;"><p style="color:var(--dim);">Selecione uma conversa</p></div>`;
+    return;
+  }
+  document.getElementById('conv-chat-name').textContent = l.nome;
+  document.getElementById('conv-chat-sub').textContent = `${l.canal} · Score ${l.lead_score ?? '—'}/100${l.telefone ? ' · ' + l.telefone : ''}`;
+  document.getElementById('conv-header-actions').innerHTML = `<span class="badge badge-${esc(l.temperatura)}">${esc(l.temperatura)}</span><button class="btn btn-ghost btn-sm" onclick="openNewDealFromLead('${l.id}')">Criar deal</button>`;
+  msgs.innerHTML = l.historico.map(m => `<div class="msg ${m.dir === 'outbound' ? 'outbound' : 'inbound'}"><div class="msg-bubble">${esc(m.text)}</div><div class="msg-time">${m.ts ? U.fmtDateTime(m.ts) : esc(m.time)}</div></div>`).join('')
+    || `<div class="empty-state"><p>Nenhuma mensagem registrada</p></div>`;
+  msgs.scrollTop = msgs.scrollHeight;
+  document.getElementById('conv-input-area').style.display = 'block';
+  document.getElementById('btn-resolve').textContent = l.status === 'resolved' ? 'Reabrir' : 'Resolver';
+  renderContactPanel(l);
+}
+
+function renderContactPanel(l) {
+  const statusLabel = { open:'Aberta', pending:'Pendente', resolved:'Resolvida' };
+  const wa = U.waLink(l.telefone);
+  document.getElementById('contact-panel-content').innerHTML = `
+    <div style="margin-bottom:12px;"><div style="font-size:16px;font-weight:600;color:var(--text);font-family:'Syne',sans-serif;">${esc(l.nome)}</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">${esc(l.canal)}</div></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;"><span style="font-size:12px;color:var(--muted);">Score</span><span style="font-size:13px;font-weight:600;color:var(--teal);font-family:'Syne',sans-serif;">${l.lead_score ?? '—'}</span></div>
+    <div class="contact-score-bar"><div class="contact-score-fill" style="width:${Number(l.lead_score) || 0}%"></div></div>
+    <div class="contact-field"><div class="contact-field-label">WhatsApp</div><div class="contact-field-value">${l.telefone ? (wa ? `<a href="${wa}" target="_blank" rel="noopener" style="color:var(--teal);">${esc(l.telefone)} ↗</a>` : esc(l.telefone)) : '<span style="color:var(--dim);">não informado</span>'}</div></div>
+    <div class="contact-field"><div class="contact-field-label">Status</div><div class="contact-field-value">${statusLabel[l.status] || '—'}</div></div>
+    <div class="contact-field"><div class="contact-field-label">Próximo passo</div><div class="contact-field-value">${esc(l.proximo_passo) || '<span style="color:var(--dim);">não definido</span>'}</div></div>
+    <div class="contact-field"><div class="contact-field-label">Adicionado</div><div class="contact-field-value">${U.fmtDate(l.criado_em)}</div></div>
+    <div class="contact-field"><div class="contact-field-label">Post de origem</div><div class="contact-field-value">${postLabel(l) || '<span style="color:var(--dim);">não identificado</span>'}</div></div>
+    <div style="display:flex;gap:6px;margin-bottom:4px;">
+      <button class="btn btn-ghost btn-sm" onclick="openEditLeadModal('${l.id}')">Editar</button>
+      <button class="btn btn-ghost btn-sm" onclick="setPending('${l.id}')">${l.status === 'pending' ? 'Tirar de pendente' : 'Marcar pendente'}</button>
+      <button class="icon-btn danger" title="Excluir lead" onclick="deleteLead('${l.id}')">Excluir</button>
+    </div>
+    ${l.ai_intencao || l.ai_qualificacao ? `
+    <div class="ai-box">
+      <div class="ai-box-label">${STAR} Análise IA</div>
+      <div class="ai-box-text">${esc(l.ai_intencao)}</div>
+      ${l.ai_qualificacao ? `<div style="border-top:1px solid var(--border);margin:8px 0;"></div><div class="ai-box-text" style="color:var(--dim);">${esc(l.ai_qualificacao)}</div>` : ''}
+    </div>` : ''}`;
+}
+
+async function suggestResponse() {
+  const l = activeLead();
+  if (!l) return;
+  const btn = document.getElementById('btn-suggest');
+  btn.disabled = true;
+  btn.innerHTML = `${SPIN} Pensando…`;
+  try {
+    const r = await window.callClaude({
+      systemPrompt:`Você é o assistente comercial de ${CLIENT_CONFIG.empresa}. Tom: ${CLIENT_CONFIG.tom_voz}. Objetivo: avançar o lead para o próximo passo. Retorne APENAS JSON: {"resposta_sugerida":"...","acao_interna":"..."}`,
+      userPayload:{ lead:{ nome:l.nome, temperatura:l.temperatura, proximo_passo:l.proximo_passo, historico:l.historico.map(m=>({ de: m.dir === 'outbound' ? 'empresa' : 'lead', texto: m.text })) } },
+      mockResponse:JSON.stringify({ resposta_sugerida:`Combinado! Revisei a proposta com a marcenaria da cozinha inclusa e te envio ainda hoje. Quer que eu já reserve um horário esta semana para apresentar o 3D para você e seu marido?`, acao_interna:`Lead quente com prazo definido (mudança em março). Enviar a revisão hoje e fechar a data de apresentação.` })
+    });
+    const p = U.parseAIJson(r);
+    const ta = document.getElementById('conv-textarea');
+    ta.value = p.resposta_sugerida || '';
+    autoResizeTextarea(ta);
+    if (p.acao_interna) toast(`Ação: ${p.acao_interna}`, 'info');
+  } catch (e) { toast(e.message, 'error'); }
+  btn.disabled = false;
+  btn.innerHTML = `${STAR} Sugerir resposta`;
+}
+
+// Registra a mensagem no histórico. O envio de verdade é pelo botão do WhatsApp.
+async function addMessage(dir) {
+  const ta = document.getElementById('conv-textarea');
+  const text = ta.value.trim();
+  const id = state.activeConvId;
+  if (!text || !id) return false;
+  const now = new Date().toISOString();
+  await store.mutate('leads', list => {
+    const l = list.find(x => x.id === id);
+    if (!l) return;
+    l.historico.push({ dir, text, time: U.nowTime(), ts: now });
+    l.ultima_interacao = now;
+    if (dir === 'inbound' && l.status === 'resolved') l.status = 'open';
+    const post = dir === 'inbound' && !l.post_codigo && detectPost(text);
+    if (post) Object.assign(l, { post_codigo: post.codigo, post_ponto: post.ponto, post_origem: 'codigo' });
+  });
+  ta.value = ''; ta.style.height = 'auto';
+  await refresh();
+  return true;
+}
+
+function sendMessage() { return addMessage(document.getElementById('msg-dir').value); }
+
+async function sendWhatsApp() {
+  const l = activeLead();
+  const text = document.getElementById('conv-textarea').value.trim();
+  if (!l) return;
+  if (!text) { toast('Escreva a mensagem antes de enviar', 'warn'); return; }
+  const link = U.waLink(l.telefone, text);
+  if (!link) { toast('Cadastre o WhatsApp do lead (botão Editar) para enviar', 'warn'); return; }
+  window.open(link, '_blank', 'noopener');
+  await addMessage('outbound');
+  toast('WhatsApp aberto com a mensagem pronta — confirme o envio por lá', 'info');
+}
+
+async function setLeadStatus(id, status) {
+  await store.mutate('leads', list => { const l = list.find(x => x.id === id); if (l) l.status = status; });
+  await refresh();
+}
+
+async function markResolved() {
+  const l = activeLead();
+  if (!l) return;
+  const next = l.status === 'resolved' ? 'open' : 'resolved';
+  await setLeadStatus(l.id, next);
+  toast(`${l.nome} ${next === 'resolved' ? 'marcado como resolvido' : 'reaberto'}`, 'success');
+}
+
+function setPending(id) {
+  const l = state.leads.find(x => x.id === id);
+  if (l) return setLeadStatus(id, l.status === 'pending' ? 'open' : 'pending');
+}
+
+async function deleteLead(id) {
+  const l = state.leads.find(x => x.id === id);
+  if (!l || !confirm(`Excluir o lead "${l.nome}" e todo o histórico de conversa? Esta ação não pode ser desfeita.`)) return;
+  await store.mutate('leads', list => list.filter(x => x.id !== id));
+  await refresh();
+  toast('Lead excluído', 'success');
+}
+
+function handleTextareaKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
+function autoResizeTextarea(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; }
+
+// ── CONTATOS ─────────────────────────────────────────────────
+function renderContatos() {
+  let leads = state.leads;
+  if (state.contFilter) leads = leads.filter(l => l.nome.toLowerCase().includes(state.contFilter.toLowerCase()));
+  if (state.contTempFilter) leads = leads.filter(l => l.temperatura === state.contTempFilter);
+  document.getElementById('contatos-tbody').innerHTML = leads.map(l => `
+    <tr>
+      <td><span style="font-weight:500;">${esc(l.nome)}</span>${l.telefone ? `<div style="font-size:11px;color:var(--dim);">${esc(l.telefone)}</div>` : ''}</td>
+      <td><span style="color:var(--muted);">${esc(l.canal)}</span> ${postLabel(l)}</td>
+      <td><span class="badge badge-${esc(l.temperatura)}">${esc(l.temperatura)}</span></td>
+      <td><div class="priority-dots">${Array.from({length:5},(_,i)=>`<div class="priority-dot ${i<l.prioridade?'filled':''}"></div>`).join('')}</div></td>
+      <td style="color:var(--muted);max-width:200px;font-size:12px;">${esc(l.proximo_passo)}</td>
+      <td style="color:var(--dim);">${U.fmtDate(l.criado_em)}</td>
+      <td style="white-space:nowrap;">
+        <button class="btn btn-ghost btn-sm" onclick="selectConv('${l.id}');switchTab('conversas',document.querySelectorAll('.lead-tab')[0])">Ver conversa</button>
+        <button class="icon-btn" title="Editar" onclick="openEditLeadModal('${l.id}')">Editar</button>
+      </td>
+    </tr>`).join('') || `<tr><td colspan="7" style="text-align:center;color:var(--dim);padding:32px;">Nenhum contato encontrado</td></tr>`;
+  document.getElementById('count-contatos').textContent = state.leads.length;
+}
+
+function filterContatos(q) { state.contFilter = q; renderContatos(); }
+function filterTemperatura(v) { state.contTempFilter = v; renderContatos(); }
+
+// ── PIPELINE ─────────────────────────────────────────────────
+function renderPipeline() {
+  // "Em pipeline" = só o que ainda está em aberto (Ganho e Perdido ficam de fora)
+  const total = Suite.pipelineStats(state.pipeline).valorAberto;
+  document.getElementById('pipeline-total-value').textContent = U.fmtBRL(total);
+  document.getElementById('count-pipeline').textContent = U.fmtK(total);
+  document.getElementById('pipeline-board').innerHTML = state.pipeline.map(s => `
+    <div class="pipeline-col" id="col-${s.id}" ondragover="onDragOver(event,'${s.id}')" ondragleave="onDragLeave(event,'${s.id}')" ondrop="onDrop(event,'${s.id}')">
+      <div class="pipeline-col-header">
+        <div class="pipeline-col-title"><div class="pipeline-col-dot" style="background:${esc(s.cor)}"></div>${esc(s.nome)}</div>
+        <span class="pipeline-col-count">${s.deals.length}</span>
+      </div>
+      ${s.deals.map(d => `
+        <div class="pipeline-card" draggable="true" id="deal-${d.id}" ondragstart="onDragStart(event,'${d.id}')" onclick="openEditDealModal('${d.id}')" title="Clique para editar · arraste para mover">
+          <div class="pipeline-card-name">${esc(d.titulo)}</div>
+          <div class="pipeline-card-company">${esc(d.lead)}</div>
+          <div class="pipeline-card-footer">
+            <span class="pipeline-card-value">${d.valor > 0 ? U.fmtBRL(d.valor) : '—'}</span>
+            <span style="font-size:10px;color:var(--dim);">${d.movido_em ? 'desde ' + U.fmtDate(d.movido_em).slice(0,5) : ''}</span>
+          </div>
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+function onDragStart(e, id) { state.dragDealId = id; setTimeout(()=>e.target.classList.add('dragging'),0); }
+function onDragOver(e, id)  { e.preventDefault(); document.getElementById('col-'+id)?.classList.add('drag-over'); }
+function onDragLeave(e, id) { document.getElementById('col-'+id)?.classList.remove('drag-over'); }
+async function onDrop(e, toStageId) {
+  e.preventDefault();
+  document.getElementById('col-'+toStageId)?.classList.remove('drag-over');
+  const dealId = state.dragDealId;
+  state.dragDealId = null;
+  if (!dealId) return;
+  const from = state.pipeline.find(s => s.deals.some(d => d.id === dealId));
+  if (!from || from.id === toStageId) { renderPipeline(); return; }
+  let moved;
+  await store.mutate('pipeline', stages => {
+    let deal;
+    stages.forEach(s => { const i = s.deals.findIndex(d => d.id === dealId); if (i > -1) deal = s.deals.splice(i,1)[0]; });
+    const target = stages.find(s => s.id === toStageId);
+    if (deal && target) { deal.movido_em = new Date().toISOString(); target.deals.push(deal); moved = deal; }
+  });
+  await refresh();
+  if (moved && toStageId === 'st5') toast(`Deal ganho! Lance a receita de ${U.fmtBRL(moved.valor)} no UP·Vault.`, 'success');
+  else toast('Deal movido', 'success');
+}
+
+// ── MODAL LEAD ───────────────────────────────────────────────
+function fillLeadModal(l) {
+  state.editLeadId = l?.id || null;
+  document.getElementById('lead-modal-title').textContent = l ? 'Editar lead' : 'Novo lead';
+  document.getElementById('new-lead-nome').value = l?.nome || '';
+  document.getElementById('new-lead-telefone').value = l?.telefone || '';
+  document.getElementById('new-lead-passo').value = l?.proximo_passo || '';
+  document.getElementById('new-lead-mensagem').value = '';
+  document.getElementById('new-lead-msg-group').style.display = l ? 'none' : '';
+  const canal = document.getElementById('new-lead-canal');
+  if (l && ![...canal.options].some(o => o.value === l.canal)) canal.add(new Option(l.canal, l.canal));
+  if (l) canal.value = l.canal;
+  const postSel = document.getElementById('new-lead-post');
+  postSel.innerHTML = `<option value="">${l ? 'Não identificado' : 'Detectar pela mensagem'}</option>` + state.posts.map(p => `<option value="${esc(p.codigo)}">${esc(p.codigo)} · ${esc(p.titulo)}</option>`).join('');
+  postSel.value = l?.post_codigo && state.posts.some(p => p.codigo === l.post_codigo) ? l.post_codigo : '';
+  const temp = document.getElementById('new-lead-temp');
+  // "Classificar com IA" só aparece em lead novo e com a IA ligada
+  temp.options[0].hidden = !!l || !state.ai;
+  temp.value = l ? l.temperatura : (state.ai ? 'auto' : 'morno');
+  document.getElementById('modal-new-lead').classList.remove('hidden');
+  document.getElementById('new-lead-nome').focus();
+}
+function openNewLeadModal() { fillLeadModal(null); }
+function openEditLeadModal(id) { const l = state.leads.find(x => x.id === id); if (l) fillLeadModal(l); }
+
+async function classifyLead(canal, msg) {
+  const r = await window.callClaude({
+    systemPrompt:`Você classifica leads de ${CLIENT_CONFIG.empresa}. Público-alvo: ${CLIENT_CONFIG.publico_alvo}. Retorne APENAS JSON: {"temperatura":"quente|morno|frio","intencao":"...","qualificacao":"...","prioridade":1-5,"proximo_passo":"..."}`,
+    userPayload:{ canal, mensagem_original:msg, data_contato:U.today() },
+    mockResponse:JSON.stringify({ temperatura:'morno', intencao:'Interesse em organizar operação. Sem urgência definida.', qualificacao:'Confirmar faturamento e quem decide.', prioridade:3, proximo_passo:'Entrar em contato e entender o momento da empresa.' })
+  });
+  const ai = U.parseAIJson(r);
+  if (!TEMPS.includes(ai.temperatura)) ai.temperatura = 'morno';
+  ai.prioridade = Math.max(1, Math.min(5, parseInt(ai.prioridade, 10) || 3));
+  return ai;
+}
+
+async function saveLead() {
+  const nome = document.getElementById('new-lead-nome').value.trim();
+  const telefone = document.getElementById('new-lead-telefone').value.trim();
+  const canal = document.getElementById('new-lead-canal').value;
+  const tempSel = document.getElementById('new-lead-temp').value;
+  const passo = document.getElementById('new-lead-passo').value.trim();
+  const msg   = document.getElementById('new-lead-mensagem').value.trim();
+  const postEscolhido = document.getElementById('new-lead-post').value;
+  if (!nome) { toast('Informe o nome do contato', 'warn'); return; }
+  const btn = document.getElementById('btn-save-lead');
+  btn.disabled = true;
+
+  try {
+    if (state.editLeadId) {
+      const id = state.editLeadId;
+      await store.mutate('leads', list => {
+        const l = list.find(x => x.id === id);
+        if (!l) return;
+        Object.assign(l, { nome, telefone, canal, proximo_passo: passo });
+        if (postEscolhido !== (l.post_codigo || '')) Object.assign(l, { post_codigo: postEscolhido || null, post_ponto: null, post_origem: postEscolhido ? 'informado' : null });
+        if (TEMPS.includes(tempSel) && tempSel !== l.temperatura) { l.temperatura = tempSel; l.prioridade = PRIORIDADE[tempSel]; l.lead_score = PRIORIDADE[tempSel] * 18; }
+      });
+      toast(`${nome} atualizado`, 'success');
+    } else {
+      let ai = null;
+      if (tempSel === 'auto' && msg) {
+        btn.textContent = 'Classificando…';
+        try { ai = await classifyLead(canal, msg); }
+        catch (e) { toast(`Sem classificação automática: ${e.message}. Salvo como morno — ajuste em Editar.`, 'warn'); }
+      }
+      const temperatura = ai?.temperatura || (TEMPS.includes(tempSel) ? tempSel : 'morno');
+      const prioridade = ai?.prioridade || PRIORIDADE[temperatura];
+      const now = new Date().toISOString();
+      const detectado = detectPost(msg);
+      const origem = detectado ? { post_codigo: detectado.codigo, post_ponto: detectado.ponto, post_origem: 'codigo' }
+        : postEscolhido ? { post_codigo: postEscolhido, post_ponto: null, post_origem: 'informado' } : {};
+      const lead = {
+        ...origem,
+        id: U.uid('l'), nome, telefone, canal, mensagem_original: msg, temperatura, prioridade, status: 'open',
+        proximo_passo: passo || ai?.proximo_passo || '', ai_intencao: ai?.intencao || '', ai_qualificacao: ai?.qualificacao || '',
+        lead_score: prioridade * 18, criado_em: U.today(), ultima_interacao: now,
+        historico: msg ? [{ dir:'inbound', text:msg, time:U.nowTime(), ts:now }] : [],
+      };
+      await store.mutate('leads', list => { list.unshift(lead); });
+      toast(`${nome} adicionado como lead ${temperatura}${origem.post_codigo ? ` · origem ${origem.post_codigo}` : ''}`, 'success');
+    }
+    closeModal('modal-new-lead');
+    await refresh();
+  } catch (e) { toast(e.message, 'error'); }
+  btn.textContent = 'Salvar lead'; btn.disabled = false;
+}
+
+// ── MODAL DEAL ───────────────────────────────────────────────
+function fillDealModal(d) {
+  state.editDealId = d?.id || null;
+  document.getElementById('deal-modal-title').textContent = d ? 'Editar deal' : 'Novo deal';
+  const leadSel = document.getElementById('new-deal-lead');
+  leadSel.innerHTML = `<option value="">— sem contato vinculado —</option>` + state.leads.map(l=>`<option value="${esc(l.nome)}">${esc(l.nome)}</option>`).join('');
+  if (d && d.lead && d.lead !== '—' && !state.leads.some(l => l.nome === d.lead)) leadSel.add(new Option(d.lead, d.lead));
+  leadSel.value = d?.lead && d.lead !== '—' ? d.lead : '';
+  const stageSel = document.getElementById('new-deal-stage');
+  stageSel.innerHTML = state.pipeline.map(s => `<option value="${s.id}">${esc(s.nome)}</option>`).join('');
+  stageSel.value = d ? state.pipeline.find(s => s.deals.some(x => x.id === d.id)).id : 'st1';
+  document.getElementById('new-deal-titulo').value = d?.titulo || '';
+  document.getElementById('new-deal-valor').value = d?.valor || '';
+  document.getElementById('btn-delete-deal').style.display = d ? '' : 'none';
+  document.getElementById('modal-new-deal').classList.remove('hidden');
+}
+function openNewDealModal() { fillDealModal(null); }
+function openEditDealModal(id) {
+  const d = state.pipeline.flatMap(s => s.deals).find(x => x.id === id);
+  if (d) fillDealModal(d);
+}
+function openNewDealFromLead(id) {
+  fillDealModal(null);
+  const l = state.leads.find(x => x.id === id);
+  if (!l) return;
+  document.getElementById('new-deal-lead').value = l.nome;
+  document.getElementById('new-deal-titulo').value = `Proposta — ${l.nome}`;
+}
+
+async function saveDeal() {
+  const titulo = document.getElementById('new-deal-titulo').value.trim();
+  const lead   = document.getElementById('new-deal-lead').value || '—';
+  const stageId = document.getElementById('new-deal-stage').value;
+  const valor  = parseFloat(document.getElementById('new-deal-valor').value) || 0;
+  if (!titulo) { toast('Informe o título do deal', 'warn'); return; }
+  const editId = state.editDealId;
+  const now = new Date().toISOString();
+  await store.mutate('pipeline', stages => {
+    let deal = { id: U.uid('d'), criado_em: now, movido_em: now };
+    let fromId = null;
+    if (editId) {
+      stages.forEach(s => { const i = s.deals.findIndex(d => d.id === editId); if (i > -1) { deal = s.deals.splice(i,1)[0]; fromId = s.id; } });
+      if (fromId !== stageId) deal.movido_em = now;
+    }
+    Object.assign(deal, { titulo, lead, valor, lead_id: state.leads.find(l => l.nome === lead)?.id || null });
+    (stages.find(s => s.id === stageId) || stages[0]).deals.push(deal);
+  });
+  closeModal('modal-new-deal');
+  await refresh();
+  toast(`Deal "${titulo}" ${editId ? 'atualizado' : 'criado'}`, 'success');
+}
+
+async function deleteDeal() {
+  const id = state.editDealId;
+  if (!id || !confirm('Excluir este deal? Esta ação não pode ser desfeita.')) return;
+  await store.mutate('pipeline', stages => { stages.forEach(s => { s.deals = s.deals.filter(d => d.id !== id); }); });
+  closeModal('modal-new-deal');
+  await refresh();
+  toast('Deal excluído', 'success');
+}
+
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+function closeModalOnBackdrop(e, id) { if (e.target.classList.contains('modal-overlay')) closeModal(id); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal('modal-new-lead'); closeModal('modal-new-deal'); } });
+
+init();
+</script>
+</body>
+</html>

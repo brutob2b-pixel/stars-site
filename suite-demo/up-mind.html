@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>UP·Mind — IA</title>
+  <script src="config.js"></script>
+  <script src="nav.js"></script>
+  <script src="suite-data.js"></script>
+  <script src="demo-data.js"></script>
+  <style>
+    .mind-content { flex:1;overflow-y:auto;padding:20px 28px 28px; }
+    .mind-intro { background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:24px;display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center; }
+    .mind-intro-text h3 { font-family:'Syne',sans-serif;font-weight:700;font-size:15px;letter-spacing:-.02em;margin-bottom:6px; }
+    .mind-intro-text p { font-size:13px;color:var(--muted);line-height:1.6; }
+    .mind-stat { text-align:center; }
+    .mind-stat-val { font-family:'Syne',sans-serif;font-weight:800;font-size:28px;letter-spacing:-.04em;color:var(--teal); }
+    .mind-stat-label { font-size:11px;color:var(--dim);margin-top:2px; }
+
+    .historico-list { display:flex;flex-direction:column;gap:16px; }
+    .hist-card { background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden; }
+    .hist-header { padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;cursor:pointer; }
+    .hist-week { font-family:'Syne',sans-serif;font-weight:700;font-size:14px;letter-spacing:-.02em; }
+    .hist-meta { display:flex;align-items:center;gap:10px; }
+    .hist-score { font-size:13px;font-weight:600;font-family:'Syne',sans-serif; }
+    .hist-body { padding:16px 18px;display:none; }
+    .hist-body.open { display:block; }
+    .insight-item { padding:12px;background:var(--bg3);border-radius:8px;margin-bottom:10px; }
+    .insight-item-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:6px; }
+    .insight-item-title { font-size:13px;font-weight:600;color:var(--text); }
+    .insight-ctx { font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:5px; }
+    .insight-act { font-size:12px;color:var(--teal); }
+    .padrao-box { background:var(--teal-12);border:1px solid var(--teal);border-radius:8px;padding:12px;margin-top:12px; }
+    .padrao-label { font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);margin-bottom:5px; }
+    .padrao-text { font-size:13px;color:var(--text);line-height:1.6; }
+
+    .run-section { background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:24px; }
+    .run-title { font-family:'Syne',sans-serif;font-weight:700;font-size:14px;letter-spacing:-.02em;margin-bottom:14px; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .spin { animation:spin 1s linear infinite; }
+    .urgency-badge { font-size:10px;font-weight:500;letter-spacing:.04em;padding:2px 7px;border-radius:3px; }
+    .urgency-alta  { background:var(--red-12);color:var(--red); }
+    .urgency-media { background:var(--amber-12);color:var(--amber); }
+    .urgency-baixa { background:var(--green-12);color:var(--green); }
+  </style>
+</head>
+<body>
+<div class="suite-layout">
+  <aside id="suite-sidebar" class="suite-sidebar"></aside>
+  <main class="suite-main">
+    <div class="module-header">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div>
+          <h1 class="module-title">UP <span class="dash">—</span> Mind</h1>
+          <p class="module-subtitle">IA contextualizada · insights semanais acumulativos</p>
+        </div>
+        <button class="btn btn-primary" onclick="runMind()" style="margin-top:4px;" id="btn-run">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Rodar análise agora
+        </button>
+      </div>
+    </div>
+    <div class="mind-content">
+      <div class="mind-intro">
+        <div class="mind-intro-text">
+          <h3>Como o UP·Mind funciona</h3>
+          <p>A cada análise, o UP·Mind lê os números reais de todos os módulos junto com as últimas 6 semanas de histórico. Ele não vê a empresa pela primeira vez — ele acompanha. Por enquanto a análise é rodada pelo botão acima (uma por semana); o agendamento automático entra com os crons.</p>
+        </div>
+        <div class="mind-stat">
+          <div class="mind-stat-val" id="mind-weeks">0</div>
+          <div class="mind-stat-label">semanas<br>de histórico</div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;letter-spacing:-.02em;">Histórico de análises</div>
+      </div>
+      <div class="historico-list" id="hist-list"></div>
+    </div>
+  </main>
+</div>
+<div id="toast-container"></div>
+<script>
+const { U } = Suite;
+const esc = U.esc;
+const STAR = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+const urgLabel = { alta:'Alta', media:'Média', baixa:'Baixa' };
+
+let historico=[];
+const openWeeks = new Set();
+
+async function init() {
+  historico = await store.load('mind_historico');
+  if (historico[0]) openWeeks.add(historico[0].semana);
+  renderHistorico();
+}
+
+function renderHistorico() {
+  document.getElementById('mind-weeks').textContent = historico.length;
+  if (!historico.length) {
+    document.getElementById('hist-list').innerHTML = `<div class="empty-block"><strong>Nenhuma análise ainda</strong>Clique em "Rodar análise agora". O UP·Mind lê os números reais de todos os módulos e, a partir da segunda semana, compara com as análises anteriores para achar padrões.</div>`;
+    return;
+  }
+  document.getElementById('hist-list').innerHTML = historico.map((h,i) => {
+    const open = openWeeks.has(h.semana);
+    return `
+    <div class="hist-card">
+      <div class="hist-header" onclick="toggleHist('${h.semana}')">
+        <div class="hist-week">${U.weekLabel(h.semana)}</div>
+        <div class="hist-meta">
+          ${h.padrao_identificado ? `<span class="badge badge-teal" style="font-size:10px;">Padrão detectado</span>` : ''}
+          ${h.health_score != null ? `<span class="hist-score" style="color:${Suite.gosColor(h.health_score)}">GOS ${h.health_score}</span>` : ''}
+          <span style="color:var(--dim);transition:transform .2s;transform:rotate(${open ? 90 : 0}deg);">▶</span>
+        </div>
+      </div>
+      <div class="hist-body ${open ? 'open' : ''}">
+        ${h.contexto_narrativo ? `<p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.6;">${esc(h.contexto_narrativo)}</p>` : ''}
+        ${(h.insights || []).map(ins => {
+          const urg = urgLabel[ins.urgencia] ? ins.urgencia : 'media';
+          return `
+          <div class="insight-item">
+            <div class="insight-item-header">
+              <div class="insight-item-title">${esc(ins.titulo)}</div>
+              <span class="urgency-badge urgency-${urg}">${urgLabel[urg]}</span>
+            </div>
+            <div class="insight-ctx">${esc(ins.contexto)}</div>
+            <div class="insight-act">→ ${esc(ins.acao)}</div>
+          </div>`;
+        }).join('')}
+        ${h.padrao_identificado ? `<div class="padrao-box"><div class="padrao-label">Padrão identificado</div><div class="padrao-text">${esc(h.padrao_identificado)}</div></div>` : ''}
+        ${h.gerado_em ? `<div style="font-size:11px;color:var(--dim);margin-top:10px;">Gerado em ${U.fmtDateTime(h.gerado_em)}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleHist(semana) {
+  openWeeks.has(semana) ? openWeeks.delete(semana) : openWeeks.add(semana);
+  renderHistorico();
+}
+
+async function runMind() {
+  const btn=document.getElementById('btn-run');
+  btn.disabled=true;
+  btn.innerHTML=`<svg class="spin" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Analisando…`;
+
+  try {
+    const all = await Suite.loadAll();
+    const gos = await Suite.snapshotGOS(all);
+    if (gos.score == null) throw new Error('Ainda não há dados nos módulos para analisar. Lance ao menos o financeiro ou os leads.');
+    const pulse = Suite.computePulse(all);
+    toast('Rodando UP·Mind — isso leva alguns segundos…', 'info');
+
+    const C = CLIENT_CONFIG;
+    const empresa = { nome:C.empresa, setor:C.setor, porte:C.porte, publico_alvo:C.publico_alvo, servicos:C.principais_servicos, sazonalidade:C.sazonalidade, dores:C.dores_mapeadas, objetivos:C.objetivos, kpis_criticos:C.kpis_criticos, contexto:C.contexto_adicional };
+    const anteriores = historico.filter(h => h.semana !== pulse.semana).slice(0, 6)
+      .map(h => ({ semana:h.semana, health_score:h.health_score, padrao_identificado:h.padrao_identificado, insights:(h.insights || []).map(i => ({ titulo:i.titulo, acao:i.acao, urgencia:i.urgencia })) }));
+
+    const r = await window.callClaude({
+      systemPrompt:`Você é o analista estratégico que acompanha ${C.empresa} semana a semana. Perfil da empresa: ${JSON.stringify(empresa)}. Você recebe os números reais da semana e o que você mesmo concluiu nas semanas anteriores. Gere até 3 insights acionáveis, do mais urgente ao menos urgente. Baseie-se só nos dados recebidos — não invente números, nomes ou fatos. Só aponte "padrao_identificado" se algo se repetir em pelo menos duas semanas do histórico; caso contrário use null. Retorne APENAS JSON: {"insights":[{"titulo":"...","contexto":"...","acao":"...","urgencia":"alta|media|baixa"}],"padrao_identificado":"... ou null","contexto_narrativo":"2 frases resumindo a semana"}`,
+      userPayload:{ hoje:U.today(), semana:pulse.semana, health_score:gos.score, dimensoes:gos.dims, historico_health_score:gos.historico.slice(0,8).map(h=>({ semana:h.semana, score:h.score })), pulso:pulse,
+        leads_ativos: all.leads.filter(l=>l.status!=='resolved').slice(0,30).map(l=>({ nome:l.nome, temperatura:l.temperatura, canal:l.canal, proximo_passo:l.proximo_passo, dias_sem_interacao:Math.floor(U.hoursSince(Suite.lastInteraction(l))/24) })),
+        deals_abertos: Suite.pipelineStats(all.pipeline).abertos.map(d=>({ titulo:d.titulo, etapa:d.stage_nome, valor:d.valor, desde:(d.movido_em||'').slice(0,10) })),
+        projetos: all.projetos.map(p=>({ nome:p.nome, status:Suite.projectStatus(p), previsao:p.previsao, etapas_concluidas:p.etapas.filter(e=>e.status==='concluido').length, etapas_total:p.etapas.length })),
+        analises_anteriores: anteriores },
+      mockResponse: JSON.stringify({
+        insights:[
+          { titulo:'R$ 102 mil em propostas sem resposta', contexto:'A Base Sólida (R$ 64 mil) está parada há 9 dias e a Juliana Costa (R$ 38 mil), lead quente vindo do post P-016, pediu revisão há 3 dias.', acao:'Diego liga para a Renata hoje; Helena revisa a proposta da Juliana com marcenaria até amanhã.', urgencia:'alta' },
+          { titulo:'Casa Fontes passou do prazo', contexto:'A obra venceu há 2 dias com marcenaria e pintura abertas — o mesmo gargalo das semanas anteriores.', acao:'Sofia comunica nova data ao cliente hoje e cobra o marceneiro por escrito.', urgencia:'alta' },
+          { titulo:'Thiago está sobrecarregado', contexto:'7 tarefas abertas, 2 atrasos e 1 ausência — e ele é o único que faz os 3D de 3 projetos ativos.', acao:'Helena redistribui um 3D ou contrata render terceirizado para o Tanaka.', urgencia:'media' },
+        ],
+        padrao_identificado:'Atrasos de obra nascem na marcenaria — terceira semana seguida.',
+        contexto_narrativo:'Health Score subiu pela 8ª semana seguida. Vendas e caixa vão bem; o risco agora está na entrega das obras e na carga do Thiago.'
+      })
+    });
+
+    const ai = U.parseAIJson(r);
+    const entry = {
+      semana: pulse.semana, health_score: gos.score, gerado_em: new Date().toISOString(),
+      insights: (Array.isArray(ai.insights) ? ai.insights : []).slice(0, 5),
+      padrao_identificado: ai.padrao_identificado && ai.padrao_identificado !== 'null' ? ai.padrao_identificado : null,
+      contexto_narrativo: ai.contexto_narrativo || '',
+    };
+    // uma análise por semana: rodar de novo substitui a da semana corrente
+    historico = await store.mutate('mind_historico', list => [entry, ...list.filter(h => h.semana !== entry.semana)].sort((a,b)=>b.semana.localeCompare(a.semana)).slice(0, 52));
+    openWeeks.add(entry.semana);
+    renderHistorico();
+    toast('Análise concluída e salva no histórico', 'success');
+  } catch (e) { toast(e.message, 'error'); }
+
+  btn.disabled=false;
+  btn.innerHTML=`${STAR} Rodar análise agora`;
+}
+
+init();
+</script>
+</body>
+</html>

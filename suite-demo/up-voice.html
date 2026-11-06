@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>UP·Voice — Alertas WhatsApp</title>
+  <script src="config.js"></script>
+  <script src="nav.js"></script>
+  <script src="suite-data.js"></script>
+  <script src="demo-data.js"></script>
+  <style>
+    .voice-content { flex:1;overflow-y:auto;padding:20px 28px 28px; }
+    .voice-top { display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:24px; }
+
+    .status-card { background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px; }
+    .status-row { display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04); }
+    .status-row:last-child { border-bottom:none; }
+    .status-label { font-size:13px;color:var(--muted); }
+    .status-value { font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:6px; }
+    .status-dot { width:7px;height:7px;border-radius:50%; }
+    .dot-on  { background:var(--green); }
+    .dot-off { background:var(--dim); }
+
+    .config-card { background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px; }
+    .config-title { font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin-bottom:12px; }
+    .toggle-row { display:flex;align-items:center;justify-content:space-between;padding:8px 0; }
+    .toggle-label { font-size:13px;color:var(--text); }
+    .toggle-sub { font-size:11px;color:var(--dim);margin-top:2px; }
+    .toggle-switch { width:36px;height:20px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0; }
+    .toggle-switch.on { background:var(--teal); }
+    .toggle-knob { width:14px;height:14px;background:#fff;border-radius:50%;position:absolute;top:2px;left:2px;transition:transform .2s; }
+    .toggle-switch.on .toggle-knob { transform:translateX(16px); }
+
+    .thresholds-card { background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:24px; }
+    .threshold-item { display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04); }
+    .threshold-item:last-child { border-bottom:none; }
+    .threshold-info { flex:1; }
+    .threshold-name { font-size:13px;font-weight:500;color:var(--text); }
+    .threshold-desc { font-size:11px;color:var(--dim);margin-top:2px; }
+    .threshold-rule { font-size:12px;color:var(--teal);font-family:'Syne',sans-serif;font-weight:600; }
+
+    .section-title { font-family:'Syne',sans-serif;font-weight:700;font-size:14px;letter-spacing:-.02em;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between; }
+
+    .alerts-feed { display:flex;flex-direction:column;gap:10px; }
+    .alert-card { background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;transition:border-color .15s; }
+    .alert-card:hover { border-color:var(--teal); }
+    .alert-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:8px; }
+    .alert-title { font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px; }
+    .alert-time { font-size:11px;color:var(--dim); }
+    .alert-body { font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:10px; }
+    .alert-recipients { display:flex;gap:6px;flex-wrap:wrap; }
+    .recipient-chip { font-size:10px;font-weight:500;padding:2px 8px;border-radius:10px;background:var(--bg3);color:var(--muted);display:flex;align-items:center;gap:4px; }
+    .recipient-chip.sent { color:var(--green); }
+
+    .urgency-icon { width:8px;height:8px;border-radius:50%;flex-shrink:0; }
+    .urgency-alta  { background:var(--red); }
+    .urgency-media { background:var(--amber); }
+    .urgency-baixa { background:var(--teal); }
+
+    .whatsapp-preview { background:#0a1014;border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:10px; }
+    .wa-bubble { background:#005c4b;color:#e9edef;padding:8px 12px;border-radius:8px;font-size:12.5px;line-height:1.5;max-width:90%;position:relative; }
+    .wa-meta { font-size:9px;color:rgba(255,255,255,.5);margin-top:4px;text-align:right; }
+
+    .empty-alerts { display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;gap:8px;color:var(--dim); }
+
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .spin { animation:spin 1s linear infinite; }
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.4; } }
+    .pulse { animation:pulse 1.6s ease-in-out infinite; }
+  </style>
+</head>
+<body>
+<div class="suite-layout">
+  <aside id="suite-sidebar" class="suite-sidebar"></aside>
+  <main class="suite-main">
+    <div class="module-header">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div>
+          <h1 class="module-title">UP <span class="dash">—</span> Voice</h1>
+          <p class="module-subtitle">Alertas proativos via WhatsApp · founder + Rafael</p>
+        </div>
+        <button class="btn btn-primary" onclick="runVoiceCheck()" id="btn-check" style="margin-top:4px;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Verificar agora
+        </button>
+      </div>
+    </div>
+
+    <div class="voice-content">
+
+      <!-- Status + Config -->
+      <div class="voice-top">
+        <div class="status-card">
+          <div class="config-title" style="margin-bottom:14px;">Status da integração</div>
+          <div class="status-row">
+            <span class="status-label">Evolution API</span>
+            <span class="status-value"><span class="status-dot dot-off"></span>Não conectada — envio manual pelo WhatsApp</span>
+          </div>
+          <div class="status-row">
+            <span class="status-label">WhatsApp do founder</span>
+            <span class="status-value" id="status-founder-phone">—</span>
+          </div>
+          <div class="status-row">
+            <span class="status-label">WhatsApp do Rafael</span>
+            <span class="status-value" id="status-rafael-phone">—</span>
+          </div>
+          <div class="status-row">
+            <span class="status-label">Alertas enviados hoje</span>
+            <span class="status-value" id="status-sent-today">0 / 1 (limite diário)</span>
+          </div>
+          <div class="status-row">
+            <span class="status-label">Última verificação</span>
+            <span class="status-value" id="status-last-check">—</span>
+          </div>
+        </div>
+
+        <div class="config-card">
+          <div class="config-title">Configuração</div>
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Aprovação manual</div>
+              <div class="toggle-sub">Sempre ligada enquanto o envio for manual</div>
+            </div>
+            <div class="toggle-switch on" id="toggle-approval" style="cursor:not-allowed;opacity:.6;" title="Sempre ligada enquanto o envio for manual"><div class="toggle-knob"></div></div>
+          </div>
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Cópia para Rafael</div>
+              <div class="toggle-sub">Oferece enviar a cópia depois de cada alerta ao cliente</div>
+            </div>
+            <div class="toggle-switch on" id="toggle-copy" onclick="toggleSwitch('toggle-copy')"><div class="toggle-knob"></div></div>
+          </div>
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Limite de 1/dia</div>
+              <div class="toggle-sub">Evita saturar o WhatsApp do cliente</div>
+            </div>
+            <div class="toggle-switch on" id="toggle-limit" onclick="toggleSwitch('toggle-limit')"><div class="toggle-knob"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Limiares -->
+      <div class="thresholds-card">
+        <div class="config-title">Limiares de disparo (regras determinísticas)</div>
+        <div id="thresholds-list"></div>
+      </div>
+
+      <!-- Feed de alertas -->
+      <div class="section-title">
+        <span>Alertas recentes</span>
+        <span style="font-size:11px;color:var(--dim);font-weight:400;">Mais recente primeiro</span>
+      </div>
+      <div class="alerts-feed" id="alerts-feed"></div>
+
+    </div>
+  </main>
+</div>
+<div id="toast-container"></div>
+
+<script>
+// ============================================================
+// UP·Voice — Motor de alertas
+// ============================================================
+// As regras são determinísticas e vivem em suite-data.js (Suite.voiceDetect):
+// elas leem os dados reais dos outros módulos. A IA só entra, se você pedir,
+// para reescrever o texto. Enquanto a Evolution API não estiver conectada,
+// "enviar" abre o WhatsApp com a mensagem pronta — o clique final é seu.
+// ============================================================
+const { U } = Suite;
+const esc = U.esc;
+const CHECK_ICON = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>`;
+const PLACEHOLDER_PHONES = ['99000-0000', '98888-0000']; // números de exemplo do config.js original
+
+const phones = { founder: CLIENT_CONFIG.whatsapp_phone, rafael: CLIENT_CONFIG.rafael_whatsapp };
+const isPlaceholder = p => !p || PLACEHOLDER_PHONES.some(x => p.includes(x));
+const dailyLimit = Number(CLIENT_CONFIG.voice_daily_limit) || 1;
+
+let alerts = [];
+let voiceState = {};
+const toggles = () => ({ copy: true, limit: true, ...(voiceState.toggles || {}) });
+
+async function init() {
+  [alerts, voiceState] = await Promise.all([store.load('voice_alerts'), store.load('voice_state')]);
+  renderThresholds();
+  render();
+}
+
+const sentToFounderToday = () => alerts.filter(a => (a.destinatarios || []).includes('founder') && (a.enviado_em || '').slice(0, 10) === U.today()).length;
+
+function render() {
+  const phoneCell = p => isPlaceholder(p) ? `<span style="color:var(--amber);">${esc(p || 'não definido')} — trocar em config.js</span>` : esc(p);
+  document.getElementById('status-founder-phone').innerHTML = phoneCell(phones.founder);
+  document.getElementById('status-rafael-phone').innerHTML = phoneCell(phones.rafael);
+  document.getElementById('status-sent-today').textContent = `${sentToFounderToday()} / ${dailyLimit} (limite diário ao cliente)`;
+  document.getElementById('status-last-check').textContent = voiceState.last_check ? U.fmtDateTime(voiceState.last_check) : 'Ainda não verificado';
+  const t = toggles();
+  document.getElementById('toggle-copy').classList.toggle('on', t.copy);
+  document.getElementById('toggle-limit').classList.toggle('on', t.limit);
+  renderAlerts();
+}
+
+function renderThresholds() {
+  document.getElementById('thresholds-list').innerHTML = Suite.VOICE_RULES.map(t => `
+    <div class="threshold-item">
+      <div class="threshold-info">
+        <div class="threshold-name">${t.nome} <span style="font-size:10px;color:var(--dim);font-weight:400;">· ${t.fonte}</span></div>
+        <div class="threshold-desc">${t.desc}</div>
+      </div>
+      <div class="threshold-rule">${t.regra}</div>
+    </div>`).join('');
+}
+
+function renderAlerts() {
+  if (alerts.length === 0) {
+    document.getElementById('alerts-feed').innerHTML = `
+      <div class="empty-alerts">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <p>Nenhum alerta ainda. Clique em "Verificar agora" para aplicar as regras aos dados atuais.</p>
+      </div>`;
+    return;
+  }
+  const statusChip = { pendente:['Aguardando sua decisão','var(--amber)'], enviado:['Enviado','var(--green)'], descartado:['Descartado','var(--dim)'] };
+
+  document.getElementById('alerts-feed').innerHTML = alerts.map(a => {
+    const [label, color] = statusChip[a.status] || statusChip.pendente;
+    const pend = a.status === 'pendente';
+    const dest = a.destinatarios || [];
+    return `
+    <div class="alert-card" style="${a.status === 'descartado' ? 'opacity:.55;' : ''}">
+      <div class="alert-header">
+        <div class="alert-title">
+          <span class="urgency-icon urgency-${esc(a.urgencia)}"></span>
+          ${esc(a.titulo)}
+        </div>
+        <span class="alert-time">${U.fmtDateTime(a.criado_em)}</span>
+      </div>
+      <div class="alert-body">${esc(a.contexto)}</div>
+      <div class="whatsapp-preview">
+        ${pend
+          ? `<textarea class="input" id="msg-${a.id}" rows="3" style="resize:vertical;" onchange="saveMessage('${a.id}')">${esc(a.mensagem)}</textarea>`
+          : `<div class="wa-bubble">${esc(a.mensagem)}${a.enviado_em ? `<div class="wa-meta">${U.fmtDateTime(a.enviado_em)} ✓✓</div>` : ''}</div>`}
+      </div>
+      <div class="alert-recipients" style="margin-top:10px;align-items:center;">
+        <span class="recipient-chip" style="color:${color};">${label}</span>
+        ${dest.includes('founder') ? `<span class="recipient-chip sent">✓ Dono da empresa</span>` : ''}
+        ${dest.includes('rafael') ? `<span class="recipient-chip sent">✓ Rafael</span>` : ''}
+        <span class="recipient-chip">${esc(a.fonte)}</span>
+        <span style="margin-left:auto;display:flex;gap:6px;">
+          ${pend ? `
+            <button class="btn btn-ghost btn-sm" onclick="rewriteWithAI('${a.id}')" id="ai-${a.id}">Reescrever com IA</button>
+            <button class="btn btn-ghost btn-sm" onclick="sendAlert('${a.id}','rafael')">Enviar para mim ↗</button>
+            <button class="btn btn-primary btn-sm" onclick="sendAlert('${a.id}','founder')">Enviar ao cliente ↗</button>
+            <button class="icon-btn danger" onclick="dismissAlert('${a.id}')">Descartar</button>`
+          : (a.status === 'enviado' && !dest.includes('rafael') && toggles().copy ? `<button class="btn btn-ghost btn-sm" onclick="sendAlert('${a.id}','rafael')">Enviar cópia para mim ↗</button>` : '')}
+        </span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function updateAlert(id, fn) {
+  alerts = await store.mutate('voice_alerts', list => { const a = list.find(x => x.id === id); if (a) fn(a); });
+}
+
+async function toggleSwitch(id) {
+  const key = id.replace('toggle-', '');
+  voiceState = await store.mutate('voice_state', s => { s.toggles = { ...toggles(), ...(s.toggles || {}) }; s.toggles[key] = !s.toggles[key]; });
+  render();
+}
+
+// ── Verificação: aplica as regras aos dados reais ───────────
+async function runVoiceCheck() {
+  const btn = document.getElementById('btn-check');
+  btn.disabled = true;
+  btn.innerHTML = `<svg class="spin" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Verificando…`;
+
+  try {
+    const all = await Suite.loadAll();
+    const gos = await Suite.snapshotGOS(all);
+    const detected = Suite.voiceDetect(all, gos);
+    const now = new Date().toISOString();
+    let novos = 0;
+    alerts = await store.mutate('voice_alerts', list => {
+      // a chave termina na data: no máximo um alerta por situação por dia, e nenhum novo
+      // enquanto o anterior da mesma situação ainda estiver aguardando decisão
+      const situacao = k => k.slice(0, k.lastIndexOf(':'));
+      const keys = new Set(list.map(a => a.key));
+      const pendentes = new Set(list.filter(a => a.status === 'pendente').map(a => situacao(a.key)));
+      detected.filter(d => !keys.has(d.key) && !pendentes.has(situacao(d.key))).forEach(d => { list.unshift({ id: U.uid('al'), ...d, status: 'pendente', destinatarios: [], criado_em: now }); novos++; });
+      return list.slice(0, 200);
+    });
+    voiceState = await store.mutate('voice_state', s => { s.last_check = now; });
+    render();
+    toast(novos ? `${novos} novo(s) alerta(s) — revise e decida o envio` : 'Nenhum limiar cruzado agora ✓', novos ? 'warn' : 'success');
+  } catch (e) { toast(e.message, 'error'); }
+
+  btn.disabled = false;
+  btn.innerHTML = `${CHECK_ICON} Verificar agora`;
+}
+
+function saveMessage(id) {
+  const text = document.getElementById('msg-' + id).value.trim();
+  if (text) return updateAlert(id, a => { a.mensagem = text; });
+}
+
+async function rewriteWithAI(id) {
+  const a = alerts.find(x => x.id === id);
+  if (!a) return;
+  const btn = document.getElementById('ai-' + id);
+  btn.disabled = true; btn.textContent = 'Reescrevendo…';
+  try {
+    const msg = await window.callClaude({
+      systemPrompt: `Você escreve alertas de WhatsApp curtos para ${a.publico === 'founder' ? `o dono de ${CLIENT_CONFIG.empresa}, enviados pelo Rafael (consultor)` : 'o Rafael, consultor que opera a empresa'}. Tom: ${CLIENT_CONFIG.tom_voz} Máximo 3 linhas. Vá direto ao ponto e sugira uma ação clara. Use só os fatos recebidos. Retorne APENAS o texto da mensagem.`,
+      userPayload: { situacao: a.titulo, contexto: a.contexto, urgencia: a.urgencia },
+      mockResponse: `E aí! 👋 ${a.contexto} Vale agir hoje.`
+    });
+    await updateAlert(id, x => { x.mensagem = String(msg).trim(); });
+    renderAlerts();
+  } catch (e) { toast(e.message, 'error'); btn.disabled = false; btn.textContent = 'Reescrever com IA'; }
+}
+
+async function sendAlert(id, to) {
+  const a = alerts.find(x => x.id === id);
+  if (!a) return;
+  const text = (document.getElementById('msg-' + id)?.value || a.mensagem).trim();
+  if (isPlaceholder(phones[to])) { toast(`Defina o WhatsApp ${to === 'founder' ? 'do dono da empresa (whatsapp_phone)' : 'do Rafael (rafael_whatsapp)'} em config.js`, 'warn'); return; }
+  const t = toggles();
+  if (to === 'founder' && t.limit && sentToFounderToday() >= dailyLimit) { toast(`Limite de ${dailyLimit} alerta(s) por dia ao cliente já atingido`, 'warn'); return; }
+
+  // depois de enviado ao cliente, o envio ao Rafael é a cópia — vai identificada como tal
+  const copia = to === 'rafael' && (a.destinatarios || []).includes('founder');
+  window.open(U.waLink(phones[to], copia ? `[Cópia — alerta enviado ao cliente ${CLIENT_CONFIG.empresa}]\n${text}` : text), '_blank', 'noopener');
+  await updateAlert(id, x => {
+    x.mensagem = text; x.status = 'enviado'; x.enviado_em = x.enviado_em || new Date().toISOString();
+    x.destinatarios = [...new Set([...(x.destinatarios || []), to])];
+  });
+  render();
+  toast('WhatsApp aberto com a mensagem pronta — confirme o envio por lá', 'info');
+}
+
+async function dismissAlert(id) { await updateAlert(id, a => { a.status = 'descartado'; }); render(); }
+
+init();
+</script>
+</body>
+</html>

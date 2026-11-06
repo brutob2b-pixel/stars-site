@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>UP·GOS — Health Score</title>
+  <script src="config.js"></script>
+  <script src="nav.js"></script>
+  <script src="suite-data.js"></script>
+  <script src="demo-data.js"></script>
+  <style>
+    .gos-content { flex:1;overflow-y:auto;padding:20px 28px 28px; }
+    .gos-main { display:grid;grid-template-columns:1fr 280px;gap:20px;margin-bottom:24px; }
+
+    /* Gauge */
+    .gos-gauge { background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px;display:flex;flex-direction:column;align-items:center;justify-content:center; }
+    .gos-ring { position:relative;width:160px;height:160px; }
+    .gos-ring svg { transform:rotate(-90deg); }
+    .gos-ring-track { fill:none;stroke:var(--bg3);stroke-width:12; }
+    .gos-ring-fill { fill:none;stroke-width:12;stroke-linecap:round;transition:stroke-dashoffset 1s ease; }
+    .gos-score { position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center; }
+    .gos-num { font-family:'Syne',sans-serif;font-weight:800;font-size:44px;letter-spacing:-.04em; }
+    .gos-label { font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-top:4px; }
+    .gos-status { font-size:13px;font-weight:600;margin-top:12px; }
+
+    /* Dimensões */
+    .dimensions-card { background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px; }
+    .dim-title { font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin-bottom:12px; }
+    .dim-item { margin-bottom:12px; }
+    .dim-item:last-child { margin-bottom:0; }
+    .dim-label { display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:4px; }
+    .dim-bar { height:4px;background:var(--bg3);border-radius:2px;overflow:hidden; }
+    .dim-fill { height:100%;border-radius:2px;transition:width .5s ease; }
+
+    /* Histórico */
+    .hist-card { background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px; }
+    .hist-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:12px; }
+    .hist-period { font-family:'Syne',sans-serif;font-weight:700;font-size:13px; }
+    .hist-change { font-size:12px;font-weight:500; }
+    .change-up { color:var(--green); }
+    .change-down { color:var(--red); }
+    .hist-details { display:grid;grid-template-columns:repeat(4,1fr);gap:8px; }
+    .hist-detail { background:var(--bg3);border-radius:6px;padding:8px;text-align:center; }
+    .hist-detail-val { font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--teal); }
+    .hist-detail-label { font-size:9px;color:var(--dim);margin-top:2px; }
+
+    .section-title { font-family:'Syne',sans-serif;font-weight:700;font-size:14px;letter-spacing:-.02em;margin-bottom:12px; }
+  </style>
+</head>
+<body>
+<div class="suite-layout">
+  <aside id="suite-sidebar" class="suite-sidebar"></aside>
+  <main class="suite-main">
+    <div class="module-header">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div>
+          <h1 class="module-title">UP <span class="dash">—</span> GOS</h1>
+          <p class="module-subtitle">Health Score dimensionado · 0–100 com diagnóstico</p>
+        </div>
+        <span id="gos-updated" style="font-size:12px;color:var(--dim);margin-top:6px;"></span>
+      </div>
+    </div>
+
+    <div class="gos-content">
+      <div class="gos-main">
+        <div class="gos-gauge">
+          <div class="gos-ring">
+            <svg viewBox="0 0 120 120" width="160" height="160">
+              <circle class="gos-ring-track" cx="60" cy="60" r="50"/>
+              <circle class="gos-ring-fill" id="gos-fill" cx="60" cy="60" r="50" stroke-dasharray="314" stroke-dashoffset="314"/>
+            </svg>
+            <div class="gos-score">
+              <div class="gos-num" id="gos-num">—</div>
+              <div class="gos-label">GOS</div>
+            </div>
+          </div>
+          <div class="gos-status" id="gos-status"></div>
+        </div>
+        <div class="dimensions-card">
+          <div class="dim-title">Dimensões</div>
+          <div id="dimensions-list"></div>
+        </div>
+      </div>
+
+      <div class="section-title">Histórico de health score</div>
+      <div id="historico-list"></div>
+    </div>
+  </main>
+</div>
+<div id="toast-container"></div>
+
+<script>
+// ============================================================
+// UP·GOS — Health Score
+// ============================================================
+// O cálculo vive em suite-data.js (Suite.computeGOS), porque o UP·Dash,
+// o UP·Mind e o UP·Voice usam o mesmo número. Aqui é só leitura + exibição.
+// Pesos: Financeiro 25% + Comercial 25% + Operacional 20% + Equipe 20% + Processos 10%
+// Faixas: 70+ saudável · 50–69 atenção · 0–49 crítico
+// ============================================================
+const { U } = Suite;
+const DIMS = [
+  { key:'financeiro',  label:'Financeiro',  fonte:'UP·Vault', href:'up-vault.html' },
+  { key:'comercial',   label:'Comercial',   fonte:'UP·Lead',  href:'up-lead.html' },
+  { key:'operacional', label:'Operacional', fonte:'UP·Flow',  href:'up-flow.html' },
+  { key:'equipe',      label:'Equipe',      fonte:'UP·Team',  href:'up-team.html' },
+  { key:'processos',   label:'Processos',   fonte:'UP·Core',  href:'up-core.html' },
+];
+
+async function init() {
+  const gos = await Suite.snapshotGOS();
+  render(gos);
+}
+
+function render(gos) {
+  const { score } = gos;
+  const color = Suite.gosColor(score);
+  const circ = 2 * Math.PI * 50;
+
+  document.getElementById('gos-updated').textContent = `Calculado agora · ${U.weekLabel(gos.semana)}`;
+  document.getElementById('gos-num').textContent = score ?? '—';
+  document.getElementById('gos-num').style.color = color;
+  document.getElementById('gos-status').textContent = Suite.gosStatus(score) + (score != null && gos.cobertura < 5 ? ` · ${gos.cobertura} de 5 dimensões com dados` : '');
+  document.getElementById('gos-status').style.color = color;
+
+  const fill = document.getElementById('gos-fill');
+  fill.style.stroke = color;
+  setTimeout(() => { fill.style.strokeDashoffset = circ * (1 - (score || 0) / 100); }, 100);
+
+  document.getElementById('dimensions-list').innerHTML = DIMS.map(d => {
+    const val = gos.dims[d.key];
+    return `
+    <div class="dim-item">
+      <div class="dim-label"><span>${d.label} <span style="color:var(--dim);">· ${Math.round(Suite.GOS_WEIGHTS[d.key] * 100)}%</span></span><span>${val ?? `<a href="${d.href}" style="color:var(--teal);">sem dados — abrir ${d.fonte}</a>`}</span></div>
+      <div class="dim-bar"><div class="dim-fill" style="width:${val || 0}%;background:${Suite.gosColor(val)}"></div></div>
+    </div>`;
+  }).join('');
+
+  const hist = gos.historico;
+  document.getElementById('historico-list').innerHTML = hist.length ? hist.map((h, i) => {
+    const anterior = hist[i + 1]; // lista vem da semana mais recente para a mais antiga
+    const diff = anterior ? h.score - anterior.score : null;
+    const col = diff > 0 ? 'var(--green)' : diff < 0 ? 'var(--red)' : 'var(--dim)';
+    return `
+    <div class="hist-card">
+      <div class="hist-header">
+        <div class="hist-period">${U.weekLabel(h.semana)}${h.semana === gos.semana ? ' · em andamento' : ''}</div>
+        <div class="hist-change"><span style="color:${Suite.gosColor(h.score)};font-weight:600;">${h.score}</span> ${diff == null ? '' : `<span style="color:${col};">${diff > 0 ? '+' : ''}${diff}</span>`}</div>
+      </div>
+      <div class="hist-details" style="grid-template-columns:repeat(5,1fr);">
+        ${DIMS.map(d => `<div class="hist-detail"><div class="hist-detail-val">${h[d.key] ?? '—'}</div><div class="hist-detail-label">${d.label}</div></div>`).join('')}
+      </div>
+    </div>`;
+  }).join('') : `<div class="empty-block"><strong>Sem histórico ainda</strong>O score aparece assim que houver dados em pelo menos um módulo. A cada semana fica gravada uma foto, e a comparação semana a semana aparece aqui.</div>`;
+}
+
+init();
+</script>
+</body>
+</html>

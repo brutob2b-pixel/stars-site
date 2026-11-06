@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Marketing do parceiro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="base.css">
+<style>
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.9fr);gap:28px;align-items:center;padding:44px 0 12px}
+.hero .foto{position:relative;border-radius:28px;overflow:hidden;aspect-ratio:4/3.2;border:1px solid var(--glass-line)}
+.hero .foto img{width:100%;height:100%;object-fit:cover;display:block;filter:grayscale(.2) brightness(.7)}
+.hero .foto .nota{position:absolute;left:14px;right:14px;bottom:14px;padding:14px 16px;font-size:14px}
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:22px}
+.kpis div{padding:14px}
+.kpis b{display:block;font:700 30px/1 var(--f-disp);color:var(--accent-2)}
+.kpis span{font-size:13px;color:var(--muted)}
+
+.formatos{display:flex;gap:8px;flex-wrap:wrap}
+.posts{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
+.post{padding:12px;display:grid;gap:10px}
+.post canvas{width:100%;display:block;border-radius:12px;box-shadow:0 20px 40px -20px rgba(0,0,0,.9)}
+.post .meta{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.post b{font:700 17px/1.05 var(--f-disp);text-transform:uppercase}
+.post small{display:block;color:var(--muted);font-size:12px}
+.post .btn{min-height:36px;padding:0 12px;font-size:13px}
+
+.materiais{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:16px;align-items:start}
+.mat{padding:14px;display:grid;gap:10px}
+.mat canvas{width:100%;display:block;border-radius:10px}
+.mat h3{font-size:19px}
+.mat p{color:var(--muted);font-size:14px}
+
+.msgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.msg{padding:16px;display:grid;gap:10px;align-content:start}
+.msg .bolha{background:#005c4b;color:#e9edef;border-radius:12px;border-top-right-radius:2px;padding:10px 12px;font-size:14px;line-height:1.45;white-space:pre-line}
+.msg .quando{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+
+.cal{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.semana{padding:14px;display:grid;gap:8px;align-content:start}
+.semana h3{font-size:17px;color:var(--muted)}
+.pauta{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;align-items:center;padding:10px;border-radius:12px;background:rgba(255,255,255,.04);font-size:14px;border:0;color:inherit;text-align:left;cursor:pointer;font-family:inherit}
+.pauta:hover{background:rgba(255,255,255,.08)}
+.pauta .ico{width:20px;height:20px;color:var(--accent-2);grid-row:span 2}
+.pauta small{color:var(--muted);font-size:12px}
+.pauta.feito b{opacity:.55;text-decoration:line-through}
+
+.treino{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;list-style:none;margin:0;padding:0}
+.treino li{padding:16px}
+.treino q{display:block;font:600 18px/1.35 var(--f-body);quotes:"“" "”";margin:8px 0}
+.treino span{font-size:13px;color:var(--muted)}
+
+.pacotes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.pacote{padding:20px;display:grid;gap:10px;align-content:start}
+.pacote.dest{border-color:color-mix(in srgb,var(--accent) 60%,var(--glass-line));box-shadow:var(--glass-shadow),0 0 40px -12px rgba(217,164,65,.45)}
+.pacote ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.pacote li{display:flex;gap:10px;font-size:14px}
+.pacote li::before{content:"✓";color:var(--accent);font-weight:700}
+
+@media (max-width:980px){
+  .hero{grid-template-columns:1fr}
+  .materiais{grid-template-columns:1fr 1fr}
+  .cal{grid-template-columns:1fr 1fr}
+  .treino,.pacotes{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  .materiais,.cal{grid-template-columns:1fr}
+  .posts{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .post{padding:8px}
+  .post .meta{flex-direction:column;align-items:stretch}
+  .kpis b{font-size:24px}
+}
+</style>
+</head>
+<body data-pagina="marketing">
+<main class="wrap">
+  <section class="hero">
+    <div>
+      <p class="eyebrow" data-reveal>Marketing do parceiro</p>
+      <h1 data-reveal style="margin-top:14px">O pote na prateleira é metade. Aqui está a outra.</h1>
+      <p class="muted" data-reveal style="font-size:18px;margin-top:16px;max-width:34em">Posts prontos com a marca da <b data-marca-nome></b>, materiais de balcão, mensagens de WhatsApp e um calendário para o mês inteiro. Tudo muda sozinho quando a marca muda no Estúdio.</p>
+      <div class="kpis" data-reveal>
+        <div class="glass"><b data-n-posts>0</b><span>posts prontos</span></div>
+        <div class="glass"><b>12</b><span>pautas no mês</span></div>
+        <div class="glass"><b class="ph">60</b><span>meta de potes no mês</span></div>
+      </div>
+    </div>
+    <div class="foto" data-reveal>
+      <img src="img/fotos/navalha.webp" alt="Barbeiro acertando o contorno com navalha" loading="eager">
+      <p class="nota glass">Fotos de exemplo (Unsplash). No pacote real, a equipe usa fotos da sua barbearia e do seu produto.</p>
+    </div>
+  </section>
+
+  <section class="section" id="posts">
+    <div class="section-head">
+      <div><p class="eyebrow">Instagram</p><h2 style="margin-top:10px">Posts prontos com a sua marca</h2></div>
+      <div class="formatos" role="group" aria-label="Formato">
+        <button class="chip" type="button" data-fmt="feed" aria-pressed="true">Feed 4:5</button>
+        <button class="chip" type="button" data-fmt="story" aria-pressed="false">Story 9:16</button>
+      </div>
+    </div>
+    <div class="posts" data-posts></div>
+    <p class="muted" style="font-size:13px;margin-top:12px">Rascunhos automáticos em alta resolução (1080 px). A equipe de marketing ajusta texto, foto e legenda antes de postar.</p>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><div><p class="eyebrow">Ponto de venda</p><h2 style="margin-top:10px">Materiais de balcão</h2></div></div>
+    <div class="materiais">
+      <article class="mat glass" data-reveal><canvas width="1240" height="1754" data-mat="cartaz" role="img" aria-label="Cartaz A4 da linha"></canvas><h3>Cartaz A4</h3><p>Para a parede do caixa ou o espelho. Mostra a linha e chama para perguntar ao barbeiro.</p><button class="btn btn-ghost btn-sm" type="button" data-baixar-mat="cartaz">Baixar PNG</button></article>
+      <article class="mat glass" data-reveal><canvas width="1050" height="600" data-mat="fidelidade" role="img" aria-label="Cartão-fidelidade"></canvas><h3>Cartão-fidelidade</h3><p>A cada corte, um carimbo. No décimo, o cliente ganha a pomada da casa.</p><button class="btn btn-ghost btn-sm" type="button" data-baixar-mat="fidelidade">Baixar PNG</button></article>
+      <article class="mat glass" data-reveal><canvas width="800" height="800" data-mat="adesivo" role="img" aria-label="Adesivo redondo para o espelho"></canvas><h3>Adesivo do espelho</h3><p>“Gostou do penteado? Leve o produto.” Com o código da loja da barbearia.</p><button class="btn btn-ghost btn-sm" type="button" data-baixar-mat="adesivo">Baixar PNG</button></article>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><div><p class="eyebrow">WhatsApp</p><h2 style="margin-top:10px">Mensagens prontas</h2></div><p class="muted" style="max-width:28em;font-size:14px">Copie e mande do seu número. No pacote com IA, o atendimento responde sozinho e a equipe acompanha.</p></div>
+    <div class="msgs" data-msgs></div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><div><p class="eyebrow">Planejamento</p><h2 style="margin-top:10px">Calendário do mês</h2></div><p class="muted" style="font-size:14px">Toque numa pauta para marcar como feita.</p></div>
+    <div class="cal" data-cal></div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><div><p class="eyebrow">Equipe</p><h2 style="margin-top:10px">Como oferecer no balcão</h2></div></div>
+    <ul class="treino" data-treino></ul>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><div><p class="eyebrow">Pacotes</p><h2 style="margin-top:10px">Ajuda para vender</h2></div><span class="tag">Em definição</span></div>
+    <div class="pacotes">
+      <article class="pacote glass" data-reveal><h3>Essencial</h3><p class="ph">R$ 297/mês</p><ul><li>Posts prontos deste kit</li><li>Materiais de balcão para imprimir</li><li>Mensagens de WhatsApp</li></ul></article>
+      <article class="pacote glass dest" data-reveal><span class="tag tag-ok" style="justify-self:start">Mais completo</span><h3>Crescimento</h3><p class="ph">R$ 597/mês</p><ul><li>Tudo do Essencial</li><li>Fotos e vídeos 3D do seu pote</li><li>Calendário montado pela equipe</li><li>Atendimento no WhatsApp com IA</li></ul></article>
+      <article class="pacote glass" data-reveal><h3>Completo</h3><p class="ph">R$ 997/mês</p><ul><li>Tudo do Crescimento</li><li>Gestão do Instagram</li><li>Relatório mensal na Suíte UP</li></ul></article>
+    </div>
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+<script src="icones.js"></script>
+<script src="marca.js"></script>
+<script src="data.js"></script>
+<script src="site.js"></script>
+<script>
+const { G, anima } = SITE;
+document.title = `Marketing do parceiro · ${BRAND}`;
+const m = MARCA.load(), t = MARCA.tema(m), pom = MARCA.pomada(m), nome = MARCA.nome(m);
+const arroba = "@" + slug(nome).replace(/-/g, "");
+const OURO = t.ring === "#17150F" ? "#A8772A" : t.ring; // destaque legível em qualquer paleta
+$$("[data-marca-nome]").forEach(e => e.textContent = nome);
+
+/* ---- desenho em canvas ---- */
+const CREME = "#F1ECE2";
+function fundo(c, W, H) {
+  const g = c.createRadialGradient(W * 0.7, H * 0.35, 20, W * 0.5, H * 0.5, Math.max(W, H) * 0.8);
+  const escuro = t.id === "marfim";
+  g.addColorStop(0, escuro ? "#2a261f" : t.bg1); g.addColorStop(1, escuro ? "#0b0a08" : t.bg2);
+  c.fillStyle = g; c.fillRect(0, 0, W, H);
+  const luz = c.createRadialGradient(W * 0.72, H * 0.42, 10, W * 0.72, H * 0.42, W * 0.6);
+  luz.addColorStop(0, "rgba(217,164,65,.28)"); luz.addColorStop(1, "rgba(217,164,65,0)");
+  c.fillStyle = luz; c.fillRect(0, 0, W, H);
+}
+function foto(c, img, W, H, escurecer = 0.55) {
+  const r = Math.max(W / img.width, H / img.height), w = img.width * r, h = img.height * r;
+  c.drawImage(img, (W - w) / 2, (H - h) / 2, w, h);
+  const g = c.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, `rgba(10,9,7,${escurecer * 0.6})`); g.addColorStop(0.55, `rgba(10,9,7,${escurecer})`); g.addColorStop(1, "rgba(10,9,7,.95)");
+  c.fillStyle = g; c.fillRect(0, 0, W, H);
+}
+// título em caixa alta que quebra linhas; trechos entre *asteriscos* saem na cor de destaque
+function titulo(c, txt, x, y, maxW, size, alinhar = "left") {
+  c.font = `700 ${size}px "Barlow Condensed", sans-serif`; c.textBaseline = "alphabetic"; c.textAlign = "left";
+  const linhas = []; let atual = "";
+  txt.toUpperCase().split(" ").forEach(p => {
+    const tent = atual ? atual + " " + p : p;
+    if (c.measureText(tent.replace(/\*/g, "")).width > maxW && atual) { linhas.push(atual); atual = p; } else atual = tent;
+  });
+  linhas.push(atual);
+  let destaque = false;
+  linhas.forEach((l, i) => {
+    let cx = alinhar === "center" ? x - c.measureText(l.replace(/\*/g, "")).width / 2 : x;
+    l.split(/(\*)/).forEach(parte => {
+      if (parte === "*") { destaque = !destaque; return; }
+      c.fillStyle = destaque ? OURO : CREME;
+      c.fillText(parte, cx, y + i * size * 0.95); cx += c.measureText(parte).width;
+    });
+  });
+  return y + linhas.length * size * 0.95;
+}
+function texto(c, txt, x, y, size, cor = "rgba(241,236,226,.75)", peso = 500, alinhar = "left") {
+  c.font = `${peso} ${size}px "Barlow", sans-serif`; c.fillStyle = cor; c.textAlign = alinhar; c.textBaseline = "alphabetic"; c.fillText(txt, x, y);
+}
+// pote em perspectiva desenhado no canvas, com o logotipo na tampa (ou aberto, mostrando a massa)
+function pote(c, cx, cy, R, aberto = false) {
+  const H = R * 0.62, ry = R * 0.3, L = R * 0.36;
+  c.save();
+  const sh = c.createRadialGradient(cx, cy + H + ry * 0.6, 4, cx, cy + H + ry * 0.6, R * 1.2);
+  sh.addColorStop(0, "rgba(0,0,0,.6)"); sh.addColorStop(1, "rgba(0,0,0,0)");
+  c.fillStyle = sh; c.beginPath(); c.ellipse(cx, cy + H + ry * 0.6, R * 1.2, ry * 0.8, 0, 0, 7); c.fill();
+  const corpo = c.createLinearGradient(cx - R, 0, cx + R, 0);
+  [[0, "#3a352d"], [0.3, "#15130f"], [0.72, "#0b0a08"], [1, "#2a261f"]].forEach(([o, k]) => corpo.addColorStop(o, k));
+  const cilindro = (y0, h, fill) => {
+    c.beginPath(); c.moveTo(cx - R, y0); c.lineTo(cx - R, y0 + h); c.ellipse(cx, y0 + h, R, ry, 0, Math.PI, 0, true);
+    c.lineTo(cx + R, y0); c.ellipse(cx, y0, R, ry, 0, 0, Math.PI, true); c.closePath(); c.fillStyle = fill; c.fill();
+  };
+  cilindro(cy, H, corpo);
+  const fx = c.createLinearGradient(cx - R, 0, cx + R, 0); fx.addColorStop(0, t.bg1); fx.addColorStop(0.5, t.bg2); fx.addColorStop(1, t.bg1);
+  cilindro(cy + H * 0.25, H * 0.55, fx);
+  c.strokeStyle = t.ring; c.lineWidth = R * 0.012;
+  [0.25, 0.8].forEach(k => { c.beginPath(); c.ellipse(cx, cy + H * k, R, ry, 0, 0, Math.PI); c.stroke(); });
+  c.fillStyle = t.text; c.textAlign = "center"; c.textBaseline = "middle";
+  const fn = MARCA.logo(m).css;
+  c.font = `700 ${fit(c, nome.toUpperCase(), R * 1.5, R * 0.17, fn)}px ${fn}`;
+  c.fillText(nome.toUpperCase(), cx, cy + H * 0.52 + ry * 0.92);
+  if (aberto) {
+    c.fillStyle = "#0b0a08"; c.beginPath(); c.ellipse(cx, cy, R, ry, 0, 0, 7); c.fill();
+    const g = c.createRadialGradient(cx - R * 0.25, cy - ry * 0.3, 4, cx, cy, R);
+    g.addColorStop(0, pom.brilho >= 4 ? "#fff" : pom.cor); g.addColorStop(0.3, pom.cor); g.addColorStop(1, pom.cor);
+    c.fillStyle = g; c.beginPath(); c.ellipse(cx, cy + ry * 0.08, R * 0.9, ry * 0.85, 0, 0, 7); c.fill();
+    c.strokeStyle = t.ring; c.lineWidth = R * 0.02; c.beginPath(); c.ellipse(cx, cy, R, ry, 0, 0, 7); c.stroke();
+  } else {
+    cilindro(cy - L, L, corpo);
+    const tp = c.createRadialGradient(cx, cy - L - ry * 0.3, 4, cx, cy - L, R); tp.addColorStop(0, t.bg1); tp.addColorStop(1, t.bg2);
+    c.fillStyle = tp; c.beginPath(); c.ellipse(cx, cy - L, R, ry, 0, 0, 7); c.fill();
+    c.strokeStyle = t.ring; c.lineWidth = R * 0.025; c.stroke();
+    c.save(); c.beginPath(); c.ellipse(cx, cy - L, R * 0.92, ry * 0.92, 0, 0, 7); c.clip();
+    c.translate(cx, cy - L); c.scale(1, ry / R); c.translate(-R * 0.775, -R * 0.775);
+    drawLogo(c, R * 1.55, nome, MARCA.logo(m), corEscura(t), m.cidade || "SÃO PAULO");
+    c.restore();
+  }
+  c.restore();
+}
+function rodape(c, W, H) {
+  c.fillStyle = "rgba(241,236,226,.14)"; c.fillRect(64, H - 120, W - 128, 2);
+  texto(c, arroba, 64, H - 62, 34, CREME, 600);
+  texto(c, "Peça no balcão", W - 64, H - 62, 30, OURO, 600, "right");
+}
+function logoTopo(c, s = 180, x = 50, y = 40) {
+  const cv = Object.assign(document.createElement("canvas"), { width: s, height: s });
+  pintarLogo(cv, t.id === "marfim" ? { ...m, tema: "black" } : m, { bg: null, pad: 0.04 });
+  c.drawImage(cv, x, y, s, s);
+}
+
+/* ---- modelos de post ---- */
+const FOTOS = {};
+const MODELOS = [
+  { id: "chegou", nome: "Chegou no balcão", tipo: "Lançamento", desenhar(c, W, H) {
+    fundo(c, W, H); logoTopo(c);
+    const y = titulo(c, `Chegou a *${pom.nome}* da casa`, 64, H * 0.27, W - 128, W * 0.12);
+    texto(c, pom.desc.split(".")[0] + ".", 64, y + 30, 36);
+    pote(c, W * 0.5, H * 0.66, W * 0.3); rodape(c, W, H);
+  } },
+  { id: "estilo", nome: "Estilo da semana", tipo: "Produto", desenhar(c, W, H) {
+    fundo(c, W, H);
+    texto(c, "ESTILO DA SEMANA", 64, H * 0.1, 30, OURO, 600);
+    const y = titulo(c, pom.nome, 64, H * 0.2, W - 128, W * 0.15);
+    [["Fixação", pom.fix], ["Brilho", pom.brilho]].forEach(([r, n], i) => {
+      const yy = y + 30 + i * 64;
+      texto(c, r, 64, yy + 22, 32, CREME, 600);
+      for (let k = 0; k < 5; k++) { c.fillStyle = k < n ? OURO : "rgba(241,236,226,.15)"; c.beginPath(); c.arc(260 + k * 52, yy + 12, 16, 0, 7); c.fill(); }
+    });
+    pote(c, W * 0.5, H * 0.7, W * 0.3, true); rodape(c, W, H);
+  } },
+  { id: "dica", nome: "Dica do barbeiro", tipo: "Conteúdo", foto: "barba-pb", desenhar(c, W, H) {
+    foto(c, FOTOS["barba-pb"], W, H, 0.6); logoTopo(c);
+    const y = titulo(c, "Como usar a *pomada* em 3 passos", 64, H * 0.45, W - 128, W * 0.1);
+    ["Cabelo seco ou quase seco", "Uma ponta de dedo, aquecida na mão", "Da nuca para a frente, e modele"].forEach((p, i) => {
+      c.fillStyle = OURO; c.beginPath(); c.arc(84, y + 40 + i * 72, 22, 0, 7); c.fill();
+      texto(c, String(i + 1), 84, y + 50 + i * 72, 28, "#17150F", 700, "center");
+      texto(c, p, 128, y + 52 + i * 72, 36, CREME, 500);
+    });
+    rodape(c, W, H);
+  } },
+  { id: "agenda", nome: "Agenda aberta", tipo: "Agenda", foto: "cliente-cadeira", desenhar(c, W, H) {
+    foto(c, FOTOS["cliente-cadeira"], W, H, 0.55); logoTopo(c);
+    const y = titulo(c, "Horários *livres* hoje", 64, H * 0.52, W - 128, W * 0.13);
+    ["10:00", "14:30", "17:00", "19:30"].forEach((h, i) => {
+      const w = (W - 128) / 2 - 8, x = 64 + (i % 2) * (w + 16), yy = y + 20 + Math.floor(i / 2) * 110;
+      c.fillStyle = "rgba(241,236,226,.1)"; c.strokeStyle = "rgba(241,236,226,.3)"; c.lineWidth = 2;
+      c.beginPath(); c.roundRect(x, yy, w, 90, 45); c.fill(); c.stroke();
+      texto(c, h, x + w / 2, yy + 60, 44, CREME, 600, "center");
+    });
+    rodape(c, W, H);
+  } },
+  { id: "presente", nome: "Presente pronto", tipo: "Datas", desenhar(c, W, H) {
+    fundo(c, W, H); logoTopo(c);
+    const y = titulo(c, "Presente que *tem a cara* da casa", 64, H * 0.27, W - 128, W * 0.11);
+    texto(c, "Kit pomada + óleo de barba. Peça ao seu barbeiro.", 64, y + 30, 34);
+    pote(c, W * 0.36, H * 0.68, W * 0.22);
+    pote(c, W * 0.68, H * 0.73, W * 0.19, true); rodape(c, W, H);
+  } },
+  { id: "depo", nome: "Cliente aprovou", tipo: "Prova social", desenhar(c, W, H) {
+    fundo(c, W, H); logoTopo(c);
+    c.fillStyle = OURO; c.font = `700 ${W * 0.3}px "Playfair Display", serif`; c.textAlign = "left"; c.fillText("“", 50, H * 0.44);
+    const y = titulo(c, "[Depoimento do cliente] Saí daqui e *voltei* para levar o pote.", 64, H * 0.44, W - 128, W * 0.085);
+    texto(c, "— [NOME DO CLIENTE]", 64, y + 40, 32, "rgba(241,236,226,.6)", 600);
+    pote(c, W * 0.72, H * 0.8, W * 0.16); rodape(c, W, H);
+  } }
+];
+
+let formato = "feed";
+const TAM = { feed: [1080, 1350], story: [1080, 1920] };
+function montarPosts() {
+  $("[data-posts]").innerHTML = MODELOS.map(md => `<article class="post glass" data-reveal>
+    <canvas data-post="${md.id}" role="img" aria-label="Post ${md.nome} com a marca ${escHTML(nome)}"></canvas>
+    <div class="meta"><div><small>${md.tipo}</small><b>${md.nome}</b></div><button class="btn btn-ghost" type="button" data-baixar-post="${md.id}">Baixar</button></div></article>`).join("");
+  $("[data-n-posts]").textContent = MODELOS.length * 2; // feed + story
+  desenharPosts();
+}
+function desenharPosts() {
+  const [W, H] = TAM[formato];
+  MODELOS.forEach(md => {
+    const cv = $(`[data-post="${md.id}"]`); cv.width = W; cv.height = H;
+    const c = cv.getContext("2d");
+    if (md.foto && !FOTOS[md.foto]) { fundo(c, W, H); return; } // foto ainda carregando
+    md.desenhar(c, W, H);
+  });
+}
+
+/* ---- materiais de balcão ---- */
+function desenharMateriais() {
+  let cv = $('[data-mat="cartaz"]'), c = cv.getContext("2d"), W = cv.width, H = cv.height;
+  fundo(c, W, H); logoTopo(c, 240, 70, 60);
+  const y = titulo(c, "A *linha da casa* chegou", 90, H * 0.24, W - 180, 150);
+  texto(c, "Pergunte ao seu barbeiro qual combina com o seu corte.", 90, y + 30, 42);
+  pote(c, W * 0.32, H * 0.62, W * 0.2); pote(c, W * 0.7, H * 0.66, W * 0.18, true);
+  texto(c, POMADAS.slice(0, 4).map(p => p.nome).join(" · "), W / 2, H - 150, 34, "rgba(241,236,226,.7)", 600, "center");
+  texto(c, arroba, W / 2, H - 80, 40, CREME, 600, "center");
+
+  cv = $('[data-mat="fidelidade"]'); c = cv.getContext("2d"); W = cv.width; H = cv.height;
+  fundo(c, W, H); logoTopo(c, 220, 30, 20);
+  titulo(c, "Cartão *fidelidade*", 280, 120, W - 320, 70);
+  texto(c, "10 cortes = 1 pomada da casa", 280, 178, 32);
+  for (let i = 0; i < 10; i++) {
+    const x = 120 + (i % 5) * 200, yy = 330 + Math.floor(i / 5) * 140;
+    c.strokeStyle = OURO; c.lineWidth = 4; c.setLineDash(i < 3 ? [] : [10, 8]);
+    c.beginPath(); c.arc(x, yy, 50, 0, 7); c.stroke(); c.setLineDash([]);
+    if (i < 3) texto(c, "✓", x, yy + 18, 54, OURO, 700, "center");
+  }
+
+  cv = $('[data-mat="adesivo"]'); c = cv.getContext("2d"); W = cv.width; H = cv.height;
+  c.clearRect(0, 0, W, H);
+  c.fillStyle = t.id === "marfim" ? "#17150F" : t.bg2; c.beginPath(); c.arc(W / 2, H / 2, W / 2 - 4, 0, 7); c.fill();
+  c.strokeStyle = OURO; c.lineWidth = 14; c.beginPath(); c.arc(W / 2, H / 2, W / 2 - 20, 0, 7); c.stroke();
+  titulo(c, "Gostou do *penteado*?", W / 2, H * 0.34, W * 0.72, 92, "center");
+  texto(c, "Leve o produto que usamos em você.", W / 2, H * 0.57, 34, "rgba(241,236,226,.8)", 500, "center");
+  c.fillStyle = CREME; c.beginPath(); c.roundRect(W / 2 - 80, H * 0.63, 160, 160, 14); c.fill();
+  texto(c, "CÓDIGO", W / 2, H * 0.63 + 72, 24, "#17150F", 700, "center");
+  texto(c, slug(nome).replace(/-/g, "").slice(0, 10).toUpperCase(), W / 2, H * 0.63 + 104, 17, "#A8772A", 700, "center");
+}
+
+/* ---- mensagens, calendário e treino ---- */
+const MSGS = [
+  ["Depois do corte", `Fala, tudo certo? Aqui é da ${nome} ✂️\nGostou do acabamento de hoje? A pomada que usamos é a ${pom.nome}, da nossa linha. Separo um pote para a próxima visita?`],
+  ["Cliente sumido", `Oi! Sentimos sua falta na ${nome}. Esta semana tem horário livre e a ${pom.nome} chegou fresquinha. Quer que eu reserve um horário?`],
+  ["Lançamento", `Novidade na ${nome}: agora temos pomada com a nossa marca! ${pom.nome}: ${pom.desc.split(".")[0].toLowerCase()}. Pergunte no balcão 😉`],
+  ["Datas comemorativas", `Presente pronto: kit ${nome} com pomada + óleo de barba, embalado para presente. Quer que eu separe um?`]
+];
+const PAUTAS = [
+  ["Semana 1", [["sparkles", "Post", "Chegou no balcão"], ["droplet", "Story", "Bastidor: pote na bancada"], ["user-scan", "Reels", "Antes e depois com a pomada"]]],
+  ["Semana 2", [["tag", "Post", "Estilo da semana"], ["building-store", "Story", "Agenda aberta"], ["brush", "Post", "Dica do barbeiro"]]],
+  ["Semana 3", [["gift", "Post", "Presente pronto"], ["sparkles", "Story", "Enquete: qual estilo?"], ["user-scan", "Reels", "Corte do mês"]]],
+  ["Semana 4", [["diamond", "Post", "Cliente aprovou"], ["building-store", "Story", "Últimos horários"], ["tag", "Post", "Cartão-fidelidade"]]]
+];
+const FEITAS_KEY = "stars-pautas";
+let feitas = (() => { try { return JSON.parse(localStorage.getItem(FEITAS_KEY)) || []; } catch { return []; } })();
+const pautaHTML = (si, pi, [ic, tipo, tema]) => {
+  const id = `${si}-${pi}`, ok = feitas.includes(id);
+  return `<button class="pauta${ok ? " feito" : ""}" type="button" data-pauta="${id}" aria-pressed="${ok}">${icone(ic)}<b>${tema}</b><small>${tipo}${ok ? " · feito ✓" : ""}</small></button>`;
+};
+function montarTextos() {
+  $("[data-msgs]").innerHTML = MSGS.map(([q, txt], i) => `<article class="msg glass" data-reveal><span class="quando">${q}</span><p class="bolha">${escHTML(txt)}</p><button class="btn btn-ghost btn-sm" type="button" data-copiar="${i}">Copiar mensagem</button></article>`).join("");
+  $("[data-cal]").innerHTML = PAUTAS.map(([s, ps], si) => `<div class="semana glass" data-reveal><h3>${s}</h3>${ps.map((p, pi) => pautaHTML(si, pi, p)).join("")}</div>`).join("");
+  $("[data-treino]").innerHTML = [
+    ["No fim do corte", `Usei a ${pom.nome}, que é da casa. Quer levar para manter assim em casa?`],
+    ["Se o cliente hesitar", "Experimenta passar agora, eu te mostro a quantidade certa."],
+    ["Na hora de pagar", "Quer incluir a pomada? Fica junto do corte, sem fila."]
+  ].map(([q, f]) => `<li class="glass" data-reveal><span>${q}</span><q>${escHTML(f)}</q><span>Comissão para quem vende: <b class="ph">R$ 5,25 por pote</b></span></li>`).join("");
+}
+
+/* ---- eventos ---- */
+document.addEventListener("click", async e => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.fmt) {
+    formato = b.dataset.fmt;
+    $$("[data-fmt]").forEach(x => x.setAttribute("aria-pressed", x === b));
+    desenharPosts();
+    if (anima) G.fromTo("[data-post]", { opacity: 0, scale: 0.96 }, { opacity: 1, scale: 1, duration: 0.45, stagger: 0.05, ease: "power3.out" });
+  }
+  if (b.dataset.baixarPost) baixarCanvas($(`[data-post="${b.dataset.baixarPost}"]`), `${slug(nome)}-${b.dataset.baixarPost}-${formato}.png`);
+  if (b.dataset.baixarMat) baixarCanvas($(`[data-mat="${b.dataset.baixarMat}"]`), `${slug(nome)}-${b.dataset.baixarMat}.png`);
+  if (b.dataset.copiar) {
+    try { await navigator.clipboard.writeText(MSGS[b.dataset.copiar][1]); avisar("Mensagem copiada. É só colar no WhatsApp."); }
+    catch { avisar("Não deu para copiar aqui. Selecione o texto e copie."); }
+  }
+  if (b.dataset.pauta) {
+    const id = b.dataset.pauta, [si, pi] = id.split("-").map(Number);
+    feitas = feitas.includes(id) ? feitas.filter(x => x !== id) : [...feitas, id];
+    try { localStorage.setItem(FEITAS_KEY, JSON.stringify(feitas)); } catch { /* sem armazenamento */ }
+    b.outerHTML = pautaHTML(si, pi, PAUTAS[si][1][pi]);
+    $(`[data-pauta="${id}"]`).focus();
+  }
+});
+
+montarPosts(); montarTextos(); desenharMateriais(); revelar();
+// fontes e fotos chegam depois: redesenha quando estiverem prontas
+const fontes = ['700 100px "Barlow Condensed"', '600 40px "Barlow"', '500 40px "Barlow"', '700 100px "Playfair Display"'].map(f => document.fonts.load(f));
+const fotos = MODELOS.filter(md => md.foto).map(md => new Promise(res => {
+  const img = new Image(); img.onload = () => { FOTOS[md.foto] = img; res(); }; img.onerror = res; img.src = `img/fotos/${md.foto}.webp`;
+}));
+Promise.all([...fontes, ...fotos]).then(() => { desenharPosts(); desenharMateriais(); });
+</script>
+</body>
+</html>

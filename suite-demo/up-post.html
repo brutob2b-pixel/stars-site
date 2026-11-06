@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>UP·Post — Conteúdo & atribuição</title>
+  <meta name="author" content="Rafael Barros — UP Co."/>
+  <script src="config.js"></script>
+  <script src="nav.js"></script>
+  <script src="suite-data.js"></script>
+  <script src="demo-data.js"></script>
+  <style>
+    .post-tabs { display:flex;align-items:center;border-bottom:1px solid var(--border);padding:0 28px;margin-top:16px;flex-shrink:0;overflow-x:auto; }
+    .post-tab-group { font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);padding:0 10px 0 0;white-space:nowrap; }
+    .post-tab-group + .post-tab { margin-left:0; }
+    .post-tab { padding:10px 14px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s,border-color .15s;white-space:nowrap; }
+    .post-tab:hover { color:var(--text); }
+    .post-tab.active { color:var(--text);border-bottom-color:var(--teal); }
+    .post-tab-sep { width:1px;height:18px;background:var(--border);margin:0 14px; }
+    .post-content { flex:1;overflow-y:auto;padding:20px 28px 40px; }
+    .post-panel { display:none;flex-direction:column;gap:20px; }
+    .post-panel.active { display:flex; }
+
+    .panel-head { display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between; }
+    .panel-lead { font-size:13px;color:var(--muted);max-width:640px;line-height:1.6; }
+    .field-inline { display:flex;flex-direction:column;gap:4px;font-size:11px;color:var(--dim); }
+    .field-inline .input { width:auto;min-width:170px; }
+
+    .stat-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px; }
+    .stat { background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px 18px; }
+    .stat.accent { border-color:var(--teal); }
+    .stat-label { font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin-bottom:8px; }
+    .stat.accent .stat-label { color:var(--teal); }
+    .stat-value { font-family:'Syne',sans-serif;font-weight:800;font-size:28px;letter-spacing:-.03em;line-height:1.1; }
+    .stat.accent .stat-value { color:var(--teal); }
+    .stat-sub { font-size:12px;color:var(--muted);margin-top:6px;line-height:1.5; }
+
+    .grid-2 { display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px; }
+    .grid-3 { display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px; }
+    .box { background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0; }
+    .box-head { display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap; }
+    .box-title { font-family:'Syne',sans-serif;font-weight:700;font-size:14px;letter-spacing:-.02em; }
+    .box-note { font-size:11px;color:var(--dim); }
+
+    /* Barra de score — 1,0× = normal da conta */
+    .score-row { display:flex;flex-direction:column;gap:6px; }
+    .score-row.fraco { opacity:.55; }
+    .score-top { display:flex;justify-content:space-between;gap:12px;font-size:13px; }
+    .score-top small { color:var(--dim);font-size:11px;margin-left:6px; }
+    .score-val { font-family:'Syne',sans-serif;font-weight:800; }
+    .score-bar { height:6px;border-radius:3px;background:var(--bg3);overflow:hidden;position:relative; }
+    .score-fill { height:100%;border-radius:3px; }
+    .score-bar::after { content:'';position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--dim); } /* marca do 1,0× */
+
+    .chip { display:inline-flex;align-items:center;font-size:11px;font-weight:500;padding:3px 10px;border-radius:999px;white-space:nowrap; }
+    .chip-continue { background:var(--teal);color:#0B1A1B; }
+    .chip-pare { background:var(--bg3);color:var(--text); }
+    .chip-teste { border:1px solid var(--teal);color:var(--teal); }
+    /* certeza × estimativa: sólido para o que é certo, tracejado para o que é declarado */
+    .chip-codigo { background:var(--teal-12);color:var(--teal);border:1px solid var(--teal); }
+    .chip-declarado { color:var(--muted);border:1px dashed var(--dim); }
+    .chip-ok { background:var(--teal);color:#0B1A1B; }
+    .chip-no { color:var(--text);border:1px solid var(--dim); }
+    .chip-wait { color:var(--muted);border:1px solid var(--border); }
+    .chip-tag { background:var(--bg3);color:var(--muted); }
+    .code { font-family:'Syne',sans-serif;font-weight:800;color:var(--teal);margin-right:8px; }
+
+    .rec-item { font-size:13px;line-height:1.5; }
+    .rec-item small { display:block;color:var(--dim);font-size:11px; }
+
+    .mini-posts { display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px; }
+    .mini-post { background:var(--bg3);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:6px;cursor:pointer;border:1px solid transparent; }
+    .mini-post:hover { border-color:var(--teal); }
+    .mini-post-title { font-size:13px;line-height:1.35; }
+    .mini-post-meta { display:flex;justify-content:space-between;font-size:12px;color:var(--dim); }
+
+    /* Faixa prevista */
+    .band-word { font-family:'Syne',sans-serif;font-weight:800;font-size:44px;text-transform:uppercase;letter-spacing:-.01em;line-height:1; }
+    .band-meter { position:relative;height:8px;border-radius:4px;background:var(--bg3);margin-top:6px; }
+    .band-dot { position:absolute;top:-4px;width:18%;height:16px;border-radius:8px;background:var(--teal);transition:left .5s ease; }
+    .band-scale { display:flex;justify-content:space-between;font-size:11px;color:var(--dim);margin-top:6px; }
+    .adjust { display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:8px;background:var(--bg3); }
+    .adjust-n { font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:var(--teal);width:18px; }
+    .adjust-body { flex:1;min-width:0;font-size:13px; }
+    .adjust-body small { display:block;color:var(--dim);font-size:11px;margin-top:2px; }
+
+    table.post-table { width:100%;border-collapse:collapse;min-width:720px; }
+    .post-table th { text-align:left;font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);padding:8px 12px;border-bottom:1px solid var(--border); }
+    .post-table td { padding:11px 12px;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;vertical-align:middle; }
+    .post-table tr:hover td { background:rgba(255,255,255,.02); }
+    .table-wrap { overflow-x:auto; }
+
+    .rule { display:flex;flex-wrap:wrap;gap:16px;align-items:center;padding:14px;border-radius:8px;background:var(--bg3); }
+    .rule.off { opacity:.5; }
+    .rule-body { flex:1 1 300px;min-width:0;font-size:13px;line-height:1.5; }
+    .rule-body small { display:block;color:var(--dim);font-size:11px;margin-top:4px; }
+    .rule-weight { flex:0 0 130px;font-size:11px;color:var(--dim); }
+
+    .linkbox { display:flex;gap:8px;align-items:center;flex-wrap:wrap; }
+    .linkbox code { flex:1 1 240px;min-width:0;padding:10px 12px;border-radius:6px;background:var(--bg);border:1px solid var(--border);font-size:12px;color:var(--teal);overflow-wrap:anywhere; }
+    .notice { font-size:12px;color:var(--muted);line-height:1.6;border-left:2px solid var(--border);padding-left:12px; }
+    .notice.warn { border-left-color:var(--amber);color:var(--amber); }
+
+    .modal-overlay { position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:1000;backdrop-filter:blur(4px); }
+    .modal-overlay.hidden { display:none; }
+    .modal { background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px;width:560px;max-width:92vw;max-height:92vh;overflow-y:auto; }
+    .modal-title { font-family:'Syne',sans-serif;font-weight:700;font-size:16px;letter-spacing:-.02em;margin-bottom:18px; }
+    .form-group { margin-bottom:12px; }
+    .form-label { display:block;font-size:12px;color:var(--muted);margin-bottom:5px; }
+    .form-row-3 { display:grid;grid-template-columns:repeat(3,1fr);gap:12px; }
+    .form-actions { display:flex;gap:8px;justify-content:flex-end;margin-top:18px; }
+    .form-section { font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin:16px 0 10px; }
+  </style>
+</head>
+<body>
+<div class="suite-layout">
+  <aside id="suite-sidebar" class="suite-sidebar"></aside>
+  <main class="suite-main">
+    <div class="module-header">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div>
+          <h1 class="module-title">UP <span class="dash">—</span> Post</h1>
+          <p class="module-subtitle">Saber antes de postar · provar depois de vender</p>
+        </div>
+        <button class="btn btn-primary" onclick="openPostModal()" style="margin-top:4px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Registrar post
+        </button>
+      </div>
+    </div>
+
+    <div class="post-tabs" role="tablist">
+      <span class="post-tab-group">Antes de postar</span>
+      <button class="post-tab" data-tab="visao" onclick="switchTab('visao')">Visão geral</button>
+      <button class="post-tab" data-tab="analisar" onclick="switchTab('analisar')">Analisar produção</button>
+      <button class="post-tab" data-tab="posts" onclick="switchTab('posts')">Previsões</button>
+      <button class="post-tab" data-tab="algoritmo" onclick="switchTab('algoritmo')">Algoritmo</button>
+      <span class="post-tab-sep"></span>
+      <span class="post-tab-group">Depois de postar</span>
+      <button class="post-tab" data-tab="vendas" onclick="switchTab('vendas')">Vendas</button>
+      <button class="post-tab" data-tab="anuncios" onclick="switchTab('anuncios')">Anúncios</button>
+      <button class="post-tab" data-tab="referencias" onclick="switchTab('referencias')">Referências</button>
+    </div>
+
+    <div class="post-content">
+
+      <!-- VISÃO GERAL -->
+      <section class="post-panel" id="panel-visao">
+        <div class="panel-head">
+          <p class="panel-lead">O que funciona neste perfil, comparado ao normal da própria conta. <strong>1,0×</strong> é a mediana dos posts publicados no objetivo escolhido.</p>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            <label class="field-inline">Objetivo<select class="input" id="sel-objetivo" onchange="setObjetivo(this.value)"></select></label>
+            <label class="field-inline">Período<select class="input" id="sel-periodo" onchange="setPeriodo(this.value)">
+              <option value="90">Últimos 90 dias</option><option value="30">Últimos 30 dias</option><option value="0">Tudo</option>
+            </select></label>
+          </div>
+        </div>
+        <div id="visao-aviso"></div>
+        <div class="stat-grid" id="visao-stats"></div>
+        <div class="grid-2" id="visao-rankings"></div>
+        <div class="grid-3" id="visao-recs"></div>
+        <div class="box">
+          <div class="box-head"><div class="box-title">Melhores e piores do período</div><button class="icon-btn" onclick="switchTab('posts')">Ver todos os posts →</button></div>
+          <div class="mini-posts" id="visao-posts"></div>
+        </div>
+      </section>
+
+      <!-- ANALISAR PRODUÇÃO -->
+      <section class="post-panel" id="panel-analisar">
+        <div class="panel-head">
+          <p class="panel-lead">Descreva o post antes de publicar. A previsão vem do histórico deste perfil — quanto mais posts com métricas, mais ela vale. Ela aponta uma faixa, não um número.</p>
+          <label class="field-inline">Objetivo deste post<select class="input" id="an-objetivo" onchange="renderPrediction()"></select></label>
+        </div>
+        <div class="grid-2" style="align-items:start;">
+          <div class="box">
+            <div class="box-title" id="an-form-title">Conteúdo</div>
+            <div class="form-group" style="margin:0;"><label class="form-label">Título / ideia central</label><input class="input" id="an-titulo" type="text" placeholder="Ex: Antes de contratar, olha isso"/></div>
+            <div class="form-row">
+              <div class="form-group" style="margin:0;"><label class="form-label">Formato</label><select class="input" id="an-formato" onchange="renderPrediction()"></select></div>
+              <div class="form-group" style="margin:0;"><label class="form-label">Tipo de gancho</label><select class="input" id="an-gancho" onchange="renderPrediction()"></select></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group" style="margin:0;"><label class="form-label">Tema</label><input class="input" id="an-tema" type="text" list="temas-list" placeholder="Ex: erros comuns" onchange="renderPrediction()"/></div>
+              <div class="form-group" style="margin:0;"><label class="form-label">CTA</label><select class="input" id="an-cta" onchange="renderPrediction()"></select></div>
+            </div>
+            <div class="form-group" style="margin:0;"><label class="form-label">Roteiro ou legenda (opcional — usado só pelas sugestões da IA)</label><textarea class="input" id="an-roteiro" rows="6" style="resize:vertical;" placeholder="Cole a fala dos primeiros segundos, o roteiro ou a legenda…"></textarea></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn btn-ghost" id="btn-an-ai" onclick="aiSuggestions()">Sugestões da IA</button>
+              <button class="btn btn-primary" onclick="saveDraft()">Salvar com esta previsão</button>
+              <button class="icon-btn" onclick="resetAnalyze()">Limpar</button>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px;min-width:0;">
+            <div class="box" id="an-result"></div>
+            <div class="box" id="an-adjusts"></div>
+            <div class="box" id="an-ai" style="display:none;"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PREVISÕES / POSTS -->
+      <section class="post-panel" id="panel-posts">
+        <p class="panel-lead">Cada post publicado é comparado com a previsão feita antes. As métricas são lançadas à mão por enquanto — o ideal é registrar 72 horas depois de publicar.</p>
+        <div class="stat-grid" id="posts-stats"></div>
+        <div class="box" style="padding:0;gap:0;">
+          <div class="box-head" style="padding:16px 18px 10px;">
+            <div class="box-title">Histórico</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;" id="posts-filters"></div>
+          </div>
+          <div class="table-wrap">
+            <table class="post-table">
+              <thead><tr><th>Post</th><th>Publicado</th><th>Previsto</th><th>Real</th><th>Score</th><th>Resultado</th><th></th></tr></thead>
+              <tbody id="posts-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ALGORITMO -->
+      <section class="post-panel" id="panel-algoritmo">
+        <p class="panel-lead">Cole aqui as novidades oficiais da Meta. Cada uma vira regras com data; as mais recentes pesam mais. As regras ativas entram como contexto nas sugestões da IA em "Analisar produção".</p>
+        <div class="box">
+          <div class="box-title">Adicionar novidade oficial</div>
+          <div class="form-group" style="margin:0;"><label class="form-label">Texto da novidade</label><textarea class="input" id="alg-texto" rows="4" style="resize:vertical;" placeholder="Cole o trecho do anúncio oficial…"></textarea></div>
+          <div class="form-row">
+            <div class="form-group" style="margin:0;"><label class="form-label">Link da fonte</label><input class="input" id="alg-link" type="url" placeholder="https://about.instagram.com/…"/></div>
+            <div class="form-group" style="margin:0;"><label class="form-label">Data da publicação</label><input class="input" id="alg-data" type="date"/></div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-primary" id="btn-alg-ai" onclick="extractRules()">Extrair regras com IA</button>
+            <button class="btn btn-ghost" onclick="addRuleManual()">Salvar o texto como uma regra</button>
+          </div>
+        </div>
+        <div class="box">
+          <div class="box-head"><div class="box-title">Regras</div><span class="box-note">O peso cai com o tempo, a menos que você confirme que a regra segue valendo</span></div>
+          <div id="alg-rules" style="display:flex;flex-direction:column;gap:8px;"></div>
+        </div>
+      </section>
+
+      <!-- VENDAS -->
+      <section class="post-panel" id="panel-vendas">
+        <p class="panel-lead">Conteúdo → lead no WhatsApp → venda fechada. O crédito volta para o post de origem. O lead é ligado ao post no UP·Lead, e a venda conta quando o deal dele vai para "Ganho ✓".</p>
+        <div class="stat-grid" id="vendas-stats"></div>
+        <div class="box" style="padding:0;gap:0;">
+          <div class="box-head" style="padding:16px 18px 10px;"><div class="box-title">Por post</div></div>
+          <div class="table-wrap">
+            <table class="post-table">
+              <thead><tr><th>Post</th><th>Ponto de contato</th><th>Leads</th><th>Vendas</th><th>Receita</th><th>Atribuição</th></tr></thead>
+              <tbody id="vendas-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="box">
+          <div class="box-title">Gerar link rastreado</div>
+          <div class="form-row">
+            <div class="form-group" style="margin:0;"><label class="form-label">Post</label><select class="input" id="link-post" onchange="renderLink()"></select></div>
+            <div class="form-group" style="margin:0;"><label class="form-label">Onde o link vai aparecer</label><select class="input" id="link-ponto" onchange="renderLink()">
+              <option value="B">Bio</option><option value="S">Stories</option><option value="A">Anúncio</option><option value="D">DM</option>
+            </select></div>
+          </div>
+          <div class="form-group" style="margin:0;"><label class="form-label">Mensagem que o cliente envia (o código precisa ficar)</label><input class="input" id="link-msg" type="text" oninput="renderLink()"/></div>
+          <div class="linkbox"><code id="link-out">—</code><button class="btn btn-ghost" onclick="copyLink()">Copiar link</button></div>
+          <div id="link-aviso"></div>
+          <p class="notice">O link abre o WhatsApp da empresa com a mensagem já escrita e o código do post dentro dela. Ao cadastrar o lead no UP·Lead com essa mensagem, o post é reconhecido sozinho. Quem toca no botão nativo "WhatsApp" do perfil não passa pelo link — aponte o CTA para a bio ou os stories.</p>
+        </div>
+        <p class="notice">Ainda não disponível nesta versão: atribuição por clique e por janela de tempo, e a devolução das vendas para a Meta (Conversions API). As duas dependem da suíte estar hospedada na internet e conectada à conta da Meta.</p>
+      </section>
+
+      <!-- ANÚNCIOS -->
+      <section class="post-panel" id="panel-anuncios">
+        <p class="panel-lead">O orgânico é o laboratório: só merece verba o que já provou alguma coisa sem ela. A lista ordena os posts por salvamentos e visitas ao perfil acima do normal e por leads já atribuídos.</p>
+        <div id="anuncios-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+        <p class="notice">A suíte não cria nem acompanha campanhas. "Marcar como impulsionado" só registra a decisão. Saber quais sinais orgânicos preveem lead barato nesta conta exige os resultados das campanhas, que ainda não entram aqui.</p>
+      </section>
+
+      <!-- REFERÊNCIAS -->
+      <section class="post-panel" id="panel-referencias">
+        <p class="panel-lead">O que funciona no segmento, convertido em pautas no DNA da marca. Copia o mecanismo, nunca o conteúdo. Os padrões são anotados por você ao observar as contas de referência.</p>
+        <div class="grid-2" style="align-items:start;">
+          <div class="box">
+            <div class="box-title">Anotar padrão observado</div>
+            <div class="form-group" style="margin:0;"><label class="form-label">Mecanismo</label><input class="input" id="ref-label" type="text" placeholder="Ex: erro comum resolvido em 3 passos"/></div>
+            <div class="form-group" style="margin:0;"><label class="form-label">Contas em que apareceu (separe por vírgula)</label><input class="input" id="ref-contas" type="text" placeholder="@conta1, @conta2"/></div>
+            <label style="display:flex;gap:8px;align-items:center;font-size:13px;color:var(--muted);"><input type="checkbox" id="ref-aplicavel" checked/> Combina com o DNA da marca</label>
+            <button class="btn btn-primary" style="align-self:flex-start;" onclick="addPattern()">Adicionar padrão</button>
+          </div>
+          <div class="box">
+            <div class="box-head"><div class="box-title">Padrões</div><span class="box-note">Só vira pauta o que aparece em 2 ou mais contas</span></div>
+            <div id="ref-patterns" style="display:flex;flex-direction:column;gap:8px;"></div>
+          </div>
+        </div>
+        <div class="box">
+          <div class="box-head"><div class="box-title">Pautas no DNA da marca</div><button class="btn btn-ghost btn-sm" id="btn-ref-ai" onclick="generateBriefs()">Gerar pautas com IA</button></div>
+          <div class="grid-3" id="ref-briefs"></div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<datalist id="temas-list"></datalist>
+
+<!-- Modal Post -->
+<div class="modal-overlay hidden" id="modal-post" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-title" id="post-modal-title">Registrar post</div>
+    <div class="form-group"><label class="form-label">Título</label><input class="input" id="p-titulo" type="text"/></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Formato</label><select class="input" id="p-formato"></select></div>
+      <div class="form-group"><label class="form-label">Tipo de gancho</label><select class="input" id="p-gancho"></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Tema</label><input class="input" id="p-tema" type="text" list="temas-list"/></div>
+      <div class="form-group"><label class="form-label">CTA</label><select class="input" id="p-cta"></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Situação</label><select class="input" id="p-status"><option value="publicado">Publicado</option><option value="rascunho">Rascunho (ainda não publicado)</option></select></div>
+      <div class="form-group"><label class="form-label">Data da publicação</label><input class="input" id="p-data" type="date"/></div>
+    </div>
+    <div class="form-group"><label class="form-label">Link do post (opcional)</label><input class="input" id="p-url" type="url" placeholder="https://www.instagram.com/p/…"/></div>
+    <div class="form-section">Métricas — copie dos Insights do Instagram</div>
+    <div class="form-row-3" id="p-metricas"></div>
+    <div class="form-actions">
+      <button class="btn btn-ghost danger" id="btn-delete-post" onclick="deletePost()" style="margin-right:auto;">Excluir</button>
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="savePost()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script>
+const { U, POST } = Suite;
+const esc = U.esc;
+const TEAL = 'var(--teal)', GRAY = 'var(--dim)';
+const PONTOS = { B:'Bio', S:'Stories', A:'Anúncio', D:'DM' };
+const PLACEHOLDER_PHONES = ['99000-0000', '98888-0000'];
+const pref = (k, fallback) => { try { return localStorage.getItem('uppost_' + k) || fallback; } catch { return fallback; } };
+const setPref = (k, v) => { try { localStorage.setItem('uppost_' + k, v); } catch { /* preferência de tela, não é dado */ } };
+
+const state = {
+  posts: [], leads: [], pipeline: [], regras: [], padroes: [], pautas: [],
+  tab: pref('tab', 'visao'), objetivo: pref('objetivo', 'alcance'), periodo: pref('periodo', '90'),
+  filtro: 'todos', editId: null, draftId: null, ai: null,
+};
+
+async function reload() {
+  [state.posts, state.leads, state.pipeline, state.regras, state.padroes, state.pautas] =
+    await Promise.all(['posts', 'leads', 'pipeline', 'post_regras', 'post_padroes', 'post_pautas'].map(n => store.load(n)));
+  state.attr = POST.attribution(state.posts, state.leads, state.pipeline);
+}
+
+async function refresh() { await reload(); renderAll(); }
+
+async function init() {
+  const opts = (list) => list.map(v => `<option>${esc(v)}</option>`).join('');
+  const objOpts = Object.entries(POST.OBJETIVOS).map(([k, v]) => `<option value="${k}">${v}</option>`).join('');
+  ['an-formato', 'p-formato'].forEach(id => document.getElementById(id).innerHTML = opts(POST.FORMATOS));
+  ['an-gancho', 'p-gancho'].forEach(id => document.getElementById(id).innerHTML = opts(POST.GANCHOS));
+  ['an-cta', 'p-cta'].forEach(id => document.getElementById(id).innerHTML = opts(POST.CTAS));
+  ['sel-objetivo', 'an-objetivo'].forEach(id => { const el = document.getElementById(id); el.innerHTML = objOpts; el.value = state.objetivo; });
+  document.getElementById('sel-periodo').value = state.periodo;
+  document.getElementById('p-metricas').innerHTML = Object.entries(POST.METRICAS).map(([k, v]) =>
+    `<div class="form-group"><label class="form-label">${v}</label><input class="input" id="pm-${k}" type="number" min="0"/></div>`).join('');
+  document.getElementById('alg-data').value = U.today();
+  document.getElementById('link-msg').value = 'Oi! Vi o post {codigo} e quero saber mais.';
+  await refresh();
+  switchTab(state.tab);
+}
+
+function switchTab(tab) {
+  if (!document.getElementById('panel-' + tab)) tab = 'visao';
+  state.tab = tab; setPref('tab', tab);
+  document.querySelectorAll('.post-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  document.querySelectorAll('.post-panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + tab));
+}
+
+function setObjetivo(v) { state.objetivo = v; setPref('objetivo', v); renderVisao(); }
+function setPeriodo(v) { state.periodo = v; setPref('periodo', v); renderVisao(); }
+
+function renderAll() {
+  const temas = [...new Set(state.posts.map(p => p.tema).filter(Boolean))].sort();
+  document.getElementById('temas-list').innerHTML = temas.map(t => `<option value="${esc(t)}">`).join('');
+  renderVisao(); renderPrediction(); renderPosts(); renderRules(); renderVendas(); renderAnuncios(); renderReferencias();
+}
+
+// ── Peças reutilizadas ───────────────────────────────────────
+const publicados = () => state.posts.filter(p => p.status === 'publicado');
+const noPeriodo = (p) => state.periodo === '0' || (p.publicado_em && p.publicado_em >= U.addDays(U.today(), -Number(state.periodo)));
+const color = score => score >= 1 ? TEAL : GRAY;
+
+function scoreRow(label, n, score, fraco) {
+  return `
+    <div class="score-row ${fraco ? 'fraco' : ''}">
+      <div class="score-top"><span>${esc(label)}<small>${n} post${n !== 1 ? 's' : ''}${fraco ? ' · amostra pequena' : ''}</small></span><span class="score-val" style="color:${color(score)}">${POST.fmtScore(score)}</span></div>
+      <div class="score-bar"><div class="score-fill" style="width:${Math.min(100, score / 2 * 100)}%;background:${color(score)}"></div></div>
+    </div>`;
+}
+
+const empty = (title, text) => `<div class="empty-block"><strong>${title}</strong>${text}</div>`;
+
+// ── VISÃO GERAL ──────────────────────────────────────────────
+function renderVisao() {
+  const posts = publicados().filter(noPeriodo);
+  const sc = POST.scores(posts, state.objetivo, state.attr);
+  const comMetricas = posts.filter(POST.hasMetrics).length;
+  const recentes = posts.filter(p => p.publicado_em >= U.addDays(U.today(), -30)).map(p => sc.byId[p.id]);
+  const attr = Object.values(state.attr);
+  const total = (f) => attr.reduce((s, a) => s + f(a), 0);
+
+  let aviso = '';
+  if (!posts.length) aviso = `<p class="notice">Nenhum post publicado neste período. Use "Registrar post" para lançar os que já foram ao ar, com as métricas dos Insights.</p>`;
+  else if (!sc.ok) aviso = `<p class="notice warn">São necessários ao menos ${POST.MIN_CONTA} posts com dados neste objetivo para existir um "normal da conta". Hoje há ${sc.n}.</p>`;
+  else if (sc.n < POST.RECOMENDADO) aviso = `<p class="notice">${sc.n} posts na conta. Com menos de ${POST.RECOMENDADO}, os rankings abaixo são pistas, não conclusões — cada linha mostra em quantos posts se apoia.</p>`;
+  document.getElementById('visao-aviso').innerHTML = aviso;
+
+  document.getElementById('visao-stats').innerHTML = `
+    <div class="stat"><div class="stat-label">Posts analisados</div><div class="stat-value">${comMetricas}</div><div class="stat-sub">Mínimo recomendado: ${POST.RECOMENDADO}</div></div>
+    <div class="stat"><div class="stat-label">Score mediano · 30 dias</div><div class="stat-value">${POST.fmtScore(POST.median(recentes))}</div><div class="stat-sub">1,0× = normal da conta</div></div>
+    <div class="stat"><div class="stat-label">Leads atribuídos</div><div class="stat-value">${total(a => a.leads.length)}</div><div class="stat-sub">${total(a => a.porCodigo)} por código · ${total(a => a.declarado)} informados</div></div>
+    <div class="stat accent"><div class="stat-label">Vendas atribuídas</div><div class="stat-value">${total(a => a.vendas.length)}</div><div class="stat-sub">${U.fmtBRL(total(a => a.receita))} em deals ganhos</div></div>`;
+
+  const ranks = Object.fromEntries(Object.keys(POST.ATRIBUTOS).map(a => [a, POST.ranking(posts, sc, a)]));
+  document.getElementById('visao-rankings').innerHTML = Object.entries(POST.ATRIBUTOS).map(([attrKey, title]) => `
+    <div class="box">
+      <div class="box-head"><div class="box-title">${title}</div><span class="box-note">× mediana do perfil</span></div>
+      ${ranks[attrKey].length ? ranks[attrKey].slice(0, 6).map(g => scoreRow(g.label, g.n, g.score, !g.confiavel)).join('') : `<span class="box-note">Sem dados neste período.</span>`}
+    </div>`).join('');
+
+  // Continue / Pare / Teste — só entra em Continue e Pare o que tem amostra mínima
+  const todos = Object.entries(ranks).flatMap(([a, list]) => list.map(g => ({ ...g, attr: POST.ATRIBUTOS[a] })));
+  const continuar = todos.filter(g => g.confiavel && g.score >= 1.2).sort((a, b) => b.score - a.score).slice(0, 4);
+  const parar = todos.filter(g => g.confiavel && g.score <= 0.8).sort((a, b) => a.score - b.score).slice(0, 4);
+  const usados = { gancho: new Set(posts.map(p => p.gancho)), cta: new Set(posts.map(p => p.cta)), formato: new Set(posts.map(p => p.formato)) };
+  const nuncaTestados = [['gancho', POST.GANCHOS], ['cta', POST.CTAS], ['formato', POST.FORMATOS]]
+    .flatMap(([a, list]) => list.filter(v => !usados[a].has(v) && v !== 'Outro' && v !== 'Sem CTA').map(v => ({ label: v, attr: POST.ATRIBUTOS[a], n: 0 })));
+  const testar = [...todos.filter(g => !g.confiavel && g.score >= 1), ...nuncaTestados].slice(0, 4);
+  const rec = (chip, label, list, vazio, sub) => `
+    <div class="box">
+      <span class="chip ${chip}" style="align-self:flex-start;">${label}</span>
+      ${list.length ? list.map(g => `<div class="rec-item">${esc(g.label)}<small>${g.attr} · ${sub(g)}</small></div>`).join('') : `<span class="box-note">${vazio}</span>`}
+    </div>`;
+  document.getElementById('visao-recs').innerHTML =
+    rec('chip-continue', 'Continue', continuar, `Nada com ${POST.MIN_GRUPO}+ posts ficou claramente acima do normal.`, g => `${POST.fmtScore(g.score)} em ${g.n} posts`) +
+    rec('chip-pare', 'Pare', parar, `Nada com ${POST.MIN_GRUPO}+ posts ficou claramente abaixo do normal.`, g => `${POST.fmtScore(g.score)} em ${g.n} posts`) +
+    rec('chip-teste', 'Teste', testar, 'Sem sugestões de teste por enquanto.', g => g.n ? `${POST.fmtScore(g.score)} em só ${g.n} post${g.n > 1 ? 's' : ''} — falta amostra` : 'nunca usado neste perfil');
+
+  const ordenados = posts.filter(p => sc.byId[p.id] != null).sort((a, b) => sc.byId[b.id] - sc.byId[a.id]);
+  const destaque = ordenados.length > 6 ? [...ordenados.slice(0, 3), ...ordenados.slice(-3)] : ordenados;
+  document.getElementById('visao-posts').innerHTML = destaque.length ? destaque.map(p => `
+    <div class="mini-post" onclick="openPostModal('${p.id}')">
+      <span class="code">${esc(p.codigo)}</span>
+      <div class="mini-post-title">${esc(p.titulo)}</div>
+      <div class="mini-post-meta"><span>${esc(p.formato)}</span><span class="score-val" style="color:${color(sc.byId[p.id])}">${POST.fmtScore(sc.byId[p.id])}</span></div>
+    </div>`).join('') : `<span class="box-note">Os posts aparecem aqui quando houver um normal da conta para comparar.</span>`;
+}
+
+// ── ANALISAR PRODUÇÃO ────────────────────────────────────────
+function readDraft() {
+  const v = id => document.getElementById(id).value.trim();
+  return { titulo: v('an-titulo'), formato: v('an-formato'), gancho: v('an-gancho'), tema: v('an-tema'), cta: v('an-cta'), roteiro: v('an-roteiro') };
+}
+
+function currentPrediction() {
+  const objetivo = document.getElementById('an-objetivo').value;
+  const base = publicados().filter(p => p.id !== state.draftId);
+  const sc = POST.scores(base, objetivo, state.attr);
+  return { objetivo, pred: POST.predict(readDraft(), base, sc) };
+}
+
+function renderPrediction() {
+  const { objetivo, pred } = currentPrediction();
+  const res = document.getElementById('an-result'), adj = document.getElementById('an-adjusts');
+  if (!pred.faixa) {
+    res.innerHTML = `<div class="stat-label" style="margin:0;">Faixa prevista</div><div class="band-word" style="font-size:26px;color:var(--muted);">Sem previsão</div><p class="notice">${pred.motivo}</p>`;
+  } else {
+    const left = Math.max(0, Math.min(82, (pred.score / 2) * 100 - 9));
+    const nomes = { gancho: 'gancho', formato: 'formato', tema: 'tema', cta: 'CTA' };
+    res.innerHTML = `
+      <div class="box-head"><div class="stat-label" style="margin:0;">Faixa prevista · ${POST.OBJETIVOS[objetivo]}</div><span class="box-note">Confiança: ${pred.confianca} · ${pred.comparaveis} post${pred.comparaveis !== 1 ? 's' : ''} comparáve${pred.comparaveis !== 1 ? 'is' : 'l'}</span></div>
+      <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;"><span class="band-word">${POST.FAIXAS[pred.faixa]}</span><span style="color:var(--muted);">${pred.faixa === 'media' ? 'da conta' : 'do normal da conta'}</span></div>
+      <div><div class="band-meter"><div class="band-dot" style="left:${left}%"></div></div><div class="band-scale"><span>abaixo</span><span>na média</span><span>acima</span></div></div>
+      <div style="border-top:1px solid var(--border);padding-top:12px;">
+        <div style="font-size:13px;font-weight:500;margin-bottom:6px;">Por quê</div>
+        <p style="font-size:13px;color:var(--muted);line-height:1.6;">${pred.usados.map(g => `Posts com ${nomes[g.attr]} "${esc(g.label)}" ficaram em ${POST.fmtScore(g.score)} do normal (${g.n} posts).`).join(' ')}</p>
+      </div>`;
+  }
+  const ajustes = state.ajustes = pred.ajustes || [];
+  const nomeAttr = { gancho: 'o gancho', formato: 'o formato', tema: 'o tema', cta: 'o CTA' };
+  adj.innerHTML = `
+    <div class="box-head"><div class="box-title">Ajustes sugeridos pelo histórico</div><span class="box-note">Do maior ganho para o menor</span></div>
+    ${ajustes.length ? ajustes.map((a, i) => `
+      <div class="adjust">
+        <span class="adjust-n">${i + 1}</span>
+        <div class="adjust-body">Troque ${nomeAttr[a.attr]} para "${esc(a.para)}"
+          <small>${esc(a.para)}: ${POST.fmtScore(a.paraScore)} em ${a.n} posts${a.deScore != null ? ` · ${esc(a.de)}: ${POST.fmtScore(a.deScore)}` : ''}</small></div>
+        <button class="btn btn-ghost btn-sm" onclick="applyAdjust(${i})">Aplicar</button>
+      </div>`).join('') : `<span class="box-note">${pred.faixa ? 'O histórico não aponta troca com ganho claro para este post.' : 'Os ajustes aparecem quando houver histórico para comparar.'}</span>`}`;
+}
+
+function applyAdjust(i) {
+  const a = state.ajustes[i];
+  if (!a) return;
+  document.getElementById('an-' + a.attr).value = a.para;
+  renderPrediction();
+}
+
+async function aiSuggestions() {
+  const d = readDraft();
+  if (!d.roteiro && !d.titulo) { toast('Escreva o título ou cole o roteiro para a IA analisar', 'warn'); return; }
+  const btn = document.getElementById('btn-an-ai');
+  btn.disabled = true; btn.textContent = 'Analisando…';
+  const { objetivo, pred } = currentPrediction();
+  const base = publicados();
+  const sc = POST.scores(base, objetivo, state.attr);
+  try {
+    const r = await window.callClaude({
+      systemPrompt: `Você revisa roteiros de posts de Instagram de ${CLIENT_CONFIG.empresa} (${CLIENT_CONFIG.setor}) antes da publicação. Público: ${CLIENT_CONFIG.publico_alvo}. Tom da marca: ${CLIENT_CONFIG.tom_voz} Você recebe o rascunho, o histórico de desempenho DESTE perfil por característica (score relativo à mediana da conta, com o número de posts) e regras oficiais da plataforma registradas pelo usuário. Dê de 3 a 5 ajustes concretos no texto e na estrutura, do maior impacto para o menor. Apoie-se no histórico quando ele tiver amostra; quando não tiver, diga que é uma boa prática e não um dado do perfil. Não prometa resultado nem cite números que não recebeu. Retorne APENAS JSON: {"ajustes":[{"titulo":"...","porque":"...","impacto":"alto|medio|baixo"}],"gancho_reescrito":"primeira frase sugerida"}`,
+      userPayload: { objetivo: POST.OBJETIVOS[objetivo], rascunho: d, previsao: pred.faixa ? { faixa: POST.FAIXAS[pred.faixa], confianca: pred.confianca } : null,
+        historico: Object.fromEntries(Object.keys(POST.ATRIBUTOS).map(a => [a, POST.ranking(base, sc, a).map(g => ({ valor: g.label, score: g.score && +g.score.toFixed(2), posts: g.n }))])),
+        regras_plataforma: activeRules().map(r => ({ regra: r.texto, afeta: r.afeta, peso: ruleWeight(r) })) },
+      mockResponse: JSON.stringify({ ajustes: [
+        { titulo: 'Abra direto no gancho', porque: 'Os dois primeiros segundos estão em apresentação. No seu histórico, antes e depois rende mais que qualquer outro gancho.', impacto: 'alto' },
+        { titulo: 'Traga o CTA para antes do fim', porque: 'O pedido aparece só na última frase.', impacto: 'medio' },
+        { titulo: 'Corte a segunda explicação', porque: 'Repete o ponto anterior com outras palavras.', impacto: 'baixo' } ],
+        gancho_reescrito: 'Essa sala de advocacia era só concreto. Olha como ficou.' })
+    });
+    const ai = U.parseAIJson(r);
+    state.ai = ai;
+    const label = { alto: 'impacto alto', medio: 'impacto médio', baixo: 'impacto baixo' };
+    const box = document.getElementById('an-ai');
+    box.style.display = '';
+    box.innerHTML = `
+      <div class="box-head"><div class="box-title">Sugestões da IA</div><span class="box-note">Leitura do texto — não é previsão de resultado</span></div>
+      ${(Array.isArray(ai.ajustes) ? ai.ajustes : []).map((a, i) => `
+        <div class="adjust"><span class="adjust-n">${i + 1}</span>
+          <div class="adjust-body">${esc(a.titulo)}<small>${esc(a.porque)}</small></div>
+          <span class="chip chip-tag">${label[a.impacto] || ''}</span></div>`).join('')}
+      ${ai.gancho_reescrito ? `<p class="notice">Gancho sugerido: "${esc(ai.gancho_reescrito)}"</p>` : ''}`;
+  } catch (e) { toast(e.message, 'error'); }
+  btn.disabled = false; btn.textContent = 'Sugestões da IA';
+}
+
+function resetAnalyze() {
+  state.draftId = null; state.ai = null;
+  ['an-titulo', 'an-tema', 'an-roteiro'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('an-form-title').textContent = 'Conteúdo';
+  document.getElementById('an-ai').style.display = 'none';
+  renderPrediction();
+}
+
+function analyzePost(id) {
+  const p = state.posts.find(x => x.id === id);
+  if (!p) return;
+  state.draftId = id;
+  document.getElementById('an-form-title').textContent = `Reanalisando ${p.codigo}`;
+  ['titulo', 'formato', 'gancho', 'tema', 'cta', 'roteiro'].forEach(k => document.getElementById('an-' + k).value = p[k] || '');
+  if (p.previsao?.objetivo) document.getElementById('an-objetivo').value = p.previsao.objetivo;
+  document.getElementById('an-ai').style.display = 'none';
+  renderPrediction();
+  switchTab('analisar');
+}
+
+async function saveDraft() {
+  const d = readDraft();
+  if (!d.titulo) { toast('Informe o título do post', 'warn'); return; }
+  const { objetivo, pred } = currentPrediction();
+  const previsao = pred.faixa ? { faixa: pred.faixa, score: +pred.score.toFixed(2), confianca: pred.confianca, comparaveis: pred.comparaveis, objetivo, feita_em: U.today() } : null;
+  const id = state.draftId;
+  let codigo;
+  await store.mutate('posts', list => {
+    const p = id && list.find(x => x.id === id);
+    if (p) { Object.assign(p, d); if (p.status !== 'publicado') p.previsao = previsao; codigo = p.codigo; }
+    else { codigo = POST.nextCode(list); list.unshift({ id: U.uid('po'), codigo, ...d, status: 'rascunho', publicado_em: null, url: '', metricas: {}, previsao, criado_em: U.today() }); }
+  });
+  resetAnalyze();
+  await refresh();
+  switchTab('posts');
+  toast(`${codigo} salvo${previsao ? ` com previsão "${POST.FAIXAS[previsao.faixa]}"` : ' — ainda sem histórico para prever'}`, 'success');
+}
+
+// ── PREVISÕES / POSTS ────────────────────────────────────────
+// Resultado de uma previsão: a faixa real é medida no mesmo objetivo em que foi prevista
+function outcome(p) {
+  if (!p.previsao) return { real: null, score: null, tipo: 'sem' };
+  if (p.status !== 'publicado') return { real: null, score: null, tipo: 'rascunho' };
+  const sc = POST.scores(publicados(), p.previsao.objetivo, state.attr);
+  const score = sc.byId[p.id];
+  if (score == null) return { real: null, score: null, tipo: 'aguardando' };
+  const real = POST.faixa(score);
+  return { real, score, tipo: real === p.previsao.faixa ? 'acertou' : 'errou' };
+}
+
+function renderPosts() {
+  const rows = state.posts.map(p => ({ p, o: outcome(p) }));
+  const acertos = rows.filter(r => r.o.tipo === 'acertou').length, erros = rows.filter(r => r.o.tipo === 'errou').length;
+  const avaliadas = acertos + erros;
+  document.getElementById('posts-stats').innerHTML = `
+    <div class="stat accent"><div class="stat-label">Acerto de faixa</div><div class="stat-value">${avaliadas ? `${acertos} de ${avaliadas}` : '—'}</div>
+      <div class="stat-sub">${avaliadas ? (avaliadas < 20 ? 'Amostra pequena: com três faixas, 1 em 3 já sairia por acaso.' : 'Acertar a faixa, não o número exato. Por acaso seria 1 em 3.') : 'Aparece quando um post previsto tiver métricas.'}</div></div>
+    <div class="stat"><div class="stat-label">Aguardando métricas</div><div class="stat-value">${state.posts.filter(p => p.status === 'publicado' && !POST.hasMetrics(p)).length}</div><div class="stat-sub">Publicados sem números lançados</div></div>
+    <div class="stat"><div class="stat-label">Rascunhos</div><div class="stat-value">${state.posts.filter(p => p.status === 'rascunho').length}</div><div class="stat-sub">Analisados e ainda não publicados</div></div>`;
+
+  const filtros = { todos: 'Todos', acertou: 'Acertos', errou: 'Erros', rascunho: 'Rascunhos' };
+  document.getElementById('posts-filters').innerHTML = Object.entries(filtros).map(([k, v]) =>
+    `<button class="btn btn-sm ${state.filtro === k ? 'btn-primary' : 'btn-ghost'}" onclick="state.filtro='${k}';renderPosts()">${v}</button>`).join('');
+
+  const chips = { acertou: ['chip-ok', 'Acertou'], errou: ['chip-no', 'Errou'], aguardando: ['chip-wait', 'Aguardando'], rascunho: ['chip-wait', 'Rascunho'], sem: ['chip-wait', 'Sem previsão'] };
+  const scAtual = POST.scores(publicados(), state.objetivo, state.attr);
+  const list = rows.filter(r => state.filtro === 'todos' || r.o.tipo === state.filtro || (state.filtro === 'rascunho' && r.p.status === 'rascunho'))
+    .sort((a, b) => (b.p.publicado_em || '9999').localeCompare(a.p.publicado_em || '9999'));
+  document.getElementById('posts-tbody').innerHTML = list.map(({ p, o }) => {
+    const [cls, label] = chips[p.status === 'rascunho' ? 'rascunho' : o.tipo];
+    const score = o.score ?? scAtual.byId[p.id];
+    return `
+    <tr>
+      <td><span class="code">${esc(p.codigo)}</span>${esc(p.titulo)}<div style="font-size:11px;color:var(--dim);margin-top:2px;">${esc([p.formato, p.gancho, p.tema].filter(Boolean).join(' · '))}</div></td>
+      <td style="color:var(--muted);">${p.publicado_em ? U.fmtDate(p.publicado_em) : '—'}</td>
+      <td>${p.previsao ? POST.FAIXAS[p.previsao.faixa] : '—'}</td>
+      <td>${o.real ? POST.FAIXAS[o.real] : '—'}</td>
+      <td class="score-val">${POST.fmtScore(score)}</td>
+      <td><span class="chip ${cls}">${label}</span></td>
+      <td style="white-space:nowrap;text-align:right;">
+        ${p.status === 'rascunho' ? `<button class="btn btn-ghost btn-sm" onclick="analyzePost('${p.id}')">Reanalisar</button> <button class="btn btn-primary btn-sm" onclick="publishPost('${p.id}')">Publiquei</button>` : `<button class="btn btn-ghost btn-sm" onclick="openPostModal('${p.id}')">${POST.hasMetrics(p) ? 'Editar' : 'Lançar métricas'}</button>`}
+      </td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="7">${empty(state.posts.length ? 'Nada neste filtro' : 'Nenhum post ainda', state.posts.length ? '' : 'Registre os posts já publicados com as métricas dos Insights, ou comece por "Analisar produção".')}</td></tr>`;
+}
+
+async function publishPost(id) {
+  await store.mutate('posts', list => { const p = list.find(x => x.id === id); if (p) { p.status = 'publicado'; p.publicado_em = U.today(); } });
+  await refresh();
+  toast('Marcado como publicado hoje. Lance as métricas em 72 horas.', 'success');
+}
+
+function openPostModal(id) {
+  const p = id ? state.posts.find(x => x.id === id) : null;
+  state.editId = p?.id || null;
+  document.getElementById('post-modal-title').textContent = p ? `${p.codigo} — editar` : 'Registrar post';
+  const set = (el, v) => document.getElementById(el).value = v ?? '';
+  set('p-titulo', p?.titulo); set('p-tema', p?.tema); set('p-url', p?.url);
+  set('p-formato', p?.formato || POST.FORMATOS[0]); set('p-gancho', p?.gancho || POST.GANCHOS[0]); set('p-cta', p?.cta || POST.CTAS[0]);
+  set('p-status', p?.status || 'publicado'); set('p-data', p?.publicado_em || U.today());
+  Object.keys(POST.METRICAS).forEach(k => set('pm-' + k, p?.metricas?.[k]));
+  document.getElementById('btn-delete-post').style.display = p ? '' : 'none';
+  document.getElementById('modal-post').classList.remove('hidden');
+  document.getElementById('p-titulo').focus();
+}
+function closeModal() { document.getElementById('modal-post').classList.add('hidden'); }
+
+async function savePost() {
+  const v = id => document.getElementById(id).value.trim();
+  if (!v('p-titulo')) { toast('Informe o título do post', 'warn'); return; }
+  const status = v('p-status');
+  if (status === 'publicado' && !v('p-data')) { toast('Informe a data da publicação', 'warn'); return; }
+  const metricas = {};
+  Object.keys(POST.METRICAS).forEach(k => { const n = parseInt(v('pm-' + k), 10); if (n >= 0) metricas[k] = n; });
+  const fields = { titulo: v('p-titulo'), formato: v('p-formato'), gancho: v('p-gancho'), tema: v('p-tema'), cta: v('p-cta'), status, publicado_em: status === 'publicado' ? v('p-data') : null, url: v('p-url'), metricas };
+  if (Object.keys(metricas).length) fields.metricas_em = U.today();
+  const id = state.editId;
+  let codigo;
+  await store.mutate('posts', list => {
+    const p = id && list.find(x => x.id === id);
+    if (p) { Object.assign(p, fields); codigo = p.codigo; }
+    else { codigo = POST.nextCode(list); list.unshift({ id: U.uid('po'), codigo, roteiro: '', previsao: null, criado_em: U.today(), ...fields }); }
+  });
+  closeModal();
+  await refresh();
+  toast(`${codigo} salvo`, 'success');
+}
+
+async function deletePost() {
+  const p = state.posts.find(x => x.id === state.editId);
+  if (!p) return;
+  const leads = state.attr[p.codigo]?.leads.length || 0;
+  if (!confirm(`Excluir ${p.codigo} — "${p.titulo}"?${leads ? ` ${leads} lead(s) atribuído(s) a ele ficarão sem post de origem.` : ''} Esta ação não pode ser desfeita.`)) return;
+  await store.mutate('posts', list => list.filter(x => x.id !== p.id));
+  closeModal();
+  await refresh();
+  toast(`${p.codigo} excluído`, 'success');
+}
+
+// ── ALGORITMO ────────────────────────────────────────────────
+// Peso: 100% no dia da fonte (ou da última confirmação), cai 8 pontos por mês, piso de 10%
+function ruleWeight(r) {
+  const meses = Math.max(0, U.daysBetween(r.confirmada_em || r.data, U.today())) / 30;
+  return Math.max(10, Math.round(100 - meses * 8));
+}
+const activeRules = () => state.regras.filter(r => r.ativa !== false).sort((a, b) => ruleWeight(b) - ruleWeight(a));
+
+function renderRules() {
+  const list = [...state.regras].sort((a, b) => (b.ativa !== false) - (a.ativa !== false) || ruleWeight(b) - ruleWeight(a));
+  document.getElementById('alg-rules').innerHTML = list.map(r => {
+    const w = ruleWeight(r), label = w >= 70 ? 'alto' : w >= 40 ? 'médio' : 'baixo';
+    const fonte = /^https?:\/\//.test(r.link || '') ? `<a href="${esc(r.link)}" target="_blank" rel="noopener" style="color:var(--teal);">fonte</a>` : 'sem link';
+    return `
+    <div class="rule ${r.ativa === false ? 'off' : ''}">
+      <div class="rule-body">${esc(r.texto)}<small>${fonte} · publicada em ${U.fmtDate(r.data)}${r.confirmada_em ? ' · confirmada em ' + U.fmtDate(r.confirmada_em) : ''}${r.afeta ? ' · afeta: ' + esc(r.afeta) : ''}</small></div>
+      <div class="rule-weight"><div style="display:flex;justify-content:space-between;"><span>Peso</span><span>${label}</span></div><div class="score-bar" style="margin-top:4px;"><div class="score-fill" style="width:${w}%;background:${w >= 40 ? TEAL : GRAY}"></div></div></div>
+      <div style="display:flex;gap:4px;">
+        <button class="icon-btn" onclick="updateRule('${r.id}','confirmar')" title="Segue valendo — renova o peso">Confirmar</button>
+        <button class="icon-btn" onclick="updateRule('${r.id}','toggle')">${r.ativa === false ? 'Ativar' : 'Desativar'}</button>
+        <button class="icon-btn danger" onclick="updateRule('${r.id}','excluir')">Excluir</button>
+      </div>
+    </div>`;
+  }).join('') || empty('Nenhuma regra registrada', 'Cole acima uma novidade oficial da Meta para começar.');
+}
+
+function readNovidade() {
+  const texto = document.getElementById('alg-texto').value.trim();
+  const link = document.getElementById('alg-link').value.trim();
+  const data = document.getElementById('alg-data').value || U.today();
+  if (!texto) { toast('Cole o texto da novidade', 'warn'); return null; }
+  if (link && !/^https?:\/\//.test(link)) { toast('O link precisa começar com http:// ou https://', 'warn'); return null; }
+  return { texto, link, data };
+}
+
+async function saveRules(novidade, regras) {
+  await store.mutate('post_regras', list => { regras.forEach(r => list.unshift({ id: U.uid('rg'), texto: r.texto, afeta: r.afeta || '', link: novidade.link, data: novidade.data, ativa: true, criada_em: U.today() })); });
+  document.getElementById('alg-texto').value = ''; document.getElementById('alg-link').value = '';
+  await refresh();
+}
+
+async function addRuleManual() {
+  const n = readNovidade();
+  if (!n) return;
+  await saveRules(n, [{ texto: n.texto }]);
+  toast('Regra adicionada', 'success');
+}
+
+async function extractRules() {
+  const n = readNovidade();
+  if (!n) return;
+  const btn = document.getElementById('btn-alg-ai');
+  btn.disabled = true; btn.textContent = 'Extraindo…';
+  try {
+    const r = await window.callClaude({
+      systemPrompt: 'Você recebe o trecho de um comunicado oficial de uma plataforma de rede social e extrai as regras práticas para quem produz conteúdo. Cada regra é uma frase curta, acionável e fiel ao texto: não acrescente nada que o texto não diga e não generalize. Se o trecho não trouxer regra prática, devolva a lista vazia. "afeta" é o formato atingido (Reels, Carrossel, Stories, todos os formatos). Retorne APENAS JSON: {"regras":[{"texto":"...","afeta":"..."}]}',
+      userPayload: { texto: n.texto, data_publicacao: n.data },
+      mockResponse: JSON.stringify({ regras: [{ texto: 'Conteúdo original é priorizado na distribuição; repostagens sem alteração perdem alcance.', afeta: 'Reels' }] })
+    });
+    const regras = (U.parseAIJson(r).regras || []).filter(x => x && x.texto);
+    if (!regras.length) { toast('A IA não encontrou regra prática neste trecho', 'warn'); }
+    else { await saveRules(n, regras); toast(`${regras.length} regra(s) extraída(s) — revise o texto de cada uma`, 'success'); }
+  } catch (e) { toast(e.message, 'error'); }
+  btn.disabled = false; btn.textContent = 'Extrair regras com IA';
+}
+
+async function updateRule(id, action) {
+  if (action === 'excluir' && !confirm('Excluir esta regra?')) return;
+  await store.mutate('post_regras', list => {
+    if (action === 'excluir') return list.filter(r => r.id !== id);
+    const r = list.find(x => x.id === id);
+    if (!r) return;
+    if (action === 'toggle') r.ativa = r.ativa === false;
+    if (action === 'confirmar') r.confirmada_em = U.today();
+  });
+  await refresh();
+}
+
+// ── VENDAS ───────────────────────────────────────────────────
+function renderVendas() {
+  const attr = state.attr;
+  const all = Object.values(attr);
+  const total = f => all.reduce((s, a) => s + f(a), 0);
+  document.getElementById('vendas-stats').innerHTML = `
+    <div class="stat"><div class="stat-label">Leads atribuídos</div><div class="stat-value">${total(a => a.leads.length)}</div><div class="stat-sub">de ${state.leads.length} leads no UP·Lead</div></div>
+    <div class="stat"><div class="stat-label">Vendas fechadas</div><div class="stat-value">${total(a => a.vendas.length)}</div><div class="stat-sub">Deals em "Ganho ✓"</div></div>
+    <div class="stat accent"><div class="stat-label">Receita atribuída</div><div class="stat-value">${U.fmtK(total(a => a.receita))}</div><div class="stat-sub">Valor dos deals ganhos</div></div>
+    <div class="stat"><div class="stat-label">Como foi atribuído</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;font-size:12px;color:var(--muted);">
+        <span><span class="chip chip-codigo">Código</span> veio na mensagem · certeza</span>
+        <span><span class="chip chip-declarado">Informado</span> marcado por quem atendeu</span>
+      </div></div>`;
+
+  const rows = state.posts.filter(p => attr[p.codigo]?.leads.length).sort((a, b) => attr[b.codigo].receita - attr[a.codigo].receita || attr[b.codigo].leads.length - attr[a.codigo].leads.length);
+  document.getElementById('vendas-tbody').innerHTML = rows.map(p => {
+    const a = attr[p.codigo];
+    const pontos = [...new Set(a.leads.map(l => PONTOS[l.post_ponto]).filter(Boolean))];
+    return `
+    <tr>
+      <td><span class="code">${esc(p.codigo)}</span>${esc(p.titulo)}</td>
+      <td>${pontos.map(t => `<span class="chip chip-tag" style="margin-right:4px;">${t}</span>`).join('') || '<span style="color:var(--dim);">—</span>'}</td>
+      <td>${a.leads.length}</td>
+      <td>${a.vendas.length}</td>
+      <td class="score-val" style="color:${a.receita ? TEAL : 'inherit'}">${a.receita ? U.fmtBRL(a.receita) : '—'}</td>
+      <td>${a.porCodigo ? `<span class="chip chip-codigo">Código · ${a.porCodigo}</span> ` : ''}${a.declarado ? `<span class="chip chip-declarado">Informado · ${a.declarado}</span>` : ''}</td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="6">${empty('Nenhum lead atribuído ainda', 'Gere o link de um post abaixo. Quando o lead chegar com o código na mensagem, cadastre-o no UP·Lead — o post é reconhecido sozinho.')}</td></tr>`;
+
+  const sel = document.getElementById('link-post');
+  const atual = sel.value;
+  sel.innerHTML = state.posts.map(p => `<option value="${esc(p.codigo)}">${esc(p.codigo)} · ${esc(p.titulo)}</option>`).join('') || '<option value="">Nenhum post registrado</option>';
+  if (atual && state.posts.some(p => p.codigo === atual)) sel.value = atual;
+  renderLink();
+}
+
+function buildLink() {
+  const codigo = document.getElementById('link-post').value;
+  const phone = CLIENT_CONFIG.whatsapp_atendimento || CLIENT_CONFIG.whatsapp_phone;
+  const placeholder = !phone || PLACEHOLDER_PHONES.some(x => phone.includes(x));
+  if (!codigo) return { link: null, placeholder };
+  const tag = `${codigo}-${document.getElementById('link-ponto').value}`;
+  let msg = document.getElementById('link-msg').value;
+  msg = msg.includes('{codigo}') ? msg.replace('{codigo}', tag) : `${msg} [${tag}]`; // o código nunca fica de fora
+  return { link: U.waLink(phone, msg), placeholder };
+}
+
+function renderLink() {
+  const { link, placeholder } = buildLink();
+  document.getElementById('link-out').textContent = link || '—';
+  document.getElementById('link-aviso').innerHTML = placeholder ? `<p class="notice warn">O WhatsApp de atendimento ainda é o número de exemplo. Defina <code>whatsapp_atendimento</code> em config.js antes de divulgar este link.</p>` : '';
+}
+
+async function copyLink() {
+  const { link, placeholder } = buildLink();
+  if (!link) { toast('Registre um post primeiro', 'warn'); return; }
+  if (placeholder) { toast('Defina o WhatsApp de atendimento em config.js antes de usar o link', 'warn'); return; }
+  try { await navigator.clipboard.writeText(link); toast('Link copiado', 'success'); }
+  catch { toast('Não foi possível copiar — selecione o link e copie manualmente', 'warn'); }
+}
+
+// ── ANÚNCIOS ─────────────────────────────────────────────────
+function renderAnuncios() {
+  const posts = publicados();
+  const salv = POST.scores(posts, 'salvamentos', state.attr), vis = POST.scores(posts, 'visitas_perfil', state.attr);
+  const cands = posts.map(p => {
+    const s = salv.byId[p.id], v = vis.byId[p.id], leads = state.attr[p.codigo]?.leads.length || 0;
+    const sinais = [s, v].filter(x => x != null);
+    const organico = sinais.length ? sinais.reduce((a, b) => a + b, 0) / sinais.length : 0;
+    const porque = [];
+    if (s != null && s >= 1.2) porque.push(`salvamentos em ${POST.fmtScore(s)} do normal`);
+    if (v != null && v >= 1.2) porque.push(`visitas ao perfil em ${POST.fmtScore(v)}`);
+    if (leads) porque.push(`${leads} lead${leads > 1 ? 's' : ''} sem verba`);
+    return { p, rank: organico + leads * 0.5, porque };
+  }).filter(c => c.porque.length).sort((a, b) => b.rank - a.rank).slice(0, 6);
+
+  document.getElementById('anuncios-list').innerHTML = cands.map((c, i) => `
+    <div class="box" style="flex-direction:row;flex-wrap:wrap;align-items:center;gap:16px;${i === 0 ? 'border-color:var(--teal);' : ''}">
+      <span class="score-val" style="font-size:20px;width:34px;">#${i + 1}</span>
+      <div style="flex:1 1 260px;min-width:0;">
+        <div style="font-size:14px;"><span class="code">${esc(c.p.codigo)}</span>${esc(c.p.titulo)}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">${c.porque.join(' · ')}</div>
+      </div>
+      ${c.p.impulsionado_em ? `<span class="chip chip-codigo">Impulsionado em ${U.fmtDate(c.p.impulsionado_em).slice(0, 5)}</span>` : ''}
+      <button class="btn ${i === 0 && !c.p.impulsionado_em ? 'btn-primary' : 'btn-ghost'} btn-sm" onclick="toggleBoost('${c.p.id}')">${c.p.impulsionado_em ? 'Desmarcar' : 'Marcar como impulsionado'}</button>
+    </div>`).join('') || empty('Nenhum candidato ainda', `Entra aqui o post com salvamentos ou visitas ao perfil 20% acima do normal, ou com lead atribuído. É preciso ter ao menos ${POST.MIN_CONTA} posts com métricas.`);
+}
+
+async function toggleBoost(id) {
+  await store.mutate('posts', list => { const p = list.find(x => x.id === id); if (p) p.impulsionado_em = p.impulsionado_em ? null : U.today(); });
+  await refresh();
+}
+
+// ── REFERÊNCIAS ──────────────────────────────────────────────
+const usable = p => p.aplicavel && p.contas.length >= 2;
+
+function renderReferencias() {
+  document.getElementById('ref-patterns').innerHTML = state.padroes.map(p => {
+    const status = !p.aplicavel ? ['chip-wait', 'Descartado · conflita com o DNA'] : p.contas.length < 2 ? ['chip-wait', 'Só 1 conta — ainda não vale'] : ['chip-codigo', 'Aplicável'];
+    return `
+    <div class="rule" style="${usable(p) ? '' : 'opacity:.6;'}">
+      <div class="rule-body">${esc(p.label)}<small>Em ${p.contas.length} conta${p.contas.length !== 1 ? 's' : ''}: ${esc(p.contas.join(', '))}</small></div>
+      <span class="chip ${status[0]}">${status[1]}</span>
+      <div style="display:flex;gap:4px;">
+        <button class="icon-btn" onclick="updatePattern('${p.id}','toggle')">${p.aplicavel ? 'Descartar' : 'Aceitar'}</button>
+        <button class="icon-btn danger" onclick="updatePattern('${p.id}','excluir')">Excluir</button>
+      </div>
+    </div>`;
+  }).join('') || `<span class="box-note">Nenhum padrão anotado.</span>`;
+
+  document.getElementById('ref-briefs').innerHTML = state.pautas.map(b => `
+    <article class="box" style="background:var(--bg3);">
+      <span class="chip chip-teste" style="align-self:flex-start;">${esc(b.mecanismo)}</span>
+      <div><div class="stat-label" style="margin-bottom:2px;">Gancho</div><div style="font-size:14px;">${esc(b.gancho)}</div></div>
+      <div><div class="stat-label" style="margin-bottom:2px;">Roteiro</div><div style="font-size:13px;color:var(--muted);line-height:1.5;">${esc(b.roteiro)}</div></div>
+      <div><div class="stat-label" style="margin-bottom:2px;">CTA</div><div style="font-size:13px;color:var(--muted);">${esc(b.cta)}</div></div>
+      <div style="display:flex;gap:8px;align-items:center;"><button class="btn btn-ghost btn-sm" onclick="briefToAnalyze('${b.id}')">Levar para Analisar →</button><button class="icon-btn danger" style="margin-left:auto;" onclick="deleteBrief('${b.id}')">Excluir</button></div>
+    </article>`).join('') || `<span class="box-note">As pautas são geradas a partir dos padrões aplicáveis.</span>`;
+}
+
+async function addPattern() {
+  const label = document.getElementById('ref-label').value.trim();
+  const contas = [...new Set(document.getElementById('ref-contas').value.split(',').map(s => s.trim()).filter(Boolean))];
+  if (!label || !contas.length) { toast('Informe o mecanismo e ao menos uma conta', 'warn'); return; }
+  await store.mutate('post_padroes', list => { list.unshift({ id: U.uid('pd'), label, contas, aplicavel: document.getElementById('ref-aplicavel').checked, criado_em: U.today() }); });
+  document.getElementById('ref-label').value = ''; document.getElementById('ref-contas').value = '';
+  await refresh();
+}
+
+async function updatePattern(id, action) {
+  await store.mutate('post_padroes', list => {
+    if (action === 'excluir') return list.filter(p => p.id !== id);
+    const p = list.find(x => x.id === id); if (p) p.aplicavel = !p.aplicavel;
+  });
+  await refresh();
+}
+
+async function generateBriefs() {
+  const padroes = state.padroes.filter(usable);
+  if (!padroes.length) { toast('Anote ao menos um padrão aplicável visto em 2 ou mais contas', 'warn'); return; }
+  const btn = document.getElementById('btn-ref-ai');
+  btn.disabled = true; btn.textContent = 'Gerando…';
+  const C = CLIENT_CONFIG;
+  const base = publicados(), sc = POST.scores(base, state.objetivo, state.attr);
+  try {
+    const r = await window.callClaude({
+      systemPrompt: `Você cria pautas de Instagram para ${C.empresa} (${C.setor}). Público: ${C.publico_alvo}. Serviços: ${(C.principais_servicos || []).join('; ')}. Tom: ${C.tom_voz} Você recebe mecanismos de conteúdo observados em outras contas do segmento. Use só o MECANISMO (a estrutura que prende a atenção) e escreva pautas originais sobre o negócio e o público desta empresa — nunca copie tema, frase ou exemplo de terceiros. Uma pauta por mecanismo, no máximo 3. Não invente números, cases nem resultados. Retorne APENAS JSON: {"pautas":[{"mecanismo":"...","gancho":"primeira frase","roteiro":"estrutura em até 3 passos","cta":"..."}]}`,
+      userPayload: { mecanismos: padroes.map(p => p.label), o_que_funciona_neste_perfil: POST.ranking(base, sc, 'gancho').filter(g => g.confiavel).slice(0, 3).map(g => ({ gancho: g.label, score: +g.score.toFixed(2) })), dores_do_publico: C.dores_mapeadas },
+      mockResponse: JSON.stringify({ pautas: [{ mecanismo: padroes[0].label, gancho: 'Esse apartamento de 54 m² parecia não ter solução…', roteiro: 'Sala escura e apertada → 3 decisões de projeto (luz, marcenaria, integração) → revelação do resultado no último segundo.', cta: 'Chame no WhatsApp e mande a planta do seu.' }] })
+    });
+    const pautas = (U.parseAIJson(r).pautas || []).filter(p => p && p.gancho).slice(0, 3);
+    if (!pautas.length) throw new Error('A IA não devolveu pautas');
+    await store.mutate('post_pautas', list => { pautas.forEach(p => list.unshift({ id: U.uid('pt'), mecanismo: p.mecanismo || '', gancho: p.gancho, roteiro: p.roteiro || '', cta: p.cta || '', criada_em: U.today() })); return list.slice(0, 30); });
+    await refresh();
+    toast(`${pautas.length} pauta(s) gerada(s)`, 'success');
+  } catch (e) { toast(e.message, 'error'); }
+  btn.disabled = false; btn.textContent = 'Gerar pautas com IA';
+}
+
+function briefToAnalyze(id) {
+  const b = state.pautas.find(x => x.id === id);
+  if (!b) return;
+  resetAnalyze();
+  document.getElementById('an-titulo').value = b.gancho;
+  document.getElementById('an-roteiro').value = `${b.gancho}\n\n${b.roteiro}\n\nCTA: ${b.cta}`;
+  renderPrediction();
+  switchTab('analisar');
+}
+
+async function deleteBrief(id) {
+  await store.mutate('post_pautas', list => list.filter(b => b.id !== id));
+  await refresh();
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+init();
+</script>
+</body>
+</html>

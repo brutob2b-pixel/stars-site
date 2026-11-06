@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>UP·Dash — Dashboard</title>
+  <script src="config.js"></script>
+  <script src="nav.js"></script>
+  <script src="suite-data.js"></script>
+  <script src="demo-data.js"></script>
+  <style>
+    .dash-content { flex:1;overflow-y:auto;padding:20px 28px 28px; }
+    .dash-top { display:grid;grid-template-columns:1fr 280px;gap:16px;margin-bottom:24px; }
+
+    /* Health Score */
+    .gos-card { background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center; }
+    .gos-ring { position:relative;width:120px;height:120px;margin:0 auto 12px; }
+    .gos-ring svg { transform:rotate(-90deg); }
+    .gos-ring-track { fill:none;stroke:var(--bg3);stroke-width:10; }
+    .gos-ring-fill  { fill:none;stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset .8s ease; }
+    .gos-score { position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center; }
+    .gos-score-num { font-family:'Syne',sans-serif;font-weight:800;font-size:28px;letter-spacing:-.04em;color:var(--text); }
+    .gos-score-label { font-size:10px;color:var(--dim);font-weight:500;letter-spacing:.06em;text-transform:uppercase; }
+    .gos-title { font-family:'Syne',sans-serif;font-weight:700;font-size:14px;letter-spacing:-.02em; }
+    .gos-sub { font-size:12px;color:var(--muted);margin-top:4px; }
+    .gos-trend { font-size:12px;margin-top:8px;font-weight:500; }
+
+    /* Narrativa IA */
+    .narrative-card { background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px; }
+    .narrative-label { font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);margin-bottom:10px;display:flex;align-items:center;gap:6px; }
+    .narrative-text { font-size:14px;color:var(--text);line-height:1.7; }
+    .narrative-refresh { float:right;margin-top:-2px; }
+
+    /* KPIs */
+    .kpis-grid { display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px; }
+    .kpi-card { background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px; }
+    .kpi-label { font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin-bottom:8px; }
+    .kpi-value { font-family:'Syne',sans-serif;font-weight:800;font-size:24px;letter-spacing:-.04em;color:var(--text); }
+    .kpi-sub { font-size:12px;color:var(--muted);margin-top:4px; }
+    .kpi-bar { height:3px;background:var(--bg3);border-radius:2px;margin-top:10px;overflow:hidden; }
+    .kpi-bar-fill { height:100%;border-radius:2px;background:var(--teal); }
+
+    /* Insights */
+    .insights-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px; }
+    .insight-card { background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px; }
+    .insight-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:10px; }
+    .insight-title { font-size:13px;font-weight:600;font-family:'Syne',sans-serif;letter-spacing:-.01em; }
+    .urgency-badge { font-size:10px;font-weight:500;letter-spacing:.04em;padding:2px 7px;border-radius:3px; }
+    .urgency-alta  { background:var(--red-12);color:var(--red); }
+    .urgency-media { background:var(--amber-12);color:var(--amber); }
+    .urgency-baixa { background:var(--green-12);color:var(--green); }
+    .insight-context { font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:8px; }
+    .insight-action { font-size:12px;color:var(--teal); }
+
+    /* Pulse summary */
+    .pulse-grid { display:grid;grid-template-columns:repeat(2,1fr);gap:12px; }
+    .pulse-section { background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px; }
+    .pulse-section-title { font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin-bottom:10px; }
+    .pulse-row { display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px; }
+    .pulse-row:last-child { border:none; }
+    .pulse-row-label { color:var(--muted); }
+    .pulse-row-value { color:var(--text);font-weight:500;font-family:'Syne',sans-serif; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .spin { animation:spin 1s linear infinite; }
+  </style>
+</head>
+<body>
+<div class="suite-layout">
+  <aside id="suite-sidebar" class="suite-sidebar"></aside>
+  <main class="suite-main">
+    <div class="module-header">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div>
+          <h1 class="module-title">UP <span class="dash">—</span> Dash</h1>
+          <p class="module-subtitle">Visão executiva semanal · <span id="semana-label"></span></p>
+        </div>
+        <button class="btn btn-ghost" id="btn-narrative" onclick="refreshNarrative()" style="margin-top:4px;" title="Gera a mensagem da semana com IA (uso sob demanda)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          Gerar mensagem com IA
+        </button>
+      </div>
+    </div>
+
+    <div class="dash-content">
+
+      <!-- Health Score + Narrativa -->
+      <div class="dash-top">
+        <div class="narrative-card">
+          <div class="narrative-label">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Mensagem da semana
+          </div>
+          <div class="narrative-text" id="narrative-text">Carregando…</div>
+          <div id="narrative-source" style="font-size:11px;color:var(--dim);margin-top:10px;"></div>
+        </div>
+        <div class="gos-card">
+          <div class="gos-ring">
+            <svg viewBox="0 0 120 120" width="120" height="120">
+              <circle class="gos-ring-track" cx="60" cy="60" r="50"/>
+              <circle class="gos-ring-fill" id="gos-fill" cx="60" cy="60" r="50" stroke-dasharray="314" stroke-dashoffset="314"/>
+            </svg>
+            <div class="gos-score">
+              <div class="gos-score-num" id="gos-num">—</div>
+              <div class="gos-score-label">GOS</div>
+            </div>
+          </div>
+          <div class="gos-title">UP·GOS</div>
+          <div class="gos-sub">Health Score</div>
+          <div class="gos-trend" id="gos-trend"></div>
+        </div>
+      </div>
+
+      <!-- KPIs -->
+      <div style="margin-bottom:12px;"><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;letter-spacing:-.02em;">Indicadores</div></div>
+      <div class="kpis-grid" id="kpis-grid"></div>
+
+      <!-- Insights UP·Mind -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;letter-spacing:-.02em;">Insights — UP·Mind</div>
+        <span id="insights-meta" style="font-size:11px;color:var(--dim);"></span>
+      </div>
+      <div class="insights-grid" id="insights-grid"></div>
+
+      <!-- Pulso semanal -->
+      <div style="margin-bottom:12px;"><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;letter-spacing:-.02em;">Pulso semanal consolidado</div></div>
+      <div class="pulse-grid" id="pulse-grid"></div>
+
+    </div>
+  </main>
+</div>
+<div id="toast-container"></div>
+<script>
+const { U } = Suite;
+const esc = U.esc;
+const fmt = U.fmtBRL, fmtK = U.fmtK;
+
+let pulse, gos, mind, narrativa;
+
+async function init() {
+  const all = await Suite.loadAll();
+  pulse = Suite.computePulse(all);
+  [gos, mind, narrativa] = await Promise.all([Suite.snapshotGOS(all), store.load('mind_historico'), store.load('dash_narrativa')]);
+  renderWeekLabel();
+  renderGOS();
+  renderKPIs();
+  renderInsights();
+  renderPulse();
+  renderNarrative();
+}
+
+function renderWeekLabel() {
+  const { inicio, fim } = pulse.periodo;
+  document.getElementById('semana-label').textContent = `semana de ${U.fmtDate(inicio).slice(0,5)} a ${U.fmtDate(fim)}`;
+}
+
+function renderGOS() {
+  const score = gos.score;
+  const circ  = 2 * Math.PI * 50;
+  const color = Suite.gosColor(score);
+
+  document.getElementById('gos-num').textContent = score ?? '—';
+  document.getElementById('gos-num').style.color = color;
+  const fill = document.getElementById('gos-fill');
+  fill.style.stroke = color;
+  setTimeout(() => { fill.style.strokeDashoffset = circ * (1 - (score || 0)/100); }, 100);
+
+  let trend = Suite.gosStatus(score);
+  if (score != null && gos.anterior) {
+    const diff = score - gos.anterior.score;
+    const dcolor = diff > 0 ? 'var(--green)' : diff < 0 ? 'var(--red)' : 'var(--dim)';
+    trend = `<span style="color:${dcolor}">${diff > 0 ? '+' : ''}${diff} vs semana anterior</span>`;
+  }
+  document.getElementById('gos-trend').innerHTML = `<a href="up-gos.html">${trend}</a>`;
+}
+
+function renderKPIs() {
+  const f = pulse.financeiro, c = pulse.comercial, o = pulse.operacional, e = pulse.equipe;
+  const pct = (a, b) => b > 0 ? Math.min(100, Math.round(a / b * 100)) : 0;
+  const emDia = o.projetos_ativos - o.projetos_atrasados;
+  const kpis = [
+    { label:'Receita do mês', value: fmtK(f.realizado_mes), sub: f.meta_mes ? `${pct(f.realizado_mes, f.meta_mes)}% da meta de ${fmtK(f.meta_mes)}` : 'Meta não definida', pct: pct(f.realizado_mes, f.meta_mes) },
+    { label:'Pipeline ativo', value: fmtK(c.valor_pipeline), sub:`${c.deals_abertos} deal${c.deals_abertos!==1?'s':''} · ${c.novos_leads} lead${c.novos_leads!==1?'s':''} novo${c.novos_leads!==1?'s':''} na semana`, pct: pct(c.valor_pipeline, f.meta_mes) },
+    { label:'Projetos em dia', value: o.projetos_ativos ? `${emDia}/${o.projetos_ativos}` : '—', sub:`${o.projetos_atrasados} atrasado${o.projetos_atrasados!==1?'s':''}`, pct: o.projetos_ativos ? pct(emDia, o.projetos_ativos) : 0 },
+    { label:'Tarefas concluídas', value: e.tarefas_concluidas, sub:`${e.tarefas_abertas} em aberto na equipe`, pct: pct(e.tarefas_concluidas, e.tarefas_concluidas + e.tarefas_abertas) },
+  ];
+  document.getElementById('kpis-grid').innerHTML = kpis.map(k => `
+    <div class="kpi-card">
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-value">${k.value}</div>
+      <div class="kpi-sub">${k.sub}</div>
+      <div class="kpi-bar"><div class="kpi-bar-fill" style="width:${k.pct}%"></div></div>
+    </div>`).join('');
+}
+
+function renderInsights() {
+  const urgencyLabel = { alta:'Alta', media:'Média', baixa:'Baixa' };
+  const ultima = mind[0];
+  document.getElementById('insights-meta').textContent = ultima ? `${U.weekLabel(ultima.semana)}${ultima.gerado_em ? ' · gerado em ' + U.fmtDateTime(ultima.gerado_em) : ''}` : '';
+  document.getElementById('insights-grid').innerHTML = ultima?.insights?.length ? ultima.insights.map(i => {
+    const urg = urgencyLabel[i.urgencia] ? i.urgencia : 'media';
+    return `
+    <div class="insight-card">
+      <div class="insight-header">
+        <div class="insight-title">${esc(i.titulo)}</div>
+        <span class="urgency-badge urgency-${urg}">${urgencyLabel[urg]}</span>
+      </div>
+      <div class="insight-context">${esc(i.contexto)}</div>
+      <div class="insight-action">→ ${esc(i.acao)}</div>
+    </div>`;
+  }).join('') : `<div class="empty-block" style="grid-column:1/-1;">Nenhuma análise do UP·Mind ainda. <a href="up-mind.html" style="color:var(--teal);">Rodar a primeira análise →</a></div>`;
+}
+
+function renderPulse() {
+  const f = pulse.financeiro, c = pulse.comercial, o = pulse.operacional, e = pulse.equipe, p = pulse.conteudo;
+  const sections = [
+    { title:'Financeiro', href:'up-vault.html', rows:[
+      ['Receitas da semana', fmt(f.receitas_semana)],
+      ['Despesas da semana', fmt(f.despesas_semana)],
+      ['Saldo atual', fmt(f.saldo_atual)],
+      ['A receber', fmt(f.a_receber)],
+      ['Contas a pagar em 7 dias', fmt(f.contas_a_pagar_7d)],
+    ]},
+    { title:'Comercial', href:'up-lead.html', rows:[
+      ['Novos leads na semana', c.novos_leads],
+      ['Leads quentes em aberto', c.leads_quentes],
+      ['Propostas paradas há 7+ dias', c.propostas_paradas_7d],
+      ['Deals ganhos no mês', `${c.ganhos_mes} · ${fmtK(c.valor_ganho_mes)}`],
+      ['Conversão no mês', c.taxa_conversao_mes == null ? '—' : c.taxa_conversao_mes + '%'],
+    ]},
+    { title:'Operacional', href:'up-flow.html', rows:[
+      ['Projetos ativos', o.projetos_ativos],
+      ['Projetos atrasados', o.projetos_atrasados],
+      ['Projetos concluídos', o.projetos_concluidos],
+      ['Etapas concluídas na semana', o.etapas_concluidas_semana],
+    ]},
+    { title:'Conteúdo', href:'up-post.html', rows:[
+      ['Posts publicados na semana', p.posts_publicados_semana],
+      ['Publicados sem métricas', p.posts_sem_metricas],
+      ['Leads atribuídos a posts', p.leads_atribuidos],
+      ['Vendas atribuídas', `${p.vendas_atribuidas} · ${fmtK(p.receita_atribuida)}`],
+    ]},
+    { title:'Equipe', href:'up-team.html', rows:[
+      ['Membros ativos', e.total_membros],
+      ['Ausências', e.ausencias],
+      ['Pontos de atenção', e.alertas.length],
+    ]},
+  ];
+  document.getElementById('pulse-grid').innerHTML = sections.map(s => `
+    <div class="pulse-section">
+      <div class="pulse-section-title"><a href="${s.href}">${s.title} →</a></div>
+      ${s.rows.map(([l,v]) => `<div class="pulse-row"><span class="pulse-row-label">${l}</span><span class="pulse-row-value">${v}</span></div>`).join('')}
+    </div>`).join('');
+}
+
+// Resumo montado só com os números — é o que aparece enquanto ninguém gerou a mensagem com IA
+function resumoAutomatico() {
+  const f = pulse.financeiro, c = pulse.comercial, o = pulse.operacional;
+  if (gos.score == null) return 'Ainda não há dados suficientes para o resumo da semana. Comece lançando receitas e despesas no UP·Vault e os leads no UP·Lead — o painel se monta sozinho a partir daí.';
+  const partes = [`Health score em ${gos.score} (${Suite.gosStatus(gos.score).toLowerCase()}).`];
+  partes.push(`No mês: ${fmt(f.realizado_mes)} recebidos${f.meta_mes ? ` de uma meta de ${fmt(f.meta_mes)}` : ''}; saldo de ${fmt(f.saldo_atual)}.`);
+  if (f.contas_a_pagar_7d > 0) partes.push(`${fmt(f.contas_a_pagar_7d)} em contas vencem nos próximos 7 dias.`);
+  if (c.leads_quentes || c.propostas_paradas_7d) partes.push(`Comercial: ${c.leads_quentes} lead(s) quente(s) em aberto e ${c.propostas_paradas_7d} proposta(s) parada(s) há mais de 7 dias.`);
+  if (o.projetos_atrasados) partes.push(`${o.projetos_atrasados} projeto(s) atrasado(s).`);
+  return partes.join(' ');
+}
+
+function renderNarrative() {
+  const el = document.getElementById('narrative-text');
+  const daSemana = narrativa.find(n => n.semana === pulse.semana);
+  el.textContent = daSemana ? daSemana.texto : resumoAutomatico();
+  el.style.opacity = '1';
+  document.getElementById('narrative-source').textContent = daSemana ? `Escrita pela IA em ${U.fmtDateTime(daSemana.gerado_em)}` : 'Resumo automático dos números';
+}
+
+// A mensagem com IA é gerada sob demanda (cada geração tem custo) e fica guardada por semana
+async function refreshNarrative() {
+  const btn = document.getElementById('btn-narrative');
+  btn.disabled = true; btn.querySelector('svg')?.classList.add('spin');
+  document.getElementById('narrative-text').style.opacity = '.5';
+
+  try {
+    const r = await window.callClaude({
+      systemPrompt:`Você escreve a mensagem semanal do Rafael (consultor da UP Co.) para o dono de ${CLIENT_CONFIG.empresa}. Tom: ${CLIENT_CONFIG.tom_voz} Máximo 4 linhas. Comece pelo que mais importa nesta semana. Use só os números recebidos — não invente dados. Retorne APENAS o texto da mensagem, sem aspas nem formatação.`,
+      userPayload:{ health_score: gos.score, health_score_semana_anterior: gos.anterior?.score ?? null, dimensoes: gos.dims, pulso: pulse, insights_up_mind: mind[0]?.insights || [] },
+      mockResponse:`Helena, semana forte: o caixa está confortável e a receita do mês já passa de 80% da meta. Dois pontos pedem ação hoje: a proposta da Base Sólida (R$ 64 mil) está parada há 9 dias, e a Juliana pediu revisão com marcenaria há 3 dias sem resposta. E a obra da Casa Fontes passou do prazo — avise o Luiz antes que ele pergunte.`
+    });
+    const entry = { semana: pulse.semana, texto: String(r).trim(), gerado_em: new Date().toISOString() };
+    narrativa = await store.mutate('dash_narrativa', list => [entry, ...list.filter(n => n.semana !== entry.semana)].slice(0, 52));
+    toast('Mensagem da semana gerada', 'success');
+  } catch (e) { toast(e.message, 'error'); }
+
+  renderNarrative();
+  btn.disabled = false; btn.querySelector('svg')?.classList.remove('spin');
+}
+
+init();
+</script>
+</body>
+</html>

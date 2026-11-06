@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>UP·Team — Pessoas</title>
+  <script src="config.js"></script>
+  <script src="nav.js"></script>
+  <script src="suite-data.js"></script>
+  <script src="demo-data.js"></script>
+  <style>
+    .team-content { flex:1;overflow-y:auto;padding:20px 28px 28px; }
+    .stats-row { display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px; }
+    .stat-card { background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px 16px; }
+    .stat-label { font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin-bottom:6px; }
+    .stat-value { font-family:'Syne',sans-serif;font-weight:800;font-size:22px;letter-spacing:-.04em;color:var(--text); }
+    .stat-sub { font-size:11px;color:var(--muted);margin-top:2px; }
+
+    .section-title { font-family:'Syne',sans-serif;font-weight:700;font-size:14px;letter-spacing:-.02em;color:var(--text);margin-bottom:12px; }
+    .two-col { display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:24px; }
+
+    .members-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:24px; }
+    .member-card { background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;transition:border-color .15s; }
+    .member-card:hover { border-color:var(--teal); }
+    .member-top { display:flex;align-items:center;gap:12px;margin-bottom:14px; }
+    .member-avatar { width:40px;height:40px;border-radius:50%;background:var(--teal-12);border:1.5px solid var(--teal);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:var(--teal);flex-shrink:0; }
+    .member-name { font-size:14px;font-weight:600;font-family:'Syne',sans-serif;letter-spacing:-.02em; }
+    .member-cargo { font-size:12px;color:var(--muted); }
+    .member-stats { display:grid;grid-template-columns:repeat(3,1fr);gap:8px; }
+    .member-stat { background:var(--bg3);border-radius:6px;padding:8px;text-align:center; }
+    .member-stat-val { font-size:16px;font-weight:700;font-family:'Syne',sans-serif;color:var(--text); }
+    .member-stat-label { font-size:10px;color:var(--dim);margin-top:2px; }
+
+    .ai-report-card { background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:24px; }
+    .ai-report-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:14px; }
+    .ai-report-section { margin-bottom:12px; }
+    .ai-report-label { font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px; }
+    .ai-report-label.destaques { color:var(--green); }
+    .ai-report-label.alertas   { color:var(--amber); }
+    .ai-report-label.sugestao  { color:var(--teal); }
+    .ai-report-item { font-size:13px;color:var(--muted);padding:6px 10px;border-radius:5px;background:var(--bg3);margin-bottom:4px;line-height:1.5; }
+
+    .modal-overlay { position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:1000;backdrop-filter:blur(4px); }
+    .modal-overlay.hidden { display:none; }
+    .modal { background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px;width:440px;max-width:90vw; }
+    .modal-title { font-family:'Syne',sans-serif;font-weight:700;font-size:16px;letter-spacing:-.02em;margin-bottom:20px; }
+    .form-group { margin-bottom:14px; }
+    .form-label { display:block;font-size:12px;color:var(--muted);margin-bottom:5px; }
+    .form-row { display:grid;grid-template-columns:1fr 1fr;gap:12px; }
+    .form-actions { display:flex;gap:8px;justify-content:flex-end;margin-top:20px; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .spin { animation:spin 1s linear infinite; }
+  </style>
+</head>
+<body>
+<div class="suite-layout">
+  <aside id="suite-sidebar" class="suite-sidebar"></aside>
+  <main class="suite-main">
+    <div class="module-header">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div>
+          <h1 class="module-title">UP <span class="dash">—</span> Team</h1>
+          <p class="module-subtitle">Pessoas & cultura · performance da equipe</p>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:4px;">
+          <button class="btn btn-ghost" onclick="resetWeek()" title="Guarda os números da semana no histórico e zera os contadores">Fechar semana</button>
+          <button class="btn btn-ghost" id="btn-ai" onclick="runAIReport()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Relatório IA
+          </button>
+          <button class="btn btn-primary" onclick="openModal()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Novo membro
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="team-content">
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-label">Total da equipe</div><div class="stat-value" id="stat-total">0</div><div class="stat-sub">Membros ativos</div></div>
+        <div class="stat-card"><div class="stat-label">Tarefas concluídas</div><div class="stat-value" id="stat-tasks" style="color:var(--green)">0</div><div class="stat-sub">Esta semana</div></div>
+        <div class="stat-card"><div class="stat-label">Em aberto</div><div class="stat-value" id="stat-open" style="color:var(--amber)">0</div><div class="stat-sub">Tarefas pendentes</div></div>
+        <div class="stat-card"><div class="stat-label">Ausências</div><div class="stat-value" id="stat-ausencias" style="color:var(--red)">0</div><div class="stat-sub">Esta semana</div></div>
+      </div>
+
+      <!-- Relatório IA -->
+      <div id="ai-report-area" style="display:none;margin-bottom:24px;">
+        <div class="section-title">Relatório da semana — IA</div>
+        <div id="ai-report-content"></div>
+      </div>
+
+      <!-- Membros -->
+      <div class="section-title">Membros da equipe</div>
+      <div class="members-grid" id="members-grid"></div>
+    </div>
+  </main>
+</div>
+
+<div class="modal-overlay hidden" id="modal-membro" onclick="closeModalBg(event)">
+  <div class="modal">
+    <div class="modal-title" id="m-modal-title">Novo membro</div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Nome</label><input class="input" id="m-nome" type="text" placeholder="Nome completo"/></div>
+      <div class="form-group"><label class="form-label">Cargo</label><input class="input" id="m-cargo" type="text" placeholder="Ex: Consultor"/></div>
+    </div>
+    <div style="font-size:11px;color:var(--dim);margin-bottom:10px;">Números da semana corrente</div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Tarefas concluídas</label><input class="input" id="m-done" type="number" min="0" value="0"/></div>
+      <div class="form-group"><label class="form-label">Tarefas em aberto</label><input class="input" id="m-open" type="number" min="0" value="0"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Atrasos</label><input class="input" id="m-atrasos" type="number" min="0" value="0"/></div>
+      <div class="form-group"><label class="form-label">Ausências</label><input class="input" id="m-ausencias" type="number" min="0" value="0"/></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-ghost danger" id="btn-delete-member" onclick="deleteMember()" style="margin-right:auto;">Remover</button>
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveMember()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script>
+const { U } = Suite;
+const esc = U.esc;
+const STAR = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+const COUNTERS = ['tarefas_concluidas', 'tarefas_abertas', 'atrasos', 'ausencias'];
+
+let members = [];
+let editId = null;
+
+async function init() { await refresh(); }
+
+async function refresh() {
+  members = (await store.load('membros')).filter(m => m.ativo !== false);
+  renderStats(); renderMembers();
+}
+
+function getInitials(nome) { return nome.split(' ').filter(Boolean).map(n=>n[0]).slice(0,2).join('').toUpperCase(); }
+const total = key => members.reduce((s,m)=>s+(m[key]||0),0);
+
+function renderStats() {
+  document.getElementById('stat-total').textContent    = members.length;
+  document.getElementById('stat-tasks').textContent    = total('tarefas_concluidas');
+  document.getElementById('stat-open').textContent     = total('tarefas_abertas');
+  document.getElementById('stat-ausencias').textContent= total('ausencias');
+}
+
+function renderMembers() {
+  if (!members.length) {
+    document.getElementById('members-grid').innerHTML = `<div class="empty-block" style="grid-column:1/-1;"><strong>Nenhum membro cadastrado</strong>Adicione a equipe em "Novo membro". Os números de cada um são atualizados durante a semana pelos botões +1 do card.</div>`;
+    return;
+  }
+  const stat = (m, key, label, color) => `
+    <div class="member-stat">
+      <div class="member-stat-val" style="color:${color}">${m[key] || 0}</div>
+      <div class="member-stat-label">${label}</div>
+      <button class="icon-btn" title="+1 ${label.toLowerCase()}" onclick="bump('${m.id}','${key}')">+1</button>
+    </div>`;
+  document.getElementById('members-grid').innerHTML = members.map(m => {
+    const tarefas = (m.tarefas_concluidas || 0) + (m.tarefas_abertas || 0);
+    const perf = tarefas > 0 ? Math.round(m.tarefas_concluidas / tarefas * 100) : null;
+    const perfColor = perf == null ? 'var(--dim)' : perf >= 80 ? 'var(--green)' : perf >= 60 ? 'var(--teal)' : 'var(--amber)';
+    return `
+    <div class="member-card">
+      <div class="member-top">
+        <div class="member-avatar">${esc(getInitials(m.nome))}</div>
+        <div style="flex:1;">
+          <div class="member-name">${esc(m.nome)}</div>
+          <div class="member-cargo">${esc(m.cargo)}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:16px;color:${perfColor}">${perf == null ? '—' : perf + '%'}</div>
+          <button class="icon-btn" onclick="openModal('${m.id}')">Editar</button>
+        </div>
+      </div>
+      <div class="member-stats" style="grid-template-columns:repeat(4,1fr);">
+        ${stat(m, 'tarefas_concluidas', 'Concluídas', 'var(--green)')}
+        ${stat(m, 'tarefas_abertas', 'Em aberto', 'var(--amber)')}
+        ${stat(m, 'atrasos', 'Atrasos', (m.atrasos || 0) > 0 ? 'var(--red)' : 'var(--text)')}
+        ${stat(m, 'ausencias', 'Ausências', (m.ausencias || 0) > 0 ? 'var(--red)' : 'var(--text)')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function bump(id, key) {
+  await store.mutate('membros', list => {
+    const m = list.find(x=>x.id===id);
+    if (!m) return;
+    m[key] = (m[key] || 0) + 1;
+    // concluir uma tarefa tira ela da fila de abertas
+    if (key === 'tarefas_concluidas' && m.tarefas_abertas > 0) m.tarefas_abertas -= 1;
+  });
+  await refresh();
+}
+
+// Começo de semana: guarda os números da semana que passou e zera os contadores
+async function resetWeek() {
+  if (!members.length) return;
+  if (!confirm('Fechar a semana? Os números atuais vão para o histórico de cada membro e os contadores de concluídas, atrasos e ausências voltam a zero. As tarefas em aberto são mantidas.')) return;
+  const semana = U.isoWeek(U.addDays(U.today(), -7));
+  await store.mutate('membros', list => {
+    list.forEach(m => {
+      m.historico = [{ semana, fechado_em: U.today(), ...Object.fromEntries(COUNTERS.map(k => [k, m[k] || 0])) }, ...(m.historico || [])].slice(0, 26);
+      m.tarefas_concluidas = 0; m.atrasos = 0; m.ausencias = 0;
+    });
+  });
+  await refresh();
+  toast('Semana fechada — contadores zerados', 'success');
+}
+
+async function runAIReport() {
+  if (!members.length) { toast('Cadastre a equipe antes de gerar o relatório', 'warn'); return; }
+  const btn = document.getElementById('btn-ai');
+  btn.disabled = true;
+  btn.innerHTML = `<svg class="spin" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Gerando…`;
+
+  try {
+    const r = await window.callClaude({
+      systemPrompt:`Você analisa a performance da equipe de ${CLIENT_CONFIG.empresa}. Foco em padrões, não julgamento. Tom construtivo. Use só os dados recebidos; "historico" traz as semanas anteriores de cada pessoa, quando existir. Retorne APENAS JSON: {"destaques":["..."],"alertas":["..."],"sugestao_rafael":"..."}`,
+      userPayload:{ semana:U.isoWeek(), membros: members.map(m=>({ nome:m.nome, cargo:m.cargo, ...Object.fromEntries(COUNTERS.map(k => [k, m[k] || 0])), historico:(m.historico || []).slice(0,4) })) },
+      mockResponse: JSON.stringify({
+        destaques: ['Diego fechou 14 tarefas — o comercial está respondendo leads no mesmo dia', 'Paula zerou a fila do financeiro pela 3ª semana seguida'],
+        alertas:   ['Thiago acumula 2 atrasos, 1 ausência e 7 tarefas abertas — a fila de 3D concentra três projetos nele'],
+        sugestao_rafael: 'Conversa com a Helena sobre redistribuir os 3D ou terceirizar renders. Não é cobrança ao Thiago — é gargalo de capacidade.'
+      })
+    });
+    const ai = U.parseAIJson(r);
+    const list = v => Array.isArray(v) ? v : [];
+    document.getElementById('ai-report-content').innerHTML = `
+      <div class="ai-report-card">
+        <div class="ai-report-header">
+          <span style="font-size:12px;color:var(--muted);">${U.weekLabel(U.isoWeek())} · análise gerada agora</span>
+        </div>
+        ${list(ai.destaques).length ? `
+          <div class="ai-report-section">
+            <div class="ai-report-label destaques">Destaques</div>
+            ${list(ai.destaques).map(d=>`<div class="ai-report-item">✓ ${esc(d)}</div>`).join('')}
+          </div>` : ''}
+        ${list(ai.alertas).length ? `
+          <div class="ai-report-section">
+            <div class="ai-report-label alertas">Pontos de atenção</div>
+            ${list(ai.alertas).map(a=>`<div class="ai-report-item" style="border-left:2px solid var(--amber);padding-left:8px;">⚠ ${esc(a)}</div>`).join('')}
+          </div>` : ''}
+        ${ai.sugestao_rafael ? `
+          <div class="ai-report-section">
+            <div class="ai-report-label sugestao">Sugestão para Rafael</div>
+            <div class="ai-report-item" style="color:var(--teal);border-left:2px solid var(--teal);padding-left:8px;">→ ${esc(ai.sugestao_rafael)}</div>
+          </div>` : ''}
+      </div>`;
+    document.getElementById('ai-report-area').style.display = 'block';
+    toast('Relatório gerado', 'success');
+  } catch (e) { toast(e.message, 'error'); }
+
+  btn.disabled = false;
+  btn.innerHTML = `${STAR} Relatório IA`;
+}
+
+function openModal(id) {
+  const m = id ? members.find(x=>x.id===id) : null;
+  editId = m?.id || null;
+  document.getElementById('m-modal-title').textContent = m ? 'Editar membro' : 'Novo membro';
+  document.getElementById('m-nome').value  = m?.nome || '';
+  document.getElementById('m-cargo').value = m?.cargo || '';
+  document.getElementById('m-done').value      = m?.tarefas_concluidas || 0;
+  document.getElementById('m-open').value      = m?.tarefas_abertas || 0;
+  document.getElementById('m-atrasos').value   = m?.atrasos || 0;
+  document.getElementById('m-ausencias').value = m?.ausencias || 0;
+  document.getElementById('btn-delete-member').style.display = m ? '' : 'none';
+  document.getElementById('modal-membro').classList.remove('hidden');
+  document.getElementById('m-nome').focus();
+}
+function closeModal() { document.getElementById('modal-membro').classList.add('hidden'); }
+function closeModalBg(e) { if(e.target.classList.contains('modal-overlay')) closeModal(); }
+
+async function saveMember() {
+  const nome = document.getElementById('m-nome').value.trim();
+  if (!nome) { toast('Informe o nome do membro', 'warn'); return; }
+  const num = id => Math.max(0, parseInt(document.getElementById(id).value, 10) || 0);
+  const fields = { nome, cargo:document.getElementById('m-cargo').value.trim(), tarefas_concluidas:num('m-done'), tarefas_abertas:num('m-open'), atrasos:num('m-atrasos'), ausencias:num('m-ausencias') };
+  const id = editId;
+  await store.mutate('membros', list => {
+    if (id) { const m = list.find(x=>x.id===id); if (m) Object.assign(m, fields); }
+    else list.push({ id:U.uid('m'), ativo:true, ...fields });
+  });
+  closeModal();
+  await refresh();
+  toast(id ? `${nome} atualizado` : `${nome} adicionado à equipe`, 'success');
+}
+
+async function deleteMember() {
+  const m = members.find(x=>x.id===editId);
+  if (!m || !confirm(`Remover ${m.nome} da equipe?`)) return;
+  await store.mutate('membros', list => list.filter(x=>x.id!==m.id));
+  closeModal();
+  await refresh();
+  toast(`${m.nome} removido`, 'success');
+}
+
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
+init();
+</script>
+</body>
+</html>

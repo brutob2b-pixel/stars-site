@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Estúdio de marca</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="base.css">
+<style>
+.estudio{display:grid;grid-template-columns:360px minmax(0,1fr);gap:22px;align-items:start}
+.controles{position:sticky;top:84px;padding:18px;display:grid;gap:18px;max-height:calc(100svh - 100px);overflow:auto}
+.controles h3{font-size:14px;letter-spacing:.12em;color:var(--muted);margin-bottom:8px}
+.opts{display:grid;gap:8px}
+.opts.tres{grid-template-columns:repeat(3,minmax(0,1fr))}
+.opts.cinco{grid-template-columns:repeat(5,minmax(0,1fr))}
+.opts.seis{grid-template-columns:repeat(3,minmax(0,1fr))}
+.opt{display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px 6px;border-radius:14px;border:1px solid var(--glass-line);background:rgba(255,255,255,.03);color:var(--muted);cursor:pointer;font-size:12px;text-align:center;line-height:1.15;transition:border-color .2s,color .2s}
+.opt:hover{color:var(--text)}
+.opt[aria-pressed="true"]{border-color:var(--accent);color:var(--text);box-shadow:0 0 0 1px var(--accent),0 0 22px -6px rgba(217,164,65,.5)}
+.opt canvas{width:100%;aspect-ratio:1;border-radius:10px;display:block}
+.opt i{width:34px;height:34px;border-radius:50%;border:3px solid var(--ring);background:radial-gradient(circle at 50% 38%,var(--c1),var(--c2))}
+.opt .emb{width:100%}
+.acoes{display:grid;gap:8px}
+.status{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:14px;border:1px dashed var(--glass-line);font-size:14px}
+.status b{color:var(--accent-2)}
+.status .dot{width:10px;height:10px;border-radius:50%;background:var(--warn);box-shadow:0 0 0 4px rgba(232,176,75,.2)}
+.status.revisao .dot{background:#7db7ff;box-shadow:0 0 0 4px rgba(125,183,255,.2)}
+
+.palco{display:grid;gap:16px}
+.palco .tabs{position:sticky;top:76px;z-index:5;padding:8px;border-radius:999px;width:max-content;max-width:100%;overflow-x:auto;flex-wrap:nowrap}
+.vista{padding:22px}
+.vista[hidden]{display:none}
+.logo-grande{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:14px}
+.logo-grande canvas{width:100%;display:block;border-radius:18px}
+.logo-grande .lado{display:grid;gap:14px;align-content:start}
+.mini-apps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.mini-apps figure{margin:0;text-align:center;font-size:12px;color:var(--muted)}
+.mini-apps canvas{width:100%;display:block;margin-bottom:6px}
+.mini-apps .redondo{border-radius:50%}
+.mini-apps .app{border-radius:22%}
+.legenda{font-size:13px;color:var(--muted);margin-top:10px}
+
+.embalagens{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.embalagens figure{margin:0;padding:14px 10px 12px;border-radius:18px;text-align:center;background:radial-gradient(circle at 50% 45%,rgba(217,164,65,.14),transparent 65%),rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06)}
+.embalagens figcaption{font-size:13px;color:var(--muted);margin-top:4px}
+.emb{width:100%;height:auto;display:block;overflow:visible}
+
+.rotulo-wrap{overflow-x:auto;padding-bottom:6px}
+.rotulo-wrap canvas{width:100%;min-width:560px;display:block;border-radius:6px;box-shadow:0 20px 40px -20px rgba(0,0,0,.8)}
+.tampa-wrap{display:grid;grid-template-columns:200px 1fr;gap:18px;align-items:center;margin-top:18px}
+.tampa-wrap canvas{width:100%;border-radius:50%;display:block}
+.medidas{list-style:none;margin:0;padding:0;font-size:14px}
+.medidas li{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.medidas span{color:var(--muted)}
+
+.pages{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;perspective:1200px}
+.page{aspect-ratio:3/4;background:#F1ECE2;color:#17150F;border-radius:6px;padding:14px;display:flex;flex-direction:column;gap:10px;box-shadow:0 30px 60px -24px rgba(0,0,0,.8);overflow:hidden}
+.page h4{margin:0;font:600 11px/1 var(--f-body);letter-spacing:.16em;text-transform:uppercase;color:#6F695F}
+.page .pf{margin-top:auto;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#A39C90;display:flex;justify-content:space-between;gap:8px}
+.page canvas{width:100%;display:block;border-radius:4px}
+.page .logo-bb{width:74%;margin:0 auto}
+.cores{display:grid;gap:6px;flex:1}
+.cores div{border-radius:4px;display:flex;align-items:flex-end;padding:6px 8px;font:600 11px var(--f-body);letter-spacing:.06em}
+.tipo .aa{font-size:clamp(48px,5vw,76px);line-height:1}
+.tipo p{font-size:12px;line-height:1.4;word-break:break-all}
+.apps{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:center}
+.apps canvas{border-radius:50%}
+.apps span{font-size:10px;color:#6F695F;text-align:center;display:block;margin-top:4px}
+
+.fluxo{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;list-style:none;margin:0;padding:0;counter-reset:f}
+.fluxo li{padding:16px;counter-increment:f}
+.fluxo li::before{content:counter(f);display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--accent);color:var(--bg);font:700 18px var(--f-disp);margin-bottom:10px}
+.fluxo b{display:block;margin-bottom:4px}
+.fluxo p{color:var(--muted);font-size:14px}
+
+.projetos{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;padding:12px 14px;margin-bottom:16px}
+.projetos .chips,.proj-acoes{display:flex;flex-wrap:wrap;gap:8px}
+.chip small{opacity:.7;margin-left:6px;font-size:12px}
+.status.prova .dot{background:#b79bff;box-shadow:0 0 0 4px rgba(183,155,255,.2)}
+.status.aprovado .dot{background:var(--ok);box-shadow:0 0 0 4px rgba(111,207,151,.2)}
+.etapas li.feita::before{content:"✓"}
+.etapas li[aria-current]{border-color:var(--accent);box-shadow:var(--glass-shadow),0 0 0 1px var(--accent)}
+.apr-acoes{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}
+.hist{list-style:none;margin:0;padding:0;font-size:14px}
+.hist li{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.hist time{color:var(--muted);margin-right:8px;font-variant-numeric:tabular-nums}
+.nota-linha{display:flex;gap:8px;flex-wrap:wrap;align-items:end}
+.nota-linha .field{flex:1;min-width:200px}
+.versoes{list-style:none;margin:16px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.versoes li{display:grid;grid-template-columns:84px minmax(0,1fr);gap:12px;padding:12px;align-items:center}
+.versoes canvas{width:84px;border-radius:12px;display:block}
+.versoes small{display:block;color:var(--muted)}
+.versoes li div{display:grid;gap:4px;justify-items:start}
+.versoes .vazio{display:block;grid-column:1/-1;border:1px dashed var(--glass-line);border-radius:14px}
+.linha{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.item-linha{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;padding:12px;align-items:center}
+.item-linha figure{margin:0}
+.item-linha div{display:grid;gap:6px;justify-items:start}
+.item-linha small{color:var(--muted)}
+.item-linha canvas{width:100%;border-radius:4px;display:block}
+.pacote{display:grid;gap:12px;max-width:640px}
+.pacote ul{margin:0;padding-left:20px;color:var(--muted);font-size:14px}
+
+@media (max-width:980px){
+  .estudio{grid-template-columns:1fr}
+  .controles{position:static;max-height:none}
+  .palco .tabs{top:70px}
+  .pages{grid-template-columns:1fr 1fr}
+  .fluxo{grid-template-columns:1fr 1fr}
+}
+@media (max-width:560px){
+  .logo-grande{grid-template-columns:1fr}
+  .vista{padding:14px}
+  .opts.cinco{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+  .opt i{width:28px;height:28px}
+  .tampa-wrap{grid-template-columns:1fr}
+  .tampa-wrap canvas{max-width:220px;margin:0 auto}
+  .fluxo{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body data-pagina="marca">
+<main class="wrap">
+  <header class="page-head">
+    <p class="eyebrow" data-reveal>Estúdio de marca</p>
+    <h1 data-reveal>Sua marca, do logotipo ao pote.</h1>
+    <p data-reveal>Escreva o nome, escolha o estilo e as cores. Tudo o que você vê aqui segue para a loja, para o marketing e para o designer que finaliza a arte.</p>
+  </header>
+
+  <div class="projetos glass" data-reveal>
+    <div class="chips" data-projetos role="group" aria-label="Seus projetos"></div>
+    <div class="proj-acoes">
+      <button class="btn btn-ghost btn-sm" type="button" data-acao="novo">+ Novo projeto</button>
+      <button class="btn btn-ghost btn-sm" type="button" data-acao="duplicar">Duplicar</button>
+      <button class="btn btn-ghost btn-sm" type="button" data-acao="excluir">Excluir</button>
+    </div>
+  </div>
+
+  <div class="estudio">
+    <aside class="controles glass" aria-label="Escolhas da marca">
+      <div class="field">
+        <label for="m-nome">Nome da barbearia</label>
+        <input id="m-nome" maxlength="28" autocomplete="organization" placeholder="Ex.: Barbearia do Zé">
+      </div>
+      <div class="field">
+        <label for="m-cidade">Linha de baixo (bairro ou cidade)</label>
+        <input id="m-cidade" maxlength="18" placeholder="SÃO PAULO">
+      </div>
+      <div><h3>Logotipo</h3><div class="opts tres" role="group" aria-label="Estilo do logotipo" data-logos></div></div>
+      <div><h3>Cores</h3><div class="opts cinco" role="group" aria-label="Paleta" data-temas></div></div>
+      <div><h3>Pomada principal</h3><div class="opts seis" role="group" aria-label="Estilo da pomada" data-pomadas></div></div>
+      <div class="status" data-status><span class="dot" aria-hidden="true"></span><span>Arte: <b data-status-txt>rascunho automático</b></span></div>
+      <div class="acoes">
+        <button class="btn btn-solid" type="button" data-acao="enviar" data-lado>Enviar para o designer</button>
+        <button class="btn btn-ghost" type="button" data-acao="versao">Salvar versão</button>
+        <button class="btn btn-ghost" type="button" data-baixar>Baixar logotipo (PNG)</button>
+        <a class="btn btn-ghost" href="shop.html">Ver a linha na loja</a>
+      </div>
+      <p class="muted" style="font-size:12px">Salvo automaticamente neste navegador. O logotipo é um rascunho por modelos; um designer de marcas finaliza com você antes da produção.</p>
+    </aside>
+
+    <section class="palco" aria-label="Prévia">
+      <div class="tabs glass" role="tablist" aria-label="Prévias">
+        <button type="button" role="tab" aria-selected="true" aria-controls="v-logo" data-vista="v-logo">Logotipo</button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="v-emb" data-vista="v-emb">Embalagens</button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="v-rot" data-vista="v-rot">Rótulo</button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="v-linha" data-vista="v-linha">Linha</button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="v-bb" data-vista="v-bb">Brandbook</button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="v-ver" data-vista="v-ver">Versões</button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="v-apr" data-vista="v-apr">Aprovação</button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="v-exp" data-vista="v-exp">Exportar</button>
+      </div>
+
+      <div class="vista glass" id="v-logo" role="tabpanel">
+        <div class="logo-grande">
+          <canvas width="1000" height="1000" data-c="logo" aria-label="Logotipo da marca" role="img"></canvas>
+          <div class="lado">
+            <canvas width="800" height="400" data-c="neg" style="border-radius:14px" role="img" aria-label="Logotipo em fundo claro"></canvas>
+            <div class="mini-apps">
+              <figure><canvas width="300" height="300" class="redondo" data-c="perfil"></canvas>Foto do Instagram</figure>
+              <figure><canvas width="300" height="300" class="app" data-c="app"></canvas>Ícone de app</figure>
+              <figure><canvas width="300" height="300" class="redondo" data-c="tampa-mini"></canvas>Tampa do pote</figure>
+            </div>
+            <p class="legenda">Versões para fundo escuro, fundo claro e tamanhos pequenos. O designer entrega os arquivos finais em vetor.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="vista glass" id="v-emb" role="tabpanel" hidden>
+        <div class="embalagens" data-embalagens></div>
+        <p class="legenda">Desenho de vitrine. Formatos de exemplo: <span class="ph">pote PP 120 g, óleo 30 ml, balm 100 ml, shampoo 250 ml</span>.</p>
+      </div>
+
+      <div class="vista glass" id="v-rot" role="tabpanel" hidden>
+        <h3 style="margin-bottom:12px">Faixa lateral do pote (planificada)</h3>
+        <div class="rotulo-wrap"><canvas width="2000" height="300" data-c="faixa" role="img" aria-label="Arte planificada da faixa lateral"></canvas></div>
+        <div class="tampa-wrap">
+          <canvas width="600" height="600" data-c="tampa" role="img" aria-label="Arte da tampa"></canvas>
+          <ul class="medidas">
+            <li><span>Faixa lateral</span><b class="ph">254 × 32 mm</b></li>
+            <li><span>Tampa</span><b class="ph">Ø 82 mm</b></li>
+            <li><span>Sangria e área segura</span><b class="ph">3 mm + 2 mm</b></li>
+            <li><span>Impressão</span><b class="ph">BOPP fosco, 4 cores + verniz</b></li>
+            <li><span>Informações obrigatórias (Anvisa)</span><b class="ph">lote, validade, composição, fabricante, SAC</b></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="vista glass" id="v-bb" role="tabpanel" hidden>
+        <div class="pages">
+          <article class="page"><h4>01 · Logotipo</h4><canvas class="logo-bb" width="600" height="600" data-c="bb-logo"></canvas><canvas width="600" height="300" data-c="bb-neg" style="width:74%;margin:0 auto"></canvas><div class="pf"><span data-bb-nome></span><span>1</span></div></article>
+          <article class="page"><h4>02 · Cores</h4><div class="cores" data-bb-cores></div><div class="pf"><span data-bb-nome></span><span>2</span></div></article>
+          <article class="page tipo"><h4>03 · Tipografia</h4><div class="aa" data-bb-aa>Aa</div><strong data-bb-fonte></strong><p data-bb-alfa>ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789</p><div class="pf"><span data-bb-nome></span><span>3</span></div></article>
+          <article class="page"><h4>04 · Aplicações</h4><div class="apps"><div><canvas width="400" height="400" data-c="bb-tampa"></canvas><span>Tampa do pote</span></div><div><canvas width="400" height="400" data-c="bb-perfil"></canvas><span>Instagram</span></div></div><div class="pf"><span data-bb-nome></span><span>4</span></div></article>
+        </div>
+        <p class="legenda">Prévia montada a partir das suas escolhas. O brandbook final é feito pelo designer, com o passo a passo do registro no INPI (sem garantia de aprovação: depende da análise do órgão).</p>
+      </div>
+
+      <div class="vista glass" id="v-linha" role="tabpanel" hidden>
+        <h3 style="margin-bottom:12px">Embalagem e rótulo de cada produto da linha</h3>
+        <div class="linha" data-linha></div>
+        <p class="legenda">Cada produto leva o mesmo logotipo e as mesmas cores, com o nome do produto no rótulo. Medidas e textos legais são fechados com a fábrica.</p>
+      </div>
+
+      <div class="vista glass" id="v-ver" role="tabpanel" hidden>
+        <h3 style="margin-bottom:12px">Versões da arte</h3>
+        <div class="nota-linha">
+          <div class="field"><label for="v-nota">Anotação da versão (opcional)</label><input id="v-nota" maxlength="60" placeholder="Ex.: testei o logotipo moderno"></div>
+          <button class="btn btn-solid" type="button" data-acao="versao">Salvar versão agora</button>
+        </div>
+        <ul class="versoes" data-versoes></ul>
+        <p class="legenda">Guardamos as últimas 20 versões deste projeto, neste navegador. Voltar para uma versão não apaga as outras.</p>
+      </div>
+
+      <div class="vista glass" id="v-apr" role="tabpanel" hidden>
+        <h3 style="margin-bottom:12px">Aprovação com o designer</h3>
+        <ol class="fluxo etapas" data-etapas></ol>
+        <p class="legenda" data-apr-dica></p>
+        <div class="field" data-recado style="margin-top:14px"><label for="a-recado">Recado para o designer</label><textarea id="a-recado" maxlength="300" placeholder="Ex.: quero o dourado mais quente"></textarea></div>
+        <div class="apr-acoes" data-apr-acoes></div>
+        <h3 style="margin:18px 0 6px">Histórico</h3>
+        <ul class="hist" data-hist></ul>
+      </div>
+
+      <div class="vista glass" id="v-exp" role="tabpanel" hidden>
+        <div class="pacote">
+          <h3>Pacote de arquivos</h3>
+          <p>Um único arquivo .zip com tudo o que está neste projeto:</p>
+          <ul>
+            <li>Logotipo em fundo escuro e em fundo claro (PNG)</li>
+            <li>Foto de perfil do Instagram e arte da tampa (PNG)</li>
+            <li>Rótulo planificado de cada produto da linha (PNG, 2000 × 300)</li>
+            <li>Ficha do projeto com as escolhas e o estado da aprovação (texto)</li>
+          </ul>
+          <button class="btn btn-solid" type="button" data-acao="zip">Baixar pacote (.zip)</button>
+          <p class="legenda" data-exp-aviso></p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section class="section" style="margin-top:28px">
+    <div class="section-head"><div><p class="eyebrow">Da tela à fábrica</p><h2 style="margin-top:10px">Como a arte é aprovada</h2></div></div>
+    <ol class="fluxo">
+      <li class="glass" data-reveal><b>Rascunho aqui</b><p>Você monta a ideia no estúdio, sem custo e sem compromisso.</p></li>
+      <li class="glass" data-reveal><b>Designer revisa</b><p>Um designer de marcas ajusta o logotipo e prepara os arquivos.</p></li>
+      <li class="glass" data-reveal><b>Você aprova</b><p>A prova chega pelo WhatsApp e fica registrada no painel.</p></li>
+      <li class="glass" data-reveal><b>Produção</b><p>Só depois da aprovação o lote entra na fábrica. Prazo: até 30 dias*.</p></li>
+    </ol>
+    <p class="muted" style="font-size:12px;margin-top:10px">* Ilustrativo; a fábrica confirma lote e prazo.</p>
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+<script src="icones.js"></script>
+<script src="marca.js"></script>
+<script src="data.js"></script>
+<script src="site.js"></script>
+<script>
+const { G, anima } = SITE;
+document.title = `Estúdio de marca · ${BRAND}`;
+const PROJ_KEY = "stars-projetos", ARTE_KEY = "stars-arte"; // ARTE_KEY: status da arte, lido também pelo Painel
+const MAX_PROJ = 8, MAX_VERSOES = 20;
+const ARTE_ETAPAS = [["rascunho", "Rascunho", "Você monta a ideia no estúdio."], ["revisao", "Designer revisa", "Ele ajusta o logotipo e prepara os arquivos."],
+  ["prova", "Prova pronta", "A prova chega para você conferir."], ["aprovado", "Aprovada", "Só agora o lote pode entrar na fábrica."]];
+const STATUS_TXT = { rascunho: "rascunho automático", revisao: "em revisão com o designer", prova: "prova pronta para você", aprovado: "aprovada por você" };
+const DICA = { rascunho: "Quando estiver satisfeito, envie ao designer. Você pode deixar um recado.", revisao: "Aguardando o designer. Na demonstração, o botão abaixo simula a resposta dele.",
+  prova: "O designer devolveu a prova. Aprove, ou peça um ajuste com um recado.", aprovado: "Arte aprovada. Se mudar qualquer detalhe da marca, ela volta a rascunho." };
+const novoProj = (marca, status = "rascunho") => ({ id: "p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), m: marca, status, versoes: [], hist: [{ em: Date.now(), txt: "Projeto criado" }] });
+let PJ = (() => {
+  try { const d = JSON.parse(localStorage.getItem(PROJ_KEY)); if (d?.lista?.length) return d; } catch { /* sem dados: cria o primeiro projeto */ }
+  let leg = "rascunho"; try { leg = localStorage.getItem(ARTE_KEY) || "rascunho"; } catch { /* sem armazenamento */ }
+  const p = novoProj(MARCA.load(), ARTE_ETAPAS.some(e => e[0] === leg) ? leg : "rascunho");
+  return { ativo: p.id, lista: [p] };
+})();
+const proj = () => PJ.lista.find(p => p.id === PJ.ativo) || PJ.lista[0];
+let m = proj().m;
+const fmt = t => new Date(t).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
+const log = (p, txt) => ({ ...p, hist: [{ em: Date.now(), txt }, ...p.hist].slice(0, 40) });
+function gravar() {
+  try { localStorage.setItem(PROJ_KEY, JSON.stringify(PJ)); localStorage.setItem(ARTE_KEY, proj().status); } catch { /* sem armazenamento: vale só nesta visita */ }
+  MARCA.save(m); // as outras páginas leem a marca do projeto ativo
+}
+function atualizar(fn) { PJ = { ...PJ, lista: PJ.lista.map(p => p.id === PJ.ativo ? fn(p) : p) }; m = proj().m; gravar(); }
+const nomeIn = $("#m-nome"), cidadeIn = $("#m-cidade");
+nomeIn.value = m.nome; cidadeIn.value = m.cidade === "SÃO PAULO" ? "" : m.cidade;
+const cv = k => $(`[data-c="${k}"]`);
+
+function salvar(mud) {
+  // mudou a marca depois de enviada: volta a ser rascunho
+  atualizar(p => { const q = { ...p, m: { ...p.m, ...mud } }; return p.status === "rascunho" ? q : log({ ...q, status: "rascunho" }, "Marca alterada: a arte volta a rascunho"); });
+  render();
+}
+function sincronizar() { nomeIn.value = m.nome; cidadeIn.value = m.cidade === "SÃO PAULO" ? "" : m.cidade; montarOpcoes(); render(); }
+function ativar(id) { PJ = { ...PJ, ativo: id }; m = proj().m; gravar(); sincronizar(); }
+function novoProjeto(copiar) {
+  if (PJ.lista.length >= MAX_PROJ) { avisar(`Limite de ${MAX_PROJ} projetos na demonstração.`); return; }
+  const p = novoProj(copiar ? { ...m } : { ...MARCA_PADRAO });
+  PJ = { ...PJ, lista: [...PJ.lista, p] }; ativar(p.id);
+}
+function excluirProjeto() {
+  if (PJ.lista.length < 2 || !confirm("Excluir este projeto e as versões dele? Não dá para desfazer.")) return;
+  const resto = PJ.lista.filter(p => p.id !== PJ.ativo);
+  PJ = { ativo: resto[0].id, lista: resto }; ativar(PJ.ativo);
+}
+function versionar(nota) {
+  atualizar(p => log({ ...p, versoes: [{ n: (p.versoes[0]?.n || 0) + 1, em: Date.now(), m: { ...p.m }, nota }, ...p.versoes].slice(0, MAX_VERSOES) }, `Versão salva${nota ? ": " + nota : ""}`));
+  render();
+}
+function restaurar(n) {
+  const v = proj().versoes.find(x => x.n === n); if (!v) return;
+  atualizar(p => log({ ...p, m: { ...v.m }, status: "rascunho" }, `Voltou para a versão ${n}`));
+  sincronizar();
+}
+function mover(status, txt) { atualizar(p => log({ ...p, status }, txt)); render(); }
+const recadoTxt = () => { const r = $("#a-recado").value.trim(); $("#a-recado").value = ""; return r; };
+function enviar() {
+  if (!m.nome.trim()) { avisar("Escreva o nome da barbearia antes de enviar."); nomeIn.focus(); return; }
+  const r = recadoTxt();
+  versionar("Enviada ao designer");
+  mover("revisao", "Enviada ao designer" + (r ? `. Recado: ${r}` : ""));
+  avisar("Demonstração: arte enviada ao designer (nada foi enviado de verdade).");
+}
+function ajuste() {
+  const r = recadoTxt();
+  if (!r) { avisar("Escreva o que quer ajustar no recado."); $("#a-recado").focus(); return; }
+  mover("revisao", `Ajuste pedido. Recado: ${r}`);
+}
+const abrirVista = id => $(`[data-vista="${id}"]`).click();
+
+/* ---- opções ---- */
+function montarOpcoes() {
+  $("[data-logos]").innerHTML = LOGOS.map(l => `<button class="opt" type="button" data-logo="${l.id}" aria-pressed="${l.id === m.logo}"><canvas width="240" height="240" aria-hidden="true"></canvas>${l.nome}</button>`).join("");
+  $("[data-temas]").innerHTML = TEMAS.map(t => `<button class="opt" type="button" data-tema="${t.id}" aria-pressed="${t.id === m.tema}" title="${t.nome}" style="--c1:${t.bg1};--c2:${t.bg2};--ring:${t.ring}"><i aria-hidden="true"></i><span class="sr">${t.nome}</span></button>`).join("");
+  $("[data-pomadas]").innerHTML = POMADAS.map(p => `<button class="opt" type="button" data-pom="${p.id}" aria-pressed="${p.id === m.pomada}">${potinhoAberto(p, MARCA.tema(m))}${p.nome}</button>`).join("");
+}
+
+/* ---- desenhos ---- */
+function pintarTampa(c, mm) {
+  const t = MARCA.tema(mm), ctx = c.getContext("2d"), W = c.width, r = W / 2;
+  pintarLogo(c, mm, { pad: 0.2 });
+  ctx.strokeStyle = t.ring; ctx.lineWidth = W * 0.025; ctx.beginPath(); ctx.arc(r, r, r - W * 0.03, 0, 7); ctx.stroke();
+  ctx.lineWidth = W * 0.006; ctx.beginPath(); ctx.arc(r, r, r - W * 0.07, 0, 7); ctx.stroke();
+}
+// desenha sempre em 2000×300 e escala para o canvas; texto = nome do produto no rótulo
+function pintarFaixa(c, mm, texto = MARCA.pomada(mm).rotulo) {
+  const t = MARCA.tema(mm), ctx = c.getContext("2d"), W = 2000, H = 300, p = { rotulo: texto };
+  ctx.setTransform(c.width / W, 0, 0, c.height / H, 0, 0);
+  const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, t.bg1); g.addColorStop(1, t.bg2);
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = t.ring; ctx.fillRect(0, 22, W, 5); ctx.fillRect(0, H - 27, W, 5);
+  const nome = MARCA.nome(mm).toUpperCase(), f = MARCA.logo(mm).css;
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  const size = fit(ctx, nome, W / 3 - 140, 104, f);
+  for (let i = 0; i < 3; i++) {
+    ctx.fillStyle = t.text; ctx.font = `700 ${size}px ${f}`; ctx.fillText(nome, W / 3 * (i + 0.5), H / 2 - 12);
+    ctx.fillStyle = t.sub; ctx.font = `600 22px "Barlow", sans-serif`; ctx.letterSpacing = "6px"; ctx.fillText(p.rotulo, W / 3 * (i + 0.5), H / 2 + 52); ctx.letterSpacing = "0px";
+    ctx.fillStyle = t.ring; ctx.beginPath(); ctx.arc(W / 3 * i, H / 2, 9, 0, 7); ctx.fill();
+  }
+  // marcas de corte (sangria) para lembrar que é arte de impressão
+  ctx.strokeStyle = "rgba(255,255,255,.35)"; ctx.setLineDash([10, 8]); ctx.lineWidth = 2; ctx.strokeRect(14, 10, W - 28, H - 20); ctx.setLineDash([]);
+}
+function render() {
+  const t = MARCA.tema(m), lg = MARCA.logo(m), p = MARCA.pomada(m);
+  // opções
+  $$("[data-logo]").forEach(b => { b.setAttribute("aria-pressed", b.dataset.logo === m.logo); pintarLogo($("canvas", b), { ...m, logo: b.dataset.logo }, { pad: 0.06 }); });
+  $$("[data-tema]").forEach(b => b.setAttribute("aria-pressed", b.dataset.tema === m.tema));
+  $$("[data-pom]").forEach(b => b.setAttribute("aria-pressed", b.dataset.pom === m.pomada));
+  // logotipo
+  pintarLogo(cv("logo"), m);
+  pintarLogo(cv("neg"), m, { bg: "#F1ECE2", cor: corClara(t), pad: 0.02 });
+  pintarLogo(cv("perfil"), m, { bg: "#17150F", pad: 0.16 });
+  pintarLogo(cv("app"), m, { pad: 0.12 });
+  pintarTampa(cv("tampa-mini"), m);
+  // embalagens
+  const tipos = [["pote", "Pote"], ["lata", "Lata"], ["frasco", "Óleo de barba", "ÓLEO DE BARBA"], ["tubo", "Balm", "BALM PJÓS-BARBA"], ["pump", "Shampoo", "SHAMPOO 3 EM 1"], ["spray", "Tônico", "TÔNICO CAPILAR"], ["caixa", "Kit presente", "KIT PRESENTE"]];
+  $("[data-embalagens]").innerHTML = tipos.map(([k, n, r]) => `<figure>${embalagem(k, m, r ? { rotulo: r } : {})}<figcaption>${n}${k === "pote" || k === "lata" ? ` · ${p.nome}` : ""}</figcaption></figure>`).join("");
+  // rótulo
+  pintarFaixa(cv("faixa"), m); pintarTampa(cv("tampa"), m);
+  // brandbook
+  pintarLogo(cv("bb-logo"), m);
+  pintarLogo(cv("bb-neg"), m, { bg: "#F1ECE2", cor: corClara(t), pad: 0.02 });
+  pintarTampa(cv("bb-tampa"), m);
+  pintarLogo(cv("bb-perfil"), m, { bg: "#17150F", pad: 0.16 });
+  $("[data-bb-cores]").innerHTML = [["Fundo", t.bg1, t.text], ["Destaque", t.ring, t.id === "marfim" ? "#F1ECE2" : "#17150F"], ["Texto", t.text, t.id === "marfim" ? "#F1ECE2" : "#17150F"], ["Apoio", t.sub, "#17150F"]]
+    .map(([n, hex, fg]) => `<div style="background:${hex};color:${fg}">${n} · ${hex.toUpperCase()}</div>`).join("");
+  $("[data-bb-aa]").style.fontFamily = lg.css; $("[data-bb-alfa]").style.fontFamily = lg.css; $("[data-bb-fonte]").textContent = lg.fonte;
+  $$("[data-bb-nome]").forEach(e => e.textContent = MARCA.nome(m));
+  renderProjetos(); renderEstado(); renderAprov(); renderVersoes(); renderExp();
+  if (!$("#v-linha").hidden) renderLinha();
+}
+const rotuloDe = p => p.rotulo || POMADAS.find(x => x.id === p.pomada)?.rotulo || MARCA.pomada(m).rotulo;
+const lote = () => PRODUTOS.filter(p => p.tipo === "lote");
+function renderProjetos() {
+  $("[data-projetos]").innerHTML = PJ.lista.map((p, i) => `<button class="chip" type="button" data-proj="${p.id}" aria-pressed="${p.id === PJ.ativo}">${escHTML(p.m.nome.trim() || "Projeto " + (i + 1))}<small>${ARTE_ETAPAS.find(e => e[0] === p.status)[1]}</small></button>`).join("");
+  $('[data-acao="excluir"]').disabled = PJ.lista.length < 2;
+  $('[data-acao="novo"]').disabled = $('[data-acao="duplicar"]').disabled = PJ.lista.length >= MAX_PROJ;
+}
+function renderEstado() {
+  const st = proj().status;
+  $("[data-status]").className = "status " + st;
+  $("[data-status-txt]").textContent = STATUS_TXT[st];
+  $("[data-lado]").textContent = st === "rascunho" ? "Enviar para o designer" : "Ver aprovação";
+}
+function renderAprov() {
+  const st = proj().status, i = ARTE_ETAPAS.findIndex(e => e[0] === st);
+  $("[data-etapas]").innerHTML = ARTE_ETAPAS.map(([, n, d], j) => `<li class="glass${j < i ? " feita" : ""}"${j === i ? ' aria-current="step"' : ""}><b>${n}</b><p>${d}</p></li>`).join("");
+  $("[data-apr-dica]").textContent = DICA[st];
+  $("[data-recado]").hidden = st === "revisao" || st === "aprovado";
+  const acoes = { rascunho: [["enviar", "Enviar para o designer", "btn-solid"]], revisao: [["designer", "Simular resposta do designer", "btn-solid"]],
+    prova: [["aprovar", "Aprovar a arte", "btn-solid"], ["ajuste", "Pedir ajuste", "btn-ghost"]], aprovado: [["reabrir", "Reabrir para ajustes", "btn-ghost"]] }[st];
+  $("[data-apr-acoes]").innerHTML = acoes.map(([a, t, c]) => `<button class="btn ${c}" type="button" data-acao="${a}">${t}</button>`).join("");
+  $("[data-hist]").innerHTML = proj().hist.map(h => `<li><time>${fmt(h.em)}</time>${escHTML(h.txt)}</li>`).join("");
+}
+function renderVersoes() {
+  const v = proj().versoes;
+  $("[data-versoes]").innerHTML = v.length ? v.map(x => `<li class="glass"><canvas width="240" height="240" data-vn="${x.n}" aria-hidden="true"></canvas><div><b>Versão ${x.n}</b><small>${fmt(x.em)}</small><span>${escHTML(x.nota || "Sem anotação")}</span><button class="btn btn-ghost btn-sm" type="button" data-acao="restaurar" data-n="${x.n}">Voltar para esta</button></div></li>`).join("")
+    : `<li class="vazio muted" style="padding:16px">Nenhuma versão salva ainda. Use “Salvar versão” para guardar um ponto de volta.</li>`;
+  $$("[data-vn]").forEach(c => pintarLogo(c, v.find(x => x.n === +c.dataset.vn).m, { pad: 0.06 }));
+}
+function renderLinha() {
+  $("[data-linha]").innerHTML = lote().map(p => `<article class="item-linha glass"><figure>${embalagem(p.emb, m, { pomada: POMADAS.find(x => x.id === p.pomada), rotulo: p.rotulo })}</figure><div><b>${p.nome}</b><small>${p.detalhe}</small><canvas width="1000" height="150" data-rot="${p.id}" role="img" aria-label="Rótulo planificado de ${p.nome}"></canvas><button class="btn btn-ghost btn-sm" type="button" data-acao="rotulo" data-id="${p.id}">Baixar rótulo (PNG)</button></div></article>`).join("");
+  $$("[data-rot]").forEach(c => pintarFaixa(c, m, rotuloDe(PRODUTOS.find(p => p.id === c.dataset.rot))));
+}
+function renderExp() {
+  $("[data-exp-aviso]").textContent = proj().status === "aprovado" ? "Arte aprovada: o pacote sai como versão final de prova." : "A arte ainda não foi aprovada: o pacote sai marcado como rascunho.";
+}
+
+/* ---- pacote .zip (sem biblioteca): arquivos guardados sem compressão ---- */
+const CRC_TAB = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+const crc32 = b => { let c = ~0; for (const x of b) c = CRC_TAB[(c ^ x) & 255] ^ (c >>> 8); return ~c >>> 0; };
+function montarZip(arqs) {
+  const enc = new TextEncoder(), partes = [], central = [], d = new Date();
+  const hora = (d.getHours() << 11) | (d.getMinutes() << 5) | (d.getSeconds() >> 1), data = ((d.getFullYear() - 1980) << 9) | ((d.getMonth() + 1) << 5) | d.getDate();
+  let off = 0;
+  for (const a of arqs) {
+    const n = enc.encode(a.nome), c = crc32(a.dados), s = a.dados.length;
+    const lh = new DataView(new ArrayBuffer(30));
+    [[0, 4, 0x04034b50], [4, 2, 20], [6, 2, 0x0800], [8, 2, 0], [10, 2, hora], [12, 2, data], [14, 4, c], [18, 4, s], [22, 4, s], [26, 2, n.length]].forEach(([o, z, v]) => z === 4 ? lh.setUint32(o, v, true) : lh.setUint16(o, v, true));
+    const ch = new DataView(new ArrayBuffer(46));
+    [[0, 4, 0x02014b50], [4, 2, 20], [6, 2, 20], [8, 2, 0x0800], [10, 2, 0], [12, 2, hora], [14, 2, data], [16, 4, c], [20, 4, s], [24, 4, s], [28, 2, n.length], [42, 4, off]].forEach(([o, z, v]) => z === 4 ? ch.setUint32(o, v, true) : ch.setUint16(o, v, true));
+    partes.push(new Uint8Array(lh.buffer), n, a.dados); central.push(new Uint8Array(ch.buffer), n);
+    off += 30 + n.length + s;
+  }
+  const tam = central.reduce((t, x) => t + x.length, 0), fim = new DataView(new ArrayBuffer(22));
+  fim.setUint32(0, 0x06054b50, true); fim.setUint16(8, arqs.length, true); fim.setUint16(10, arqs.length, true); fim.setUint32(12, tam, true); fim.setUint32(16, off, true);
+  return new Blob([...partes, ...central, new Uint8Array(fim.buffer)], { type: "application/zip" });
+}
+function baixarBlob(blob, nome) {
+  const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(blob), download: nome });
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+const novoCanvas = (w, h) => Object.assign(document.createElement("canvas"), { width: w, height: h });
+async function exportar(btn) {
+  btn.disabled = true;
+  try {
+    const s = slug(MARCA.nome(m)), t = MARCA.tema(m), st = proj().status, arqs = [], enc = new TextEncoder();
+    const add = async (nome, cv) => arqs.push({ nome, dados: new Uint8Array(await (await new Promise(r => cv.toBlob(r, "image/png"))).arrayBuffer()) });
+    let c = novoCanvas(1000, 1000); pintarLogo(c, m); await add(`logotipo/logotipo-${s}-fundo-escuro.png`, c);
+    c = novoCanvas(1000, 500); pintarLogo(c, m, { bg: "#F1ECE2", cor: corClara(t), pad: 0.02 }); await add(`logotipo/logotipo-${s}-fundo-claro.png`, c);
+    c = novoCanvas(600, 600); pintarLogo(c, m, { bg: "#17150F", pad: 0.16 }); await add(`redes/perfil-instagram-${s}.png`, c);
+    c = novoCanvas(600, 600); pintarTampa(c, m); await add(`embalagem/tampa-${s}.png`, c);
+    for (const p of lote()) { c = novoCanvas(2000, 300); pintarFaixa(c, m, rotuloDe(p)); await add(`rotulos/${slug(p.nome)}.png`, c); }
+    const ficha = [`Projeto: ${MARCA.nome(m)} (${m.cidade})`, `Logotipo: ${MARCA.logo(m).nome}`, `Cores: ${t.nome}`, `Pomada principal: ${MARCA.pomada(m).nome}`,
+      `Situação da arte: ${STATUS_TXT[st]}`, `Gerado em: ${fmt(Date.now())}`, "", "Rascunho por modelos, feito no estúdio de demonstração. O designer entrega os arquivos finais em vetor.", "Demonstração: nenhum arquivo foi enviado a ninguém."].join("\r\n");
+    arqs.push({ nome: "ficha-do-projeto.txt", dados: enc.encode(ficha) });
+    baixarBlob(montarZip(arqs), `pacote-${s}-${st === "aprovado" ? "aprovado" : "rascunho"}.zip`);
+    avisar(`Pacote com ${arqs.length} arquivos baixado.`);
+  } catch { avisar("Não consegui montar o pacote. Tente de novo."); }
+  finally { btn.disabled = false; }
+}
+function pulsar(sel) { if (anima) G.fromTo(sel, { scale: 0.97, opacity: 0.6 }, { scale: 1, opacity: 1, duration: 0.45, ease: "power3.out" }); }
+
+/* ---- eventos ---- */
+let digT;
+nomeIn.addEventListener("input", () => { clearTimeout(digT); digT = setTimeout(() => salvar({ nome: nomeIn.value.trim() }), 120); });
+cidadeIn.addEventListener("input", () => { clearTimeout(digT); digT = setTimeout(() => salvar({ cidade: cidadeIn.value.trim().toUpperCase() || "SÃO PAULO" }), 120); });
+document.addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.logo) { salvar({ logo: b.dataset.logo }); pulsar('[data-c="logo"]'); }
+  if (b.dataset.tema) { salvar({ tema: b.dataset.tema }); montarOpcoes(); render(); pulsar(".vista:not([hidden])"); }
+  if (b.dataset.pom) { salvar({ pomada: b.dataset.pom }); pulsar(".vista:not([hidden])"); }
+  if (b.dataset.vista) {
+    $$("[data-vista]").forEach(x => x.setAttribute("aria-selected", x === b));
+    $$(".vista").forEach(v => v.hidden = v.id !== b.dataset.vista);
+    const v = $("#" + b.dataset.vista);
+    if (b.dataset.vista === "v-linha") renderLinha();
+    if (anima) G.fromTo(v.children, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.45, stagger: 0.05, ease: "power3.out" });
+  }
+  if (b.hasAttribute("data-baixar")) baixarCanvas(cv("logo"), `logotipo-${slug(MARCA.nome(m))}-rascunho.png`);
+  if (b.dataset.proj && b.dataset.proj !== PJ.ativo) ativar(b.dataset.proj);
+  const acao = {
+    novo: () => novoProjeto(false), duplicar: () => novoProjeto(true), excluir: excluirProjeto,
+    enviar: () => proj().status === "rascunho" ? enviar() : abrirVista("v-apr"),
+    versao: () => { versionar($("#v-nota").value.trim()); $("#v-nota").value = ""; avisar(`Versão ${proj().versoes[0].n} salva.`); },
+    restaurar: () => { restaurar(+b.dataset.n); avisar(`Voltou para a versão ${b.dataset.n}.`); },
+    designer: () => mover("prova", "Designer devolveu a prova (simulação da demonstração)"),
+    aprovar: () => { mover("aprovado", "Você aprovou a arte"); avisar("Arte aprovada. Nada foi enviado de verdade."); },
+    ajuste, reabrir: () => mover("rascunho", "Arte reaberta para ajustes"),
+    rotulo: () => { const p = PRODUTOS.find(x => x.id === b.dataset.id), c = novoCanvas(2000, 300); pintarFaixa(c, m, rotuloDe(p)); baixarCanvas(c, `rotulo-${slug(p.nome)}-${slug(MARCA.nome(m))}.png`); },
+    zip: () => exportar(b)
+  }[b.dataset.acao];
+  if (acao) { acao(); if (anima && ["aprovar", "designer", "enviar"].includes(b.dataset.acao)) G.fromTo("[data-status]", { scale: 1.04 }, { scale: 1, duration: 0.5, ease: "elastic.out(1,0.4)" }); }
+});
+// setas trocam de aba (padrão de abas acessíveis)
+$(".palco .tabs").addEventListener("keydown", e => {
+  if (!["ArrowRight", "ArrowLeft"].includes(e.key)) return;
+  const tabs = $$("[data-vista]"), i = tabs.indexOf(document.activeElement);
+  if (i < 0) return;
+  const prox = tabs[(i + (e.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length];
+  prox.focus(); prox.click();
+});
+
+montarOpcoes(); render();
+// as fontes do logotipo chegam depois: redesenha quando carregarem
+Promise.all(['700 100px "Playfair Display"', '700 100px "Barlow Condensed"', '600 40px "Barlow"'].map(f => document.fonts.load(f))).then(render);
+revelar();
+if (anima) G.from(".controles, .palco", { opacity: 0, y: 30, duration: 0.8, stagger: 0.12, ease: "power3.out", delay: 0.15 });
+</script>
+</body>
+</html>

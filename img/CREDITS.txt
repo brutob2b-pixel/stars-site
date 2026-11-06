@@ -1,0 +1,16 @@
+top_hat.glb
+"Top hat" por Filip (@filip.hans.nyberg), Sketchfab
+https://sketchfab.com/3d-models/top-hat-acc9845b7c48479c9b23d93d3643612f
+Licença: CC BY 4.0 (uso comercial permitido, com crédito ao autor)
+Baixado em 23/10/2026. Feltro e fita recoloridos no código.
+
+Tabler Icons (MIT) - https://tabler.io/icons - icones.js
+cadeira-tijolo.webp — foto de Nathon Oski na Unsplash (unsplash.com/photos/EW_rqoSdDes), Licença Unsplash (uso comercial permitido)
+cliente-cadeira.webp — foto de Allef Vinicius na Unsplash (unsplash.com/photos/IvQeAVeJULw), Licença Unsplash (uso comercial permitido)
+navalha.webp — foto de Agustin Fernandez na Unsplash (unsplash.com/photos/1Pmp9uxK8X8), Licença Unsplash (uso comercial permitido)
+salao-luzes.webp — foto de Jason Leung na Unsplash (unsplash.com/photos/2seUdPQNy_I), Licença Unsplash (uso comercial permitido)
+cadeira-prata.webp — foto de Joshua Lawrence na Unsplash (unsplash.com/photos/dU6eE_j2My8), Licença Unsplash (uso comercial permitido)
+barba-pb.webp — foto de Nathon Oski na Unsplash (unsplash.com/photos/fE42nRlBcG8), Licença Unsplash (uso comercial permitido)
+secador.webp — foto de delfina pan na Unsplash (unsplash.com/photos/wJoB8D3hnzc), Licença Unsplash (uso comercial permitido)
+
+prova-prateleira.webp, prova-balcao.webp, prova-bancada.webp — imagens geradas por IA (ilustrativas, não são barbearias reais); trocar por fotos reais das barbearias piloto

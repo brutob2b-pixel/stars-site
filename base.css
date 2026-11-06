@@ -1,0 +1,126 @@
+/* Base das páginas internas (Loja, Estúdio de marca, Marketing, Painel). Mesmas cores, luz de fundo e vidro da home.
+   PROVISÓRIO até o brandbook. */
+:root{
+  --bg:#0E0D0B; --bg-2:#17150F; --surface:#1B1710; --line:#3A352C;
+  --text:#F1ECE2; --muted:#A39C90; --accent:#D9A441; --accent-2:#F0C46A;
+  --wa:#25D366; --warn:#E8B04B; --ok:#6FCF97;
+  --gutter:16px; --maxw:1240px;
+  --f-body:"Barlow",system-ui,sans-serif; --f-disp:"Barlow Condensed","Barlow",system-ui,sans-serif;
+  --glass:linear-gradient(140deg,rgba(255,255,255,.10),rgba(255,255,255,.025) 42%,rgba(255,255,255,.06)),rgba(28,24,17,.42);
+  --glass-line:rgba(255,255,255,.13);
+  --glass-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 1px 0 0 rgba(255,255,255,.06),inset 0 -1px 0 rgba(255,255,255,.03),0 20px 44px -20px rgba(0,0,0,.75);
+  --glass-blur:blur(20px) saturate(170%);
+}
+*{box-sizing:border-box}
+html{scrollbar-gutter:stable}
+html,body{margin:0;background:var(--bg);color:var(--text);overflow-x:clip}
+body{font:400 16px/1.55 var(--f-body);-webkit-font-smoothing:antialiased;min-height:100svh;display:flex;flex-direction:column}
+body>main{flex:1;position:relative;z-index:1;width:100%}
+a{color:inherit}
+h1,h2,h3{font-family:var(--f-disp);font-weight:700;line-height:.95;margin:0;letter-spacing:-.01em;text-transform:uppercase}
+h1{font-size:clamp(42px,6vw,88px)}
+h2{font-size:clamp(30px,3.6vw,48px)}
+h3{font-size:22px;line-height:1.05}
+p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+.muted{color:var(--muted)}
+.eyebrow{font:600 13px/1 var(--f-body);letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--gutter)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* fundo: luz quente, contraluz verde, vinheta e grão (igual à home) */
+.atmos{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(40vmax 40vmax at 78% 30%,rgba(217,164,65,.20),rgba(217,164,65,.06) 45%,transparent 72%),
+    radial-gradient(60vmax 48vmax at 4% 106%,rgba(37,144,72,.18),transparent 62%),
+    radial-gradient(50vmax 35vmax at 96% -6%,rgba(240,196,106,.10),transparent 60%),
+    radial-gradient(130% 95% at 50% 42%,transparent 52%,rgba(0,0,0,.6) 100%)}
+.atmos::after{content:"";position:absolute;inset:0;opacity:.07;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* vidro estilo iOS */
+.glass,.panel{background:var(--glass);border:1px solid var(--glass-line);box-shadow:var(--glass-shadow);
+  -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);border-radius:20px}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  :root{--glass:linear-gradient(140deg,rgba(255,255,255,.08),rgba(255,255,255,.02)),rgba(28,24,17,.92)}
+}
+
+/* botões */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:46px;padding:0 20px;border-radius:999px;border:1px solid var(--accent);
+  font:600 15px/1 var(--f-body);text-decoration:none;cursor:pointer;background:transparent;color:var(--text);transition:background .2s,color .2s,border-color .2s;white-space:nowrap}
+.btn:hover{background:var(--accent);color:var(--bg)}
+.btn-solid{background:var(--accent);color:var(--bg)}
+.btn-solid:hover{background:var(--accent-2)}
+.btn-ghost{border-color:var(--glass-line);background:rgba(255,255,255,.04)}
+.btn-ghost:hover{background:rgba(255,255,255,.1);color:var(--text);border-color:rgba(255,255,255,.3)}
+.btn-wa{background:var(--wa);border-color:var(--wa);color:#08130c}
+.btn-sm{min-height:38px;padding:0 14px;font-size:14px}
+.btn[disabled],.btn[aria-disabled="true"]{opacity:.5;cursor:not-allowed;background:transparent;color:var(--text)}
+.btn .ico{width:18px;height:18px}
+:focus-visible{outline:2px solid var(--accent-2);outline-offset:3px}
+.tag{display:inline-block;padding:4px 10px;border-radius:999px;border:1px solid var(--warn);color:var(--warn);font:600 11px/1.2 var(--f-body);letter-spacing:.08em;text-transform:uppercase}
+.tag-ok{border-color:var(--accent);color:var(--accent)}
+/* valor de exemplo: sublinhado pontilhado (a faixa do topo explica) */
+.ph{color:inherit;font-weight:600;text-decoration:underline dotted var(--warn);text-underline-offset:3px}
+.ico{width:24px;height:24px;flex:none}
+
+/* faixa de demonstração */
+.draft{position:relative;z-index:30;background:#3b2a0a;color:#ffd98a;font:500 13px/1.4 var(--f-body);text-align:center;padding:8px var(--gutter)}
+
+/* topo */
+.top{position:sticky;top:0;z-index:20;-webkit-backdrop-filter:blur(14px) saturate(160%);backdrop-filter:blur(14px) saturate(160%);
+  background:color-mix(in srgb,var(--bg) 66%,transparent);border-bottom:1px solid rgba(255,255,255,.08)}
+.top .wrap{position:relative;display:flex;align-items:center;justify-content:space-between;height:64px;gap:12px}
+.logo{font:700 24px/1 var(--f-disp);letter-spacing:.06em;text-transform:uppercase;text-decoration:none}
+.logo small{display:block;font:500 10px/1.2 var(--f-body);letter-spacing:.14em;color:var(--muted)}
+.top nav{display:flex;gap:4px;font-size:15px}
+.top nav a{text-decoration:none;color:var(--muted);padding:8px 12px;border-radius:999px;transition:color .2s,background .2s}
+.top nav a[aria-current="page"]{color:var(--text);background:rgba(255,255,255,.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
+.top nav a:hover{color:var(--text)}
+.top .right{display:flex;gap:8px;align-items:center}
+.count{min-width:22px;height:22px;border-radius:999px;background:var(--bg);color:var(--accent-2);font:700 12px/22px var(--f-body);text-align:center;padding:0 6px}
+.menu-btn{display:none}
+@media (max-width:980px){
+  .top nav{display:none;position:absolute;top:64px;left:var(--gutter);right:var(--gutter);flex-direction:column;padding:10px;border-radius:20px;
+    background:var(--glass),rgba(14,13,11,.75);border:1px solid var(--glass-line);box-shadow:var(--glass-shadow);-webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur)}
+  .top nav.open{display:flex}
+  .top nav a{padding:12px 14px;font-size:17px}
+  .menu-btn{display:inline-flex}
+  .logo small{display:none}
+}
+@media (max-width:420px){.top .right .btn{padding:0 12px}.top .hide-sm{display:none}}
+
+/* abas e chips */
+.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tabs button,.chip{min-height:40px;padding:0 16px;border-radius:999px;border:1px solid var(--glass-line);background:rgba(255,255,255,.04);cursor:pointer;font-weight:500;color:var(--muted);transition:color .2s,border-color .2s,background .2s}
+.tabs button:hover,.chip:hover{color:var(--text)}
+.tabs button[aria-selected="true"],.chip[aria-pressed="true"]{color:var(--text);border-color:var(--accent);background:color-mix(in srgb,var(--accent) 18%,transparent)}
+
+/* campos */
+.field{display:flex;flex-direction:column;gap:6px}
+.field label,.field>span{font-size:13px;color:var(--muted)}
+.field input,.field select,.field textarea,.input{height:48px;border-radius:14px;border:1px solid var(--glass-line);background:rgba(255,255,255,.05);color:var(--text);padding:0 14px;font-size:16px;width:100%}
+.field textarea{height:auto;min-height:96px;padding:12px 14px;resize:vertical}
+.field input:focus,.field select:focus,.field textarea:focus,.input:focus{border-color:var(--accent);outline:none}
+.field select option{background:var(--bg-2)}
+
+/* cabeçalho de página */
+.page-head{padding:56px 0 28px;display:grid;gap:14px;max-width:760px}
+.page-head p{color:var(--muted);font-size:18px}
+.section{padding:28px 0}
+.section-head{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px;margin-bottom:18px}
+
+/* rodapé */
+footer.site{position:relative;z-index:1;border-top:1px solid rgba(255,255,255,.08);padding:28px 0;margin-top:64px;font-size:13px;color:var(--muted);background:rgba(14,13,11,.6)}
+footer.site .cols{display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between}
+footer.site a{color:var(--muted)}
+
+/* aparecer na rolagem (o site.js anima com GSAP; sem GSAP ou com movimento reduzido, tudo aparece parado) */
+.js [data-reveal]{opacity:0;transform:translateY(24px)}
+.js [data-reveal].in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.js [data-reveal]{opacity:1;transform:none}}
+
+/* aviso flutuante */
+.toast{position:fixed;left:50%;bottom:24px;z-index:60;transform:translateX(-50%);padding:12px 18px;border-radius:999px;font-weight:600;font-size:14px;
+  background:var(--glass),rgba(14,13,11,.75);border:1px solid var(--glass-line);box-shadow:var(--glass-shadow);-webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
+  max-width:calc(100% - 32px);text-align:center}

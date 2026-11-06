@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>UP·Base — Documentação</title>
+  <script src="config.js"></script>
+  <script src="nav.js"></script>
+  <script src="suite-data.js"></script>
+  <script src="demo-data.js"></script>
+  <style>
+    .base-content { flex:1;overflow:hidden;display:flex; }
+    .base-sidebar { width:260px;min-width:260px;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden; }
+    .base-sidebar-header { padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between; }
+    .base-sidebar-title { font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.04em; }
+    .base-list { flex:1;overflow-y:auto; }
+    .base-item { padding:11px 16px;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;transition:background .1s; }
+    .base-item:hover { background:rgba(255,255,255,.02); }
+    .base-item.active { background:var(--teal-12); }
+    .base-item-title { font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px; }
+    .base-item-meta  { font-size:11px;color:var(--dim); }
+    .base-category   { font-size:10px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;padding:10px 16px 5px;color:var(--dim); }
+
+    .base-editor { flex:1;display:flex;flex-direction:column;overflow:hidden; }
+    .base-editor-header { padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0; }
+    .base-editor-title { font-family:'Syne',sans-serif;font-weight:700;font-size:18px;letter-spacing:-.03em; }
+    .base-editor-body { flex:1;overflow-y:auto;padding:24px; }
+    .sop-section { margin-bottom:24px; }
+    .sop-section-title { font-size:13px;font-weight:600;color:var(--teal);margin-bottom:10px;display:flex;align-items:center;gap:6px; }
+    .sop-step { display:flex;gap:12px;margin-bottom:10px; }
+    .sop-step-num { width:22px;height:22px;background:var(--teal-12);color:var(--teal);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;font-family:'Syne',sans-serif; }
+    .sop-step-text { font-size:13px;color:var(--muted);line-height:1.6;padding-top:2px; }
+    .sop-note { background:var(--bg3);border-left:2px solid var(--teal);padding:10px 14px;border-radius:0 6px 6px 0;font-size:12px;color:var(--muted);line-height:1.6; }
+
+    .empty-doc { display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;color:var(--dim); }
+    .empty-doc h3 { font-family:'Syne',sans-serif;font-weight:700;font-size:16px;color:var(--muted); }
+
+    .modal-overlay { position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:1000;backdrop-filter:blur(4px); }
+    .modal-overlay.hidden { display:none; }
+    .modal { background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px;width:480px;max-width:90vw; }
+    .modal-title { font-family:'Syne',sans-serif;font-weight:700;font-size:16px;letter-spacing:-.02em;margin-bottom:20px; }
+    .form-group { margin-bottom:14px; }
+    .form-label { display:block;font-size:12px;color:var(--muted);margin-bottom:5px; }
+    .form-actions { display:flex;gap:8px;justify-content:flex-end;margin-top:20px; }
+  </style>
+</head>
+<body>
+<div class="suite-layout">
+  <aside id="suite-sidebar" class="suite-sidebar"></aside>
+  <main class="suite-main">
+    <div class="module-header">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div>
+          <h1 class="module-title">UP <span class="dash">—</span> Base</h1>
+          <p class="module-subtitle">Documentação & SOPs · conhecimento da operação</p>
+        </div>
+        <button class="btn btn-primary" onclick="openModal()" style="margin-top:4px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Novo documento
+        </button>
+      </div>
+    </div>
+
+    <div class="base-content">
+      <div class="base-sidebar">
+        <div class="base-sidebar-header">
+          <span class="base-sidebar-title">Documentos</span>
+          <span id="doc-count" style="font-size:11px;color:var(--dim);"></span>
+        </div>
+        <div class="base-list" id="base-list"></div>
+      </div>
+      <div class="base-editor">
+        <div class="base-editor-header" id="editor-header" style="display:none;">
+          <div>
+            <div class="base-editor-title" id="editor-title"></div>
+            <div style="font-size:12px;color:var(--dim);margin-top:3px;" id="editor-meta"></div>
+          </div>
+        </div>
+        <div class="base-editor-body" id="editor-body">
+          <div class="empty-doc">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" style="color:var(--dim)"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <h3>Selecione um documento</h3>
+            <p style="font-size:13px;">ou crie um novo SOP, processo ou política</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="modal-overlay hidden" id="modal-doc" onclick="closeModalBg(event)">
+  <div class="modal">
+    <div class="modal-title" id="d-modal-title">Novo documento</div>
+    <div class="form-group"><label class="form-label">Título</label><input class="input" id="d-titulo" type="text" placeholder="Ex: SOP de Onboarding de Cliente"/></div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Categoria</label>
+        <select class="input" id="d-cat">
+          <option>Processos</option><option>SOPs</option><option>Políticas</option><option>Vendas</option><option>Operação</option><option>Financeiro</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Responsável</label><input class="input" id="d-resp" type="text" placeholder="Rafael"/></div>
+    </div>
+    <div class="form-group"><label class="form-label">Conteúdo (etapas, uma por linha)</label><textarea class="input" id="d-content" rows="7" placeholder="Passo 1: Fazer X&#10;Passo 2: Verificar Y&#10;Passo 3: Confirmar com Z" style="resize:vertical;"></textarea></div>
+    <div class="form-group"><label class="form-label">Observação (opcional)</label><input class="input" id="d-nota" type="text" placeholder="Regra de ouro, exceção, meta de tempo…"/></div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveDoc()">Salvar</button>
+    </div>
+  </div>
+</div>
+<div id="toast-container"></div>
+<script>
+const { U } = Suite;
+const esc = U.esc;
+
+let docs=[], activeId=null, editId=null;
+
+async function init() { await refresh(); }
+
+async function refresh() {
+  docs = await store.load('docs');
+  renderList();
+  renderDoc();
+}
+
+function renderList() {
+  const cats = [...new Set(docs.map(d=>d.categoria))];
+  document.getElementById('doc-count').textContent = docs.length + ' docs';
+  document.getElementById('base-list').innerHTML = cats.map(cat => `
+    <div class="base-category">${esc(cat)}</div>
+    ${docs.filter(d=>d.categoria===cat).map(d=>`
+      <div class="base-item ${d.id===activeId?'active':''}" onclick="selectDoc('${d.id}')">
+        <div class="base-item-title">${esc(d.titulo)}</div>
+        <div class="base-item-meta">${esc(d.responsavel)} · ${U.fmtDate(d.atualizado)}</div>
+      </div>`).join('')}`).join('');
+}
+
+function selectDoc(id) { activeId=id; renderList(); renderDoc(); }
+
+function renderDoc() {
+  const d=docs.find(x=>x.id===activeId);
+  const header=document.getElementById('editor-header'), body=document.getElementById('editor-body');
+  if(!d) {
+    activeId=null;
+    header.style.display='none';
+    body.innerHTML=`
+      <div class="empty-doc">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" style="color:var(--dim)"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <h3>${docs.length ? 'Selecione um documento' : 'Nenhum documento ainda'}</h3>
+        <p style="font-size:13px;">${docs.length ? 'ou crie um novo SOP, processo ou política' : 'Crie o primeiro em "Novo documento" ou comece pelos modelos da UP Co.'}</p>
+        ${docs.length ? '' : `<button class="btn btn-ghost" onclick="importTemplates()">Carregar modelos de SOP</button>`}
+      </div>`;
+    return;
+  }
+  header.style.display='flex';
+  document.getElementById('editor-title').textContent=d.titulo;
+  document.getElementById('editor-meta').textContent=`${d.categoria} · Responsável: ${d.responsavel} · Atualizado: ${U.fmtDate(d.atualizado)}`;
+  body.innerHTML=`
+    <div class="sop-section">
+      <div class="sop-section-title"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> Etapas</div>
+      ${(d.steps||[]).map((s,i)=>`<div class="sop-step"><div class="sop-step-num">${i+1}</div><div class="sop-step-text">${esc(s)}</div></div>`).join('') || '<div class="sop-step-text">Nenhuma etapa registrada.</div>'}
+    </div>
+    ${d.nota?`<div class="sop-note">📌 ${esc(d.nota)}</div>`:''}
+    <div style="display:flex;gap:8px;margin-top:24px;">
+      <button class="btn btn-ghost btn-sm" onclick="openModal('${d.id}')">Editar</button>
+      <button class="icon-btn danger" onclick="deleteDoc('${d.id}')">Excluir</button>
+    </div>`;
+}
+
+async function importTemplates() {
+  await store.mutate('docs', list => { window.SUITE_TEMPLATES.docs.forEach(t => list.push({ ...t, id:U.uid('d') })); });
+  await refresh();
+  toast('Modelos carregados — edite para a realidade da empresa', 'success');
+}
+
+function openModal(id) {
+  const d = id ? docs.find(x=>x.id===id) : null;
+  editId = d?.id || null;
+  document.getElementById('d-modal-title').textContent = d ? 'Editar documento' : 'Novo documento';
+  document.getElementById('d-titulo').value  = d?.titulo || '';
+  document.getElementById('d-content').value = (d?.steps || []).join('\n');
+  document.getElementById('d-resp').value    = d?.responsavel || 'Rafael';
+  document.getElementById('d-nota').value    = d?.nota || '';
+  if (d) document.getElementById('d-cat').value = d.categoria;
+  document.getElementById('modal-doc').classList.remove('hidden');
+  document.getElementById('d-titulo').focus();
+}
+function closeModal() { document.getElementById('modal-doc').classList.add('hidden'); }
+function closeModalBg(e) { if(e.target.classList.contains('modal-overlay')) closeModal(); }
+
+async function saveDoc() {
+  const titulo=document.getElementById('d-titulo').value.trim();
+  if(!titulo){toast('Informe o título','warn');return;}
+  const fields={ titulo, categoria:document.getElementById('d-cat').value, responsavel:document.getElementById('d-resp').value.trim()||'Rafael', atualizado:U.today(),
+    steps:document.getElementById('d-content').value.split('\n').map(s=>s.trim()).filter(Boolean), nota:document.getElementById('d-nota').value.trim() };
+  const id = editId || U.uid('d');
+  await store.mutate('docs', list => {
+    const d = list.find(x=>x.id===id);
+    if (d) Object.assign(d, fields); else list.unshift({ id, ...fields });
+  });
+  closeModal();
+  activeId = id;
+  await refresh();
+  toast(`"${titulo}" salvo`, 'success');
+}
+
+async function deleteDoc(id) {
+  const d=docs.find(x=>x.id===id);
+  if(!d || !confirm(`Excluir o documento "${d.titulo}"? Esta ação não pode ser desfeita.`)) return;
+  await store.mutate('docs', list => list.filter(x=>x.id!==id));
+  await refresh();
+  toast('Documento excluído', 'success');
+}
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Loja</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="base.css">
+<style>
+/* topo da loja: texto e busca à esquerda, foto com a linha da marca à direita */
+.hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:28px;align-items:center;padding:44px 0 20px}
+.hero h1{font-size:clamp(44px,5.6vw,84px)}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero .lead{color:var(--muted);font-size:18px;margin:18px 0 22px;max-width:34em}
+.busca{position:relative;display:block;max-width:520px}
+.busca .ico{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--muted);width:20px;height:20px}
+.busca input{height:56px;padding-left:46px;border-radius:999px;font-size:17px}
+.atalhos{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.foto{position:relative;border-radius:28px;overflow:hidden;aspect-ratio:4/3.4;border:1px solid var(--glass-line);box-shadow:0 40px 80px -40px rgba(0,0,0,.9)}
+.foto img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.85) brightness(.75)}
+.foto::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%,rgba(10,9,7,.85))}
+.foto .linha{position:absolute;left:14px;right:14px;bottom:14px;z-index:1;padding:14px 16px 10px;display:grid;gap:4px}
+.foto .linha .embs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;align-items:end}
+.foto .linha small{color:var(--muted);font-size:12px}
+
+/* faixa da linha com a sua marca */
+.faixa{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(150px,1fr);gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 2px 14px;scrollbar-width:thin}
+.faixa a{scroll-snap-align:start;text-decoration:none;padding:12px 12px 14px;text-align:center;display:grid;gap:4px;transition:transform .3s}
+.faixa a:hover{transform:translateY(-4px)}
+.faixa a b{font:700 16px/1.05 var(--f-disp);text-transform:uppercase}
+.faixa a small{color:var(--muted);font-size:12px}
+.emb{width:100%;height:auto;display:block;overflow:visible}
+.combo{position:relative;display:block;width:100%}
+.combo svg.emb:first-child{width:84%}
+.combo svg.emb+svg.emb{position:absolute;right:-2%;bottom:-2%;width:40%;filter:drop-shadow(0 8px 10px rgba(0,0,0,.6))}
+.pdp .vitr .combo{max-width:380px}
+.mini .combo svg.emb+svg.emb,.voo .combo svg.emb+svg.emb{display:none}
+.mini .combo svg.emb:first-child,.voo .combo svg.emb:first-child{width:100%}
+
+/* catálogo */
+.catalogo{display:grid;grid-template-columns:240px minmax(0,1fr);gap:22px;align-items:start}
+.filtros{position:sticky;top:84px;padding:16px;display:grid;gap:14px}
+.filtros h3{font-size:15px;letter-spacing:.1em;color:var(--muted)}
+.cats{display:grid;gap:2px}
+.cats button{display:flex;justify-content:space-between;gap:8px;padding:9px 12px;border-radius:12px;border:0;background:none;cursor:pointer;color:var(--muted);text-align:left}
+.cats button:hover{color:var(--text);background:rgba(255,255,255,.05)}
+.cats button[aria-pressed="true"]{color:var(--text);background:color-mix(in srgb,var(--accent) 18%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 60%,transparent)}
+.cats small{opacity:.7}
+.check{display:flex;gap:10px;align-items:center;font-size:14px;color:var(--muted);cursor:pointer}
+.check input{width:18px;height:18px;accent-color:var(--accent)}
+.barra{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:14px}
+.barra select{height:42px;border-radius:999px;padding:0 14px;width:auto}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+.prod{display:flex;flex-direction:column;overflow:hidden;position:relative}
+.prod .img{position:relative;aspect-ratio:1/1;display:grid;place-items:center;cursor:pointer;border:0;padding:12px;background:radial-gradient(circle at 50% 42%,rgba(217,164,65,.16),rgba(0,0,0,0) 62%);color:var(--accent-2)}
+.prod .img .emb{width:86%}
+.prod .img .ico{width:44%;height:auto;stroke-width:1.1}
+.prod .selo{position:absolute;top:10px;left:10px;z-index:1;padding:4px 9px;border-radius:999px;font:600 11px/1.2 var(--f-body);letter-spacing:.06em;text-transform:uppercase;background:rgba(14,13,11,.7);border:1px solid color-mix(in srgb,var(--accent) 60%,transparent);color:var(--accent-2)}
+.prod .body{padding:4px 14px 14px;display:flex;flex-direction:column;gap:4px;flex:1}
+.prod .cat{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.prod h3{font-size:19px}
+.prod .det{font-size:13px;color:var(--muted)}
+.prod .preco{margin-top:auto;padding-top:8px;font-weight:600;font-size:14px}
+.prod .acts{display:flex;gap:8px;margin-top:8px}
+.prod .acts .btn{flex:1;min-height:40px;padding:0 12px;font-size:14px}
+.vazio{padding:40px;text-align:center;color:var(--muted)}
+.ex{display:inline-block;padding:1px 7px;border-radius:999px;border:1px solid var(--glass-line);color:var(--muted);font:600 10px/1.5 var(--f-body);letter-spacing:.06em;text-transform:uppercase;vertical-align:middle}
+
+/* página do produto (janela) e checkout */
+dialog.janela{width:min(980px,calc(100% - 24px));max-height:calc(100svh - 24px);padding:0;border:1px solid var(--glass-line);border-radius:24px;color:var(--text);
+  background:linear-gradient(160deg,rgba(255,255,255,.08),rgba(255,255,255,.02) 40%),rgba(20,18,13,.72);-webkit-backdrop-filter:blur(30px) saturate(170%);backdrop-filter:blur(30px) saturate(170%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 50px 100px -30px rgba(0,0,0,.9);overflow:auto}
+dialog.janela::backdrop{background:rgba(5,5,4,.6);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.x{position:sticky;top:12px;float:right;margin:12px 12px 0 0;z-index:2;width:44px;height:44px;border-radius:50%;border:1px solid var(--glass-line);background:rgba(14,13,11,.6);color:var(--text);font-size:22px;cursor:pointer}
+.pdp{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;padding:28px}
+.pdp .vitr{border-radius:20px;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at 50% 45%,rgba(217,164,65,.22),rgba(0,0,0,0) 65%),rgba(0,0,0,.25);color:var(--accent-2);min-height:320px}
+.pdp .vitr .emb{width:min(100%,360px)}
+.pdp .vitr .ico{width:46%;height:auto;stroke-width:1}
+.pdp h2{font-size:clamp(32px,4vw,52px);margin-top:8px}
+.pdp .desc{color:var(--muted);margin-top:12px}
+.specs{list-style:none;margin:18px 0;padding:0;display:grid;gap:0;border-top:1px solid rgba(255,255,255,.08)}
+.specs li{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:14px}
+.specs span{color:var(--muted)}
+.specs b{text-align:right}
+.qtd{display:inline-flex;align-items:center;border:1px solid var(--glass-line);border-radius:999px;overflow:hidden}
+.qtd button{width:44px;height:44px;border:0;background:none;cursor:pointer;font-size:18px;color:var(--text)}
+.qtd output{min-width:36px;text-align:center;font-weight:600}
+.compra{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:8px}
+.relac{padding:0 28px 28px}
+.relac .grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.relac .prod .acts{display:none}
+
+/* carrinho lateral */
+.cart{position:fixed;inset:0 0 0 auto;width:min(440px,100%);z-index:40;display:flex;flex-direction:column;transform:translateX(105%);
+  background:linear-gradient(160deg,rgba(255,255,255,.08),rgba(255,255,255,.02) 40%),rgba(20,18,13,.78);-webkit-backdrop-filter:blur(30px) saturate(170%);backdrop-filter:blur(30px) saturate(170%);
+  border-left:1px solid var(--glass-line);box-shadow:inset 1px 0 0 rgba(255,255,255,.12),-40px 0 80px -30px rgba(0,0,0,.8)}
+.cart[data-open="true"]{transform:none}
+@media (prefers-reduced-motion:no-preference){.cart{transition:transform .45s cubic-bezier(.2,.8,.2,1)}}
+.shade{position:fixed;inset:0;z-index:39;background:rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .3s}
+.shade[data-open="true"]{opacity:1;pointer-events:auto}
+.cart header{display:flex;justify-content:space-between;align-items:center;padding:16px var(--gutter);border-bottom:1px solid rgba(255,255,255,.08)}
+.cart header .x{position:static;float:none;margin:0}
+.cart ul{list-style:none;margin:0;padding:6px var(--gutter);overflow:auto;flex:1}
+.cart li{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:4px 12px;align-items:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.cart .mini{grid-row:span 2;width:64px;height:64px;border-radius:14px;display:grid;place-items:center;background:rgba(255,255,255,.04);color:var(--accent-2)}
+.cart .mini .emb{width:60px}.cart .mini .ico{width:30px;height:30px}
+.cart li small{color:var(--muted);display:block;font-size:12px}
+.cart .qtd button{width:34px;height:34px}
+.rm{background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:12px;padding:0;justify-self:start}
+.cart .foot{padding:14px var(--gutter) calc(18px + env(safe-area-inset-bottom));border-top:1px solid rgba(255,255,255,.08);display:grid;gap:8px}
+.linha-tot{display:flex;justify-content:space-between;gap:12px;font-size:14px}
+.linha-tot.forte{font-weight:600;font-size:16px}
+.cart-vazio{padding:40px 0;text-align:center;color:var(--muted)}
+
+/* checkout */
+.ck{padding:28px;display:grid;gap:18px}
+.ck-passos{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;list-style:none;margin:0;padding:0}
+.ck-passos li{font:600 11px/1.2 var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.ck-passos li::before{content:"";display:block;height:3px;border-radius:3px;margin-bottom:7px;background:var(--line)}
+.ck-passos li.on{color:var(--text)}.ck-passos li.on::before{background:var(--accent)}
+.ck-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.ck-grid .full{grid-column:1/-1}
+.ck-grid[hidden]{display:none}
+.opcoes{display:grid;gap:10px}
+.opcao{display:flex;gap:14px;align-items:flex-start;padding:14px 16px;border-radius:16px;border:1px solid var(--glass-line);background:rgba(255,255,255,.03);cursor:pointer}
+.opcao:has(input:checked){border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.opcao:has(input:disabled){opacity:.5;cursor:not-allowed}
+.opcao input{margin-top:3px;accent-color:var(--accent);width:18px;height:18px}
+.opcao small{display:block;color:var(--muted)}
+.pix{display:grid;grid-template-columns:132px 1fr;gap:16px;align-items:center;padding:14px;border-radius:16px;border:1px dashed var(--warn)}
+.pix svg{width:132px;height:132px;background:#F1ECE2;border-radius:10px;padding:8px}
+.ck-erro{color:#ff9b8a;font-size:14px;min-height:1.2em}
+.ck-foot{display:flex;gap:10px;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,.08);padding-top:16px}
+.ck-foot [hidden]{display:none}
+.ok-ico{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--bg);font-size:30px;font-weight:700}
+.resumo-ck{list-style:none;margin:0;padding:0}
+.resumo-ck li{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:14px}
+.resumo-ck b{text-align:right;overflow-wrap:anywhere}
+
+/* item voando para o carrinho */
+.voo{position:fixed;z-index:70;pointer-events:none;width:80px;height:80px;display:grid;place-items:center;color:var(--accent-2)}
+.voo .emb{width:80px}.voo .ico{width:44px;height:44px}
+
+@media (max-width:900px){
+  .hero{grid-template-columns:1fr}
+  .catalogo{grid-template-columns:1fr}
+  .filtros{position:static;padding:12px}
+  .cats{grid-auto-flow:column;grid-auto-columns:max-content;overflow-x:auto;gap:6px;padding-bottom:4px}
+  .cats button{border:1px solid var(--glass-line);border-radius:999px;white-space:nowrap}
+  .filtros h3{display:none}
+  .pdp{grid-template-columns:1fr;padding:18px}
+  .relac{padding:0 18px 18px}
+  .ck{padding:18px}
+}
+@media (max-width:520px){
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .prod h3{font-size:16px}
+  .prod .acts{flex-direction:column}
+  .ck-grid{grid-template-columns:1fr}
+  .pix{grid-template-columns:1fr;justify-items:center;text-align:center}
+  .foto{aspect-ratio:4/3.8}
+}
+</style>
+</head>
+<body data-pagina="loja">
+<template data-top>
+  <button class="btn btn-solid btn-sm" type="button" data-open-cart aria-haspopup="dialog">Carrinho <span class="count" data-count>0</span></button>
+</template>
+
+<main class="wrap">
+  <section class="hero">
+    <div>
+      <p class="eyebrow" data-reveal>Loja para barbearias</p>
+      <h1 data-reveal style="margin-top:14px">Tudo para a bancada. <em>Com a sua marca</em> no balcão.</h1>
+      <p class="lead" data-reveal>Peça a linha com o nome da casa e os itens do dia a dia num carrinho só. Cada pedido aparece no seu painel, etapa por etapa.</p>
+      <label class="busca" data-reveal><span class="sr">Buscar produtos</span><span data-ico="sparkles"></span><input class="input" type="search" placeholder="Buscar: navalhete, argila, capa…" data-busca autocomplete="off"></label>
+      <div class="atalhos" data-reveal data-atalhos></div>
+    </div>
+    <div class="foto" data-reveal>
+      <img src="img/fotos/cadeira-tijolo.webp" alt="Cadeira de barbeiro de couro preto diante de parede de tijolos" loading="eager">
+      <div class="linha glass">
+        <div class="embs" data-hero-embs></div>
+        <small>A linha com <strong data-marca-nome></strong>. <a href="marca.html">Mudar no Estúdio →</a></small>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div><p class="eyebrow">Sua linha</p><h2 style="margin-top:10px">Marca própria</h2></div>
+      <a class="btn btn-ghost btn-sm" href="marca.html">Personalizar a arte</a>
+    </div>
+    <div class="faixa" data-faixa></div>
+  </section>
+
+  <section class="section" id="catalogo">
+    <div class="catalogo">
+      <aside class="filtros glass" aria-label="Filtros">
+        <h3>Categorias</h3>
+        <div class="cats" data-cats></div>
+        <label class="check"><input type="checkbox" data-so-marca> Só marca própria</label>
+        <label class="check"><input type="checkbox" data-so-destaque> Só destaques</label>
+      </aside>
+      <div>
+        <div class="barra">
+          <p class="muted" data-contagem aria-live="polite"></p>
+          <label class="field" style="flex-direction:row;align-items:center;gap:8px"><span>Ordenar</span>
+            <select class="input" data-ordem><option value="rel">Relevância</option><option value="az">Nome A–Z</option><option value="za">Nome Z–A</option><option value="novo">Novidades primeiro</option></select>
+          </label>
+        </div>
+        <div class="grid" data-grid></div>
+        <p class="muted" style="font-size:13px;margin-top:16px">Preços, estoque e prazos de exemplo, só para a demonstração. Os reais vêm do fornecedor e da fábrica.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- página do produto -->
+<dialog class="janela" id="pdp" aria-labelledby="pdp-t"></dialog>
+<!-- checkout -->
+<dialog class="janela" id="ck" aria-labelledby="ck-t" style="width:min(720px,calc(100% - 24px))"></dialog>
+
+<div class="shade" data-shade></div>
+<aside class="cart" role="dialog" aria-modal="true" aria-labelledby="cart-t" aria-hidden="true" data-cart inert>
+  <header><h2 id="cart-t" style="font-size:30px">Carrinho</h2><button class="x" type="button" aria-label="Fechar carrinho" data-close>×</button></header>
+  <ul data-itens></ul>
+  <div class="foot">
+    <div class="linha-tot"><span>Subtotal <span class="ex">exemplo</span></span><span data-subtotal></span></div>
+    <div class="linha-tot"><span>Frete (São Paulo capital)</span><span class="ph" data-frete></span></div>
+    <div class="linha-tot forte"><span>Total</span><span data-total></span></div>
+    <p class="muted" style="font-size:12px" data-cart-nota></p>
+    <button class="btn btn-solid" type="button" data-finalizar>Finalizar compra</button>
+  </div>
+</aside>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/Flip.min.js"></script>
+<script src="icones.js"></script>
+<script src="marca.js"></script>
+<script src="data.js"></script>
+<script src="site.js"></script>
+<script>
+const { G, anima } = SITE;
+if (G && window.Flip) G.registerPlugin(Flip);
+const marca = MARCA.load();
+const byId = id => PRODUTOS.find(p => p.id === id);
+const pomadaDe = p => POMADAS.find(x => x.id === p.pomada);
+// pomadas: embalagem fechada + potinho aberto mostrando a cor e a textura da massa
+const imagem = p => !p.emb ? icone(p.ico)
+  : p.pomada ? `<span class="combo">${embalagem(p.emb, marca, { pomada: pomadaDe(p) })}${potinhoAberto(pomadaDe(p), MARCA.tema(marca))}</span>`
+  : embalagem(p.emb, marca, { rotulo: p.rotulo });
+const ORDEM_NOVO = p => (p.selo === "Novo" ? 0 : 1);
+document.title = `Loja ${BRAND}`;
+$$("[data-ico]").forEach(e => e.outerHTML = icone(e.dataset.ico));
+$$("[data-marca-nome]").forEach(e => e.textContent = MARCA.nome(marca));
+
+/* ---- topo e faixa da linha própria ---- */
+const linha = PRODUTOS.filter(p => p.tipo === "lote");
+$("[data-hero-embs]").innerHTML = ["lote-argila", "lote-oleo", "lote-shampoo", "lote-tonico"].map(id => imagem(byId(id))).join("");
+$("[data-faixa]").innerHTML = linha.map(p => `<a class="glass" href="#p-${p.id}" data-ver="${p.id}">${imagem(p)}<b>${p.nome}</b><small>${p.detalhe}</small></a>`).join("");
+$("[data-atalhos]").innerHTML = ["Argila", "Navalhete", "Capa", "Máquina", "Óleo"].map(t => `<button class="chip" type="button" data-atalho="${t}">${t}</button>`).join("");
+
+/* ---- filtros, busca e ordem ---- */
+const estado = { cat: "Todas", busca: "", soMarca: false, soDestaque: false, ordem: "rel" };
+const norm = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+function filtrados() {
+  const q = norm(estado.busca.trim());
+  let r = PRODUTOS.filter(p => (estado.cat === "Todas" || p.cat === estado.cat)
+    && (!estado.soMarca || p.tipo === "lote") && (!estado.soDestaque || p.selo)
+    && (!q || norm(`${p.nome} ${p.cat} ${p.detalhe} ${p.desc || ""}`).includes(q)));
+  if (estado.ordem === "az") r = [...r].sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+  if (estado.ordem === "za") r = [...r].sort((a, b) => b.nome.localeCompare(a.nome, "pt-BR"));
+  if (estado.ordem === "novo") r = [...r].sort((a, b) => ORDEM_NOVO(a) - ORDEM_NOVO(b));
+  return r;
+}
+function renderCats() {
+  const cats = ["Todas", ...CATEGORIAS];
+  $("[data-cats]").innerHTML = cats.map(c => {
+    const n = c === "Todas" ? PRODUTOS.length : PRODUTOS.filter(p => p.cat === c).length;
+    return `<button type="button" data-cat="${c}" aria-pressed="${c === estado.cat}">${c}<small>${n}</small></button>`;
+  }).join("");
+}
+const cartao = p => `
+  <article class="prod glass" data-id="${p.id}">
+    ${p.selo ? `<span class="selo">${p.selo}</span>` : ""}
+    <button class="img" type="button" data-ver="${p.id}" aria-label="Ver ${escHTML(p.nome)}">${imagem(p)}</button>
+    <div class="body">
+      <span class="cat">${p.cat}</span>
+      <h3>${p.nome}</h3>
+      <p class="det">${p.detalhe}</p>
+      <p class="preco">${precoTxt(p.preco)}${p.tipo === "lote" ? " / lote" : ""} <span class="ex">exemplo</span></p>
+      <div class="acts"><button class="btn btn-solid" type="button" data-add="${p.id}">${p.tipo === "lote" ? "Pedir lote" : "Adicionar"}</button><button class="btn btn-ghost" type="button" data-ver="${p.id}">Ver</button></div>
+    </div>
+  </article>`;
+function renderGrid() {
+  const grid = $("[data-grid]"), lista = filtrados();
+  const estadoFlip = anima && window.Flip ? Flip.getState(grid.children) : null;
+  grid.innerHTML = lista.length ? lista.map(cartao).join("") : `<p class="vazio">Nada encontrado para “${escHTML(estado.busca)}”. Tente outra palavra.</p>`;
+  $("[data-contagem]").textContent = `${lista.length} ${lista.length === 1 ? "produto" : "produtos"}`;
+  // cartões novos entram com fade; os que ficam deslizam para o lugar novo
+  // a grade guarda a altura nova enquanto os cartões se movem, para o rodapé não pular
+  if (estadoFlip) grid.style.height = grid.offsetHeight + "px";
+  if (estadoFlip) Flip.from(estadoFlip, { targets: grid.children, duration: 0.5, ease: "power3.inOut", absolute: true, stagger: 0.015,
+    onComplete: () => { grid.style.height = ""; },
+    onEnter: els => G.fromTo(els, { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, duration: 0.45 }),
+    onLeave: els => G.to(els, { opacity: 0, scale: 0.94, duration: 0.3 }) });
+}
+function setFiltro(mud) { Object.assign(estado, mud); renderCats(); renderGrid(); }
+renderCats(); renderGrid();
+let buscaT;
+$("[data-busca]").addEventListener("input", e => { clearTimeout(buscaT); buscaT = setTimeout(() => setFiltro({ busca: e.target.value }), 180); });
+$("[data-so-marca]").addEventListener("change", e => setFiltro({ soMarca: e.target.checked }));
+$("[data-so-destaque]").addEventListener("change", e => setFiltro({ soDestaque: e.target.checked }));
+$("[data-ordem]").addEventListener("change", e => setFiltro({ ordem: e.target.value }));
+
+/* ---- carrinho (guardado só neste navegador) ---- */
+let cart = carrinhoLer();
+const salvarCart = () => { try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch { /* sem armazenamento: vale só nesta visita */ } };
+const qtdTotal = () => Object.keys(cart).filter(byId).reduce((s, id) => s + cart[id], 0);
+function setQty(id, q) {
+  const next = { ...cart };
+  if (!(q > 0)) delete next[id]; else next[id] = Math.min(99, q);
+  cart = next; salvarCart(); renderCart();
+}
+function renderCart() {
+  const ids = Object.keys(cart).filter(byId);
+  $("[data-count]").textContent = qtdTotal();
+  $("[data-itens]").innerHTML = ids.length ? ids.map(id => {
+    const p = byId(id);
+    return `<li><span class="mini" aria-hidden="true">${imagem(p)}</span>
+      <div><strong>${p.nome}</strong><small>${p.tipo === "lote" ? "Lote com a sua marca" : p.detalhe}</small></div>
+      <div class="qtd"><button type="button" aria-label="Menos ${escHTML(p.nome)}" data-q="${id}" data-d="-1">−</button><output aria-live="polite">${cart[id]}</output><button type="button" aria-label="Mais ${escHTML(p.nome)}" data-q="${id}" data-d="1">+</button></div>
+      <button class="rm" type="button" data-rm="${id}">Remover</button><span style="font-size:13px;text-align:right">${precoTxt(p.preco * cart[id])}</span></li>`;
+  }).join("") : `<li class="cart-vazio" style="display:block">O carrinho está vazio.<br><a href="#catalogo" data-close>Ver produtos</a></li>`;
+  const temLote = ids.some(id => byId(id).tipo === "lote");
+  $("[data-cart-nota]").textContent = temLote ? "Lotes com a sua marca só entram em produção depois que você aprova a arte com o designer." : "Itens de revenda: prazo de envio a confirmar com o fornecedor.";
+  const sub = precoTxt(subtotalDe(cart));
+  $("[data-subtotal]").textContent = sub;
+  $("[data-frete]").textContent = precoTxt(ids.length ? FRETE_EXEMPLO : 0);
+  $("[data-total]").textContent = precoTxt(subtotalDe(cart) + (ids.length ? FRETE_EXEMPLO : 0));
+  $("[data-finalizar]").disabled = !ids.length;
+}
+renderCart();
+
+// o item voa do cartão até o botão do carrinho
+function voar(origem, p) {
+  const alvo = $("[data-open-cart]");
+  if (!anima || !origem || !alvo) return;
+  const a = origem.getBoundingClientRect(), b = alvo.getBoundingClientRect();
+  const v = Object.assign(document.createElement("div"), { className: "voo", innerHTML: imagem(p) });
+  document.body.append(v);
+  G.set(v, { left: a.left + a.width / 2 - 40, top: a.top + a.height / 2 - 40 });
+  G.timeline({ onComplete: () => v.remove() })
+    .to(v, { x: b.left + b.width / 2 - (a.left + a.width / 2), y: b.top + b.height / 2 - (a.top + a.height / 2), scale: 0.25, duration: 0.7, ease: "power2.in" })
+    .to(v, { opacity: 0, duration: 0.15 }, "-=0.1")
+    .fromTo(alvo, { scale: 1 }, { scale: 1.12, duration: 0.15, yoyo: true, repeat: 1 }, "-=0.1");
+}
+function adicionar(id, q = 1, origem) {
+  const p = byId(id); if (!p) return;
+  setQty(id, (cart[id] || 0) + q);
+  voar(origem, p);
+  avisar(`${p.nome} no carrinho (${cart[id]})`);
+}
+
+let ultimoFoco = null;
+function abrirCart(open) {
+  const c = $("[data-cart]");
+  if (open === (c.dataset.open === "true")) return;
+  c.dataset.open = $("[data-shade]").dataset.open = open;
+  c.setAttribute("aria-hidden", !open); c.inert = !open;
+  if (open) { ultimoFoco = document.activeElement; $("[data-close]", c).focus(); } else ultimoFoco?.focus();
+}
+
+/* ---- página do produto ---- */
+const pdp = $("#pdp");
+function specs(p) {
+  const base = p.tipo === "lote"
+    ? [["Embalagem", { pote: "Pote com tampa de rosca", lata: "Lata baixa", frasco: "Frasco âmbar conta-gotas", tubo: "Bisnaga", pump: "Frasco com válvula", spray: "Frasco spray", caixa: "Caixa rígida" }[p.emb]],
+       ["Lote mínimo", "150 unidades"], ["Conteúdo", { frasco: "30 ml", tubo: "100 ml", pump: "250 ml", spray: "120 ml", caixa: "120 g + 30 ml" }[p.emb] || "120 g"], ["Arte", "Revisada por designer antes da produção"], ["Prazo", "até 30 dias após a arte aprovada*"], ["Anvisa", "grau 1 · notificação em andamento"]]
+    : [["Categoria", p.cat], ["Fornecedor", "linha profissional homologada"], ["Garantia", p.cat === "Máquinas" || p.cat === "Mobiliário" ? "12 meses" : "90 dias"], ["Envio", "São Paulo capital · 2 dias úteis"]];
+  return base.map(([k, v]) => `<li><span>${k}</span><b class="ph">${v}</b></li>`).join("");
+}
+function abrirProduto(id) {
+  const p = byId(id); if (!p) return;
+  let q = 1;
+  const pom = pomadaDe(p);
+  const relac = PRODUTOS.filter(x => x.cat === p.cat && x.id !== p.id).slice(0, 4);
+  pdp.innerHTML = `<button class="x" type="button" aria-label="Fechar" data-fechar>×</button>
+    <div class="pdp">
+      <div class="vitr">${imagem(p)}</div>
+      <div>
+        <span class="eyebrow">${p.cat}${p.selo ? ` · ${p.selo}` : ""}</span>
+        <h2 id="pdp-t">${p.nome}</h2>
+        <p class="desc">${p.desc || p.detalhe}</p>
+        ${pom ? `<p class="muted" style="margin-top:10px;font-size:14px">Fixação ${pom.fix}/5 · Brilho ${pom.brilho}/5</p>` : ""}
+        <ul class="specs">${specs(p)}</ul>
+        <p style="font-size:24px;font-weight:600">${precoTxt(p.preco)}${p.tipo === "lote" ? " / lote" : ""} <span class="ex">preço de exemplo</span></p>
+        <div class="compra">
+          <div class="qtd"><button type="button" aria-label="Menos" data-pq="-1">−</button><output aria-live="polite" data-pqv>1</output><button type="button" aria-label="Mais" data-pq="1">+</button></div>
+          <button class="btn btn-solid" type="button" data-padd>${p.tipo === "lote" ? "Pedir lote" : "Adicionar ao carrinho"}</button>
+          ${p.tipo === "lote" ? `<a class="btn btn-ghost" href="marca.html">Ajustar a arte</a>` : ""}
+        </div>
+        ${p.tipo === "lote" ? `<p class="muted" style="font-size:12px;margin-top:10px">* Prazo ilustrativo; a fábrica confirma. A produção só começa depois que você aprova a arte.</p>` : ""}
+      </div>
+    </div>
+    ${relac.length ? `<div class="relac"><h3 style="margin-bottom:12px">Da mesma categoria</h3><div class="grid">${relac.map(cartao).join("")}</div></div>` : ""}`;
+  pdp.onclick = e => {
+    if (e.target === pdp) return fecharDialog(pdp); // clique fora fecha
+    const b = e.target.closest("button"); if (!b) return;
+    if (b.dataset.pq) { q = Math.max(1, Math.min(99, q + Number(b.dataset.pq))); $("[data-pqv]", pdp).textContent = q; }
+    if (b.hasAttribute("data-padd")) { adicionar(p.id, q, $(".vitr", pdp)); fecharDialog(pdp); }
+    if (b.hasAttribute("data-fechar")) fecharDialog(pdp);
+    if (b.dataset.ver) abrirProduto(b.dataset.ver);
+  };
+  if (!pdp.open) pdp.showModal();
+  pdp.scrollTop = 0;
+  if (anima) G.fromTo(pdp, { opacity: 0, y: 30, scale: 0.98 }, { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "power3.out" });
+  history.replaceState(null, "", `#p-${p.id}`);
+}
+function fecharDialog(d) {
+  const fim = () => { d.close(); G?.set(d, { clearProps: "all" }); if (d === pdp) history.replaceState(null, "", location.pathname + location.search); };
+  if (anima) G.to(d, { opacity: 0, y: 20, duration: 0.25, ease: "power2.in", onComplete: fim }); else fim();
+}
+[pdp, $("#ck")].forEach(d => d.addEventListener("cancel", e => { e.preventDefault(); fecharDialog(d); }));
+
+/* ---- checkout (simulado: nada é cobrado nem enviado) ---- */
+const ck = $("#ck");
+const CK = { passo: 0, dados: { barbearia: MARCA.nome(marca) === "Sua barbearia" ? "Barbearia Dom Corte" : MARCA.nome(marca), responsavel: "", whats: "", cep: "", rua: "", numero: "", entrega: "entrega", pag: "pix" } };
+const PASSOS_CK = ["Dados", "Entrega", "Pagamento", "Revisão"];
+const campo = (k, rot, attrs = "", cls = "") => `<label class="field ${cls}"><span>${rot}</span><input data-k="${k}" value="${escHTML(CK.dados[k])}" ${attrs}></label>`;
+function telaCK() {
+  const d = CK.dados, ids = Object.keys(cart).filter(byId);
+  const passos = `<ol class="ck-passos">${PASSOS_CK.map((t, i) => `<li class="${i <= CK.passo ? "on" : ""}"${i === CK.passo ? ' aria-current="step"' : ""}>${t}</li>`).join("")}</ol>`;
+  const telas = [
+    `<h3>Quem está comprando</h3><div class="ck-grid" style="margin-top:14px">
+      ${campo("barbearia", "Barbearia", 'required maxlength="60" autocomplete="organization"', "full")}
+      ${campo("responsavel", "Responsável", 'required maxlength="60" autocomplete="name"')}
+      ${campo("whats", "WhatsApp com DDD", 'required inputmode="tel" maxlength="15" placeholder="11 90000-0000" autocomplete="tel"')}
+      <p class="muted full" style="font-size:13px">CNPJ: <span class="ph">00.000.000/0001-00</span> · no produto real vem do cadastro da barbearia.</p></div>`,
+    `<h3>Como receber</h3><div class="opcoes" style="margin-top:14px">
+      <label class="opcao"><input type="radio" name="ent" value="entrega" ${d.entrega === "entrega" ? "checked" : ""}><span><b>Entrega na barbearia</b><small>São Paulo capital · frete <span class="ph">${precoTxt(FRETE_EXEMPLO)}</span></small></span></label>
+      <label class="opcao"><input type="radio" name="ent" value="retirada" ${d.entrega === "retirada" ? "checked" : ""}><span><b>Retirar no ponto parceiro</b><small>Endereço: <span class="ph">${ENDERECO_EXEMPLO}</span></small></span></label>
+    </div>
+    <div class="ck-grid" style="margin-top:14px" data-endereco ${d.entrega === "retirada" ? "hidden" : ""}>
+      ${campo("cep", "CEP", 'inputmode="numeric" maxlength="9" placeholder="00000-000" autocomplete="postal-code"')}
+      ${campo("numero", "Número", 'maxlength="8"')}
+      ${campo("rua", "Rua", 'maxlength="80" autocomplete="address-line1"', "full")}
+    </div>`,
+    `<h3>Forma de pagamento</h3><p class="muted" style="font-size:14px;margin-top:6px">Demonstração: nenhum valor é cobrado. Condições de exemplo: <span class="ph">Pix à vista; lotes com 50% de entrada e 50% na entrega</span>.</p><div class="opcoes" style="margin-top:14px">
+      <label class="opcao"><input type="radio" name="pag" value="pix" ${d.pag === "pix" ? "checked" : ""}><span><b>Pix</b><small>Código de demonstração na revisão</small></span></label>
+      <label class="opcao"><input type="radio" name="pag" value="boleto" ${d.pag === "boleto" ? "checked" : ""}><span><b>Boleto</b><small>Vencimento em <span class="ph">3</span> dias</small></span></label>
+      <label class="opcao"><input type="radio" name="pag" value="cartao" disabled><span><b>Cartão</b><small>Indisponível na demonstração</small></span></label>
+    </div>`,
+    `<h3>Revise o pedido</h3>
+      <ul class="resumo-ck" style="margin-top:12px">${ids.map(id => `<li><span>${cart[id]}× ${byId(id).nome}</span><span>${precoTxt(byId(id).preco * cart[id])}</span></li>`).join("")}
+      <li><span>Barbearia</span><b>${escHTML(d.barbearia)}</b></li>
+      <li><span>Receber</span><b>${d.entrega === "entrega" ? `Entrega · ${escHTML(d.rua)}, ${escHTML(d.numero)}` : "Retirada no ponto parceiro"}</b></li>
+      <li><span>Pagamento</span><b>${d.pag === "pix" ? "Pix" : "Boleto"}</b></li>
+      <li><span>Total <span class="ex">exemplo</span></span><b>${precoTxt(subtotalDe(cart) + (d.entrega === "entrega" ? FRETE_EXEMPLO : 0))}${d.entrega === "entrega" ? " com frete" : ""}</b></li></ul>
+      ${d.pag === "pix" ? `<div class="pix" style="margin-top:14px">${qrDemo()}<div><b>Pix de demonstração</b><p class="muted" style="font-size:13px;margin-top:6px">Este código não paga nada. No produto real, a chave e o valor vêm do meio de pagamento escolhido.</p></div></div>` : ""}`
+  ];
+  ck.innerHTML = `<button class="x" type="button" aria-label="Fechar" data-fechar>×</button>
+    <div class="ck"><div><p class="eyebrow">Checkout · demonstração</p><h2 id="ck-t" style="margin-top:8px">Finalizar compra</h2></div>
+    ${passos}<div data-tela>${telas[CK.passo]}</div><p class="ck-erro" role="alert" data-erro></p>
+    <div class="ck-foot"><button class="btn btn-ghost" type="button" data-ckv ${CK.passo === 0 ? "hidden" : ""}>Voltar</button>
+    <button class="btn btn-solid" type="button" data-cks style="margin-left:auto">${CK.passo === 3 ? "Confirmar pedido" : "Continuar"}</button></div></div>`;
+  if (anima) G.fromTo($("[data-tela]", ck), { opacity: 0, x: 16 }, { opacity: 1, x: 0, duration: 0.35, ease: "power3.out" });
+  const h = $("[data-tela] h3", ck); h.tabIndex = -1; h.focus({ preventScroll: true });
+}
+// desenho que só lembra um QR; de propósito não é um código válido
+function qrDemo() {
+  let s = 7, cel = "";
+  const r = () => (s = (s * 16807) % 2147483647) / 2147483647;
+  for (let y = 0; y < 25; y++) for (let x = 0; x < 25; x++) {
+    const canto = (x < 8 && y < 8) || (x > 16 && y < 8) || (x < 8 && y > 16);
+    if (!canto && r() > 0.52) cel += `<rect x="${x}" y="${y}" width="1" height="1"/>`;
+  }
+  const olho = (x, y) => `<rect x="${x}" y="${y}" width="7" height="7"/><rect x="${x + 1}" y="${y + 1}" width="5" height="5" fill="#F1ECE2"/><rect x="${x + 2}" y="${y + 2}" width="3" height="3"/>`;
+  return `<svg viewBox="0 0 25 25" fill="#17150F" role="img" aria-label="Código de demonstração, não pagável">${cel}${olho(0, 0)}${olho(18, 0)}${olho(0, 18)}<rect x="7.5" y="10.5" width="10" height="4" fill="#F1ECE2"/><text x="12.5" y="13.6" font-size="2.6" text-anchor="middle" font-family="Barlow,sans-serif" font-weight="700">DEMO</text></svg>`;
+}
+function lerCK() {
+  $$("[data-k]", ck).forEach(i => { CK.dados[i.dataset.k] = i.value.trim(); });
+  const ent = $('input[name="ent"]:checked', ck); if (ent) CK.dados.entrega = ent.value;
+  const pag = $('input[name="pag"]:checked', ck); if (pag) CK.dados.pag = pag.value;
+}
+function validarCK() {
+  const d = CK.dados;
+  if (CK.passo === 0) {
+    if (!d.barbearia || !d.responsavel) return "Preencha a barbearia e o responsável.";
+    if (!/^\d{10,11}$/.test(d.whats.replace(/\D/g, ""))) return "WhatsApp precisa ter DDD + número (10 ou 11 dígitos).";
+  }
+  if (CK.passo === 1 && d.entrega === "entrega") {
+    if (!/^\d{8}$/.test(d.cep.replace(/\D/g, ""))) return "CEP precisa ter 8 números.";
+    if (!d.rua || !d.numero) return "Preencha rua e número.";
+  }
+  return "";
+}
+function confirmarCK() {
+  const ids = Object.keys(cart).filter(byId), num = String(Date.now()).slice(-4);
+  const lotes = ids.filter(id => byId(id).tipo === "lote"), rev = ids.filter(id => byId(id).tipo !== "lote");
+  const hoje = hojeISO(), resumo = l => l.map(id => `${cart[id]}× ${byId(id).nome}`).join(", ");
+  if (lotes.length) PEDIDOS.add({ id: `D${num}L`, perfil: "barbearia", tipo: "lote", titulo: `Lote · ${resumo(lotes)}`, datas: [hoje, null, null, null, null, null, null], atual: 0, novo: true });
+  if (rev.length) PEDIDOS.add({ id: `D${num}R`, perfil: "barbearia", tipo: "revenda", titulo: `Revenda · ${resumo(rev)}`, datas: [hoje, null, null, null, null], atual: 0, novo: true });
+  cart = {}; salvarCart(); renderCart();
+  ck.innerHTML = `<button class="x" type="button" aria-label="Fechar" data-fechar>×</button>
+    <div class="ck" style="justify-items:center;text-align:center;padding:48px 28px">
+      <div class="ok-ico" aria-hidden="true">✓</div>
+      <h2 id="ck-t" tabindex="-1">Pedido recebido</h2>
+      <p class="muted" style="max-width:30em">Número de demonstração <b>#D${num}</b>. ${lotes.length ? "O designer vai mandar a arte pelo WhatsApp para você aprovar. " : ""}Acompanhe cada etapa no painel.</p>
+      <div class="compra" style="justify-content:center"><a class="btn btn-solid" href="painel.html">Acompanhar no painel</a><button class="btn btn-ghost" type="button" data-fechar>Continuar comprando</button></div>
+      <p class="muted" style="font-size:12px">Demonstração: nada foi cobrado nem enviado.</p>
+    </div>`;
+  $("#ck-t").focus({ preventScroll: true });
+  if (anima) G.from(".ok-ico", { scale: 0, rotate: -90, duration: 0.6, ease: "back.out(2)" });
+}
+function abrirCK() {
+  CK.passo = 0; telaCK(); abrirCart(false);
+  ck.showModal();
+  if (anima) G.fromTo(ck, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" });
+}
+ck.addEventListener("click", e => {
+  if (e.target === ck) return fecharDialog(ck);
+  const b = e.target.closest("button");
+  if (!b) return;
+  if (b.hasAttribute("data-fechar")) return fecharDialog(ck);
+  if (b.hasAttribute("data-ckv")) { lerCK(); CK.passo--; telaCK(); }
+  if (b.hasAttribute("data-cks")) {
+    lerCK();
+    const erro = validarCK();
+    if (erro) { $("[data-erro]", ck).textContent = erro; if (anima) G.fromTo($("[data-erro]", ck), { x: -6 }, { x: 0, duration: 0.4, ease: "elastic.out(1,0.3)" }); return; }
+    if (CK.passo === 3) return confirmarCK();
+    CK.passo++; telaCK();
+  }
+});
+ck.addEventListener("change", e => { if (e.target.name === "ent") $("[data-endereco]", ck).hidden = e.target.value !== "entrega"; });
+
+/* ---- cliques da página ---- */
+document.addEventListener("click", e => {
+  const t = e.target.closest("button, a");
+  if (!t || t.closest("dialog")) return;
+  if (t.dataset.add) adicionar(t.dataset.add, 1, t.closest(".prod")?.querySelector(".img"));
+  if (t.dataset.ver) { e.preventDefault(); abrirProduto(t.dataset.ver); }
+  if (t.dataset.q) setQty(t.dataset.q, cart[t.dataset.q] + Number(t.dataset.d));
+  if (t.dataset.rm) setQty(t.dataset.rm, 0);
+  if (t.dataset.cat) setFiltro({ cat: t.dataset.cat });
+  if (t.dataset.atalho) { $("[data-busca]").value = t.dataset.atalho; setFiltro({ busca: t.dataset.atalho, cat: "Todas" }); $("#catalogo").scrollIntoView({ behavior: anima ? "smooth" : "auto" }); }
+  if (t.hasAttribute("data-open-cart")) abrirCart(true);
+  if (t.hasAttribute("data-close")) abrirCart(false);
+  if (t.hasAttribute("data-finalizar")) abrirCK();
+});
+$("[data-shade]").onclick = () => abrirCart(false);
+addEventListener("keydown", e => { if (e.key === "Escape" && $("[data-cart]").dataset.open === "true") abrirCart(false); });
+
+revelar();
+// link direto para um produto: shop.html#p-navalhete
+const hashId = location.hash.match(/^#p-(.+)$/)?.[1];
+if (hashId && byId(hashId)) abrirProduto(hashId);
+</script>
+</body>
+</html>

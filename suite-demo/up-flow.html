@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>UP·Flow — Projetos</title>
+  <script src="config.js"></script>
+  <script src="nav.js"></script>
+  <script src="suite-data.js"></script>
+  <script src="demo-data.js"></script>
+  <style>
+    .flow-content { flex:1;overflow-y:auto;padding:20px 28px 28px; }
+    .flow-toolbar { display:flex;align-items:center;justify-content:space-between;margin-bottom:20px; }
+    .stats-row { display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px; }
+    .stat-card { background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px 16px; }
+    .stat-label { font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin-bottom:6px; }
+    .stat-value { font-family:'Syne',sans-serif;font-weight:800;font-size:22px;letter-spacing:-.04em;color:var(--text); }
+    .stat-sub { font-size:11px;color:var(--muted);margin-top:2px; }
+
+    .projects-list { display:flex;flex-direction:column;gap:12px; }
+    .project-card { background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color .15s; }
+    .project-card:hover { border-color:var(--teal); }
+    .project-header { padding:14px 18px;display:flex;align-items:center;gap:12px;cursor:pointer; }
+    .project-status-dot { width:8px;height:8px;border-radius:50%;flex-shrink:0; }
+    .project-name { font-size:14px;font-weight:600;font-family:'Syne',sans-serif;letter-spacing:-.02em;flex:1; }
+    .project-meta { display:flex;align-items:center;gap:12px; }
+    .project-date { font-size:12px;color:var(--muted); }
+    .project-expand { color:var(--dim);transition:transform .2s; }
+    .project-expand.open { transform:rotate(90deg); }
+
+    .project-body { display:none;border-top:1px solid var(--border);padding:16px 18px; }
+    .project-body.open { display:block; }
+    .etapas-list { display:flex;flex-direction:column;gap:6px;margin-bottom:14px; }
+    .etapa-item { display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:6px;background:var(--bg3); }
+    .etapa-checkbox { width:16px;height:16px;border-radius:4px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .15s; }
+    .etapa-checkbox.done { background:var(--teal);border-color:var(--teal); }
+    .etapa-name { flex:1;font-size:13px; }
+    .etapa-name.done { color:var(--dim);text-decoration:line-through; }
+    .etapa-resp { font-size:11px;color:var(--dim);background:var(--bg2);padding:2px 7px;border-radius:3px; }
+    .etapa-status { font-size:11px; }
+
+    .project-progress-bar { height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;margin-bottom:10px; }
+    .project-progress-fill { height:100%;border-radius:2px;transition:width .5s ease; }
+
+    .ai-suggestion { background:var(--bg3);border-left:2px solid var(--teal);padding:10px 14px;border-radius:0 6px 6px 0;margin-top:12px; }
+    .ai-suggestion-label { font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);margin-bottom:4px; }
+    .ai-suggestion-text { font-size:12px;color:var(--muted);line-height:1.6; }
+
+    .status-badge { font-size:10px;font-weight:500;letter-spacing:.04em;padding:2px 7px;border-radius:3px; }
+    .status-ativo    { background:var(--teal-12);color:var(--teal); }
+    .status-atrasado { background:var(--red-12);color:var(--red); }
+    .status-concluido{ background:var(--green-12);color:var(--green); }
+    .status-pausado  { background:rgba(255,255,255,.07);color:var(--muted); }
+
+    .modal-overlay { position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:1000;backdrop-filter:blur(4px); }
+    .modal-overlay.hidden { display:none; }
+    .modal { background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px;width:500px;max-width:90vw; }
+    .modal-title { font-family:'Syne',sans-serif;font-weight:700;font-size:16px;letter-spacing:-.02em;margin-bottom:20px; }
+    .form-group { margin-bottom:14px; }
+    .form-label { display:block;font-size:12px;color:var(--muted);margin-bottom:5px; }
+    .form-row { display:grid;grid-template-columns:1fr 1fr;gap:12px; }
+    .form-actions { display:flex;gap:8px;justify-content:flex-end;margin-top:20px; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .spin { animation:spin 1s linear infinite; }
+  </style>
+</head>
+<body>
+<div class="suite-layout">
+  <aside id="suite-sidebar" class="suite-sidebar"></aside>
+  <main class="suite-main">
+    <div class="module-header">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div>
+          <h1 class="module-title">UP <span class="dash">—</span> Flow</h1>
+          <p class="module-subtitle">Projetos & processos · execução e entregas</p>
+        </div>
+        <button class="btn btn-primary" onclick="openModal()" style="margin-top:4px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Novo projeto
+        </button>
+      </div>
+    </div>
+
+    <div class="flow-content">
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-label">Projetos ativos</div><div class="stat-value" id="stat-ativos">0</div><div class="stat-sub">Em andamento</div></div>
+        <div class="stat-card"><div class="stat-label">Atrasados</div><div class="stat-value" id="stat-atrasados" style="color:var(--red)">0</div><div class="stat-sub">Precisam de atenção</div></div>
+        <div class="stat-card"><div class="stat-label">Concluídos</div><div class="stat-value" id="stat-concluidos" style="color:var(--green)">0</div><div class="stat-sub">No total</div></div>
+        <div class="stat-card"><div class="stat-label">Taxa de entrega</div><div class="stat-value" id="stat-taxa">—</div><div class="stat-sub">No prazo</div></div>
+      </div>
+      <div class="projects-list" id="projects-list"></div>
+    </div>
+  </main>
+</div>
+
+<div class="modal-overlay hidden" id="modal-projeto" onclick="closeModalBg(event)">
+  <div class="modal">
+    <div class="modal-title" id="p-modal-title">Novo projeto</div>
+    <div class="form-group"><label class="form-label">Nome do projeto</label><input class="input" id="p-nome" type="text" placeholder="Ex: Implementação UP Suite — Cliente X"/></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Cliente / contexto</label><input class="input" id="p-cliente" type="text" placeholder="Ex: Márcio Ferreira"/></div>
+      <div class="form-group"><label class="form-label">Responsável</label><input class="input" id="p-resp" type="text" placeholder="Rafael"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Data de início</label><input class="input" id="p-inicio" type="date"/></div>
+      <div class="form-group"><label class="form-label">Previsão de entrega</label><input class="input" id="p-entrega" type="date"/></div>
+    </div>
+    <div class="form-group" id="p-etapas-group"><label class="form-label">Etapas (uma por linha)</label><textarea class="input" id="p-etapas" rows="5" style="resize:vertical;"></textarea></div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveProject()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script>
+const { U } = Suite;
+const esc = U.esc;
+const DEFAULT_ETAPAS = 'Diagnóstico e levantamento\nConfiguração CLIENT_CONFIG\nSetup técnico\nTreinamento do cliente\nReunião de ativação';
+
+let projects = [];
+let editId = null;
+const openIds = new Set(); // projetos expandidos — preservado entre renderizações
+
+async function init() { await refresh(); }
+
+async function refresh() {
+  projects = (await store.load('projetos')).map(p => ({ ...p, status: Suite.projectStatus(p) }));
+  renderStats(); renderProjects();
+}
+
+function getProgress(p) {
+  const done = p.etapas.filter(e=>e.status==='concluido').length;
+  return p.etapas.length > 0 ? Math.round(done/p.etapas.length*100) : 0;
+}
+
+function renderStats() {
+  const count = s => projects.filter(p=>p.status===s).length;
+  const validos = projects.filter(p=>p.status!=='pausado').length;
+  document.getElementById('stat-ativos').textContent    = count('ativo');
+  document.getElementById('stat-atrasados').textContent = count('atrasado');
+  document.getElementById('stat-concluidos').textContent= count('concluido');
+  document.getElementById('stat-taxa').textContent      = validos > 0 ? Math.round((validos - count('atrasado'))/validos*100) + '%' : '—';
+}
+
+function renderProjects() {
+  const statusDot  = { ativo:'var(--teal)', atrasado:'var(--red)', concluido:'var(--green)', pausado:'var(--dim)' };
+  const statusLabel= { ativo:'Ativo', atrasado:'Atrasado', concluido:'Concluído', pausado:'Pausado' };
+  const today = U.today();
+
+  if (!projects.length) {
+    document.getElementById('projects-list').innerHTML = `<div class="empty-block"><strong>Nenhum projeto ainda</strong>Crie o primeiro em "Novo projeto" — o status (ativo, atrasado, concluído) é calculado sozinho a partir do prazo e das etapas.</div>`;
+    return;
+  }
+
+  document.getElementById('projects-list').innerHTML = projects.map(p => {
+    const pct = getProgress(p);
+    const barColor = p.status==='atrasado' ? 'var(--red)' : p.status==='concluido' ? 'var(--green)' : 'var(--teal)';
+    const open = openIds.has(p.id) ? 'open' : '';
+    const atraso = p.status === 'atrasado' ? ` · ${U.daysBetween(p.previsao, today)} dia(s) de atraso` : '';
+    return `
+    <div class="project-card" id="card-${p.id}">
+      <div class="project-header" onclick="toggleProject('${p.id}')">
+        <div class="project-status-dot" style="background:${statusDot[p.status]}"></div>
+        <div class="project-name">${esc(p.nome)}</div>
+        <div class="project-meta">
+          <span class="status-badge status-${p.status}">${statusLabel[p.status]}</span>
+          <span class="project-date">${p.previsao ? 'Entrega: ' + U.fmtDate(p.previsao) : 'Sem prazo'}</span>
+          <span style="font-size:12px;color:var(--teal);font-family:'Syne',sans-serif;font-weight:600;">${pct}%</span>
+          <span class="project-expand ${open}" id="exp-${p.id}">▶</span>
+        </div>
+      </div>
+      <div class="project-body ${open}" id="body-${p.id}">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">${esc(p.cliente) || 'Sem cliente'} · início ${U.fmtDate(p.inicio)}${atraso}</div>
+        <div class="project-progress-bar">
+          <div class="project-progress-fill" style="width:${pct}%;background:${barColor}"></div>
+        </div>
+        <div class="etapas-list">
+          ${p.etapas.map(e => `
+            <div class="etapa-item">
+              <div class="etapa-checkbox ${e.status==='concluido'?'done':''}" onclick="toggleEtapa('${p.id}','${e.id}')">
+                ${e.status==='concluido' ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
+              </div>
+              <span class="etapa-name ${e.status==='concluido'?'done':''}">${esc(e.nome)}</span>
+              ${e.concluido_em ? `<span class="etapa-status" style="color:var(--dim);">${U.fmtDate(e.concluido_em).slice(0,5)}</span>` : ''}
+              ${e.responsavel ? `<span class="etapa-resp">${esc(e.responsavel)}</span>` : ''}
+              <button class="icon-btn danger" title="Remover etapa" onclick="removeEtapa('${p.id}','${e.id}')">×</button>
+            </div>`).join('')}
+          <div class="etapa-item" style="background:transparent;padding-left:0;">
+            <input class="input" id="new-etapa-${p.id}" type="text" placeholder="Adicionar etapa e pressionar Enter…" onkeydown="if(event.key==='Enter')addEtapa('${p.id}')"/>
+          </div>
+        </div>
+        ${p.ai_suggestion?.gargalo ? `
+          <div class="ai-suggestion">
+            <div class="ai-suggestion-label">✦ IA identificou gargalo</div>
+            <div class="ai-suggestion-text">${esc(p.ai_suggestion.gargalo)}</div>
+            <div class="ai-suggestion-text" style="color:var(--teal);margin-top:4px;">→ ${esc(p.ai_suggestion.acao)}${p.ai_suggestion.responsavel ? ' (' + esc(p.ai_suggestion.responsavel) + ')' : ''}</div>
+          </div>` : ''}
+        ${p.ai_suggestion?.licao ? `
+          <div class="ai-suggestion">
+            <div class="ai-suggestion-label">✦ Lição aprendida</div>
+            <div class="ai-suggestion-text">${esc(p.ai_suggestion.licao)}</div>
+          </div>` : ''}
+        <div style="margin-top:12px;display:flex;gap:8px;align-items:center;">
+          <button class="btn btn-ghost btn-sm" onclick="analyzeProject('${p.id}')">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Analisar com IA
+          </button>
+          <button class="btn btn-ghost btn-sm" onclick="openModal('${p.id}')">Editar</button>
+          ${p.status !== 'concluido' ? `<button class="btn btn-ghost btn-sm" onclick="togglePause('${p.id}')">${p.pausado ? 'Retomar' : 'Pausar'}</button>` : ''}
+          <button class="icon-btn danger" style="margin-left:auto;" onclick="deleteProject('${p.id}')">Excluir</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleProject(id) {
+  openIds.has(id) ? openIds.delete(id) : openIds.add(id);
+  document.getElementById('body-'+id).classList.toggle('open');
+  document.getElementById('exp-'+id).classList.toggle('open');
+}
+
+// Aplica fn ao projeto e grava
+async function updateProject(projId, fn) {
+  await store.mutate('projetos', list => { const p = list.find(x=>x.id===projId); if (p) fn(p); });
+  await refresh();
+}
+
+function toggleEtapa(projId, etapaId) {
+  return updateProject(projId, p => {
+    const e = p.etapas.find(x=>x.id===etapaId);
+    if (!e) return;
+    const done = e.status !== 'concluido';
+    e.status = done ? 'concluido' : 'pendente';
+    e.concluido_em = done ? U.today() : null;
+  });
+}
+
+function addEtapa(projId) {
+  const input = document.getElementById('new-etapa-'+projId);
+  const nome = input.value.trim();
+  if (!nome) return;
+  return updateProject(projId, p => { p.etapas.push({ id:U.uid('e'), nome, status:'pendente', responsavel:p.responsavel || '' }); });
+}
+
+function removeEtapa(projId, etapaId) {
+  return updateProject(projId, p => { p.etapas = p.etapas.filter(e=>e.id!==etapaId); });
+}
+
+function togglePause(projId) { return updateProject(projId, p => { p.pausado = !p.pausado; }); }
+
+async function deleteProject(projId) {
+  const p = projects.find(x=>x.id===projId);
+  if (!p || !confirm(`Excluir o projeto "${p.nome}"? Esta ação não pode ser desfeita.`)) return;
+  await store.mutate('projetos', list => list.filter(x=>x.id!==projId));
+  await refresh();
+  toast('Projeto excluído', 'success');
+}
+
+async function analyzeProject(projId) {
+  const p = projects.find(x=>x.id===projId);
+  if (!p) return;
+  toast('Analisando projeto com IA…', 'info');
+  try {
+    const r = await window.callClaude({
+      systemPrompt:`Você analisa projetos de ${CLIENT_CONFIG.empresa}. Identifique o principal gargalo e sugira UMA ação concreta. Use só os dados recebidos. Retorne APENAS JSON: {"gargalo":"...","acao":"...","responsavel":"..."}`,
+      userPayload:{ hoje:U.today(), projeto:p.nome, cliente:p.cliente, status:p.status, inicio:p.inicio, previsao:p.previsao, dias_atraso: p.status==='atrasado' ? U.daysBetween(p.previsao, U.today()) : 0, etapas:p.etapas.map(e=>({nome:e.nome,status:e.status,responsavel:e.responsavel,concluido_em:e.concluido_em})) },
+      mockResponse: JSON.stringify({ gargalo:'Próxima etapa depende de aprovação do cliente sem data marcada', acao:'Agendar a apresentação do 3D até sexta e já deixar a data do executivo reservada', responsavel:'Marina Duarte' })
+    });
+    const ai = U.parseAIJson(r);
+    openIds.add(projId);
+    await updateProject(projId, proj => { proj.ai_suggestion = { gargalo:ai.gargalo, acao:ai.acao, responsavel:ai.responsavel, gerado_em:U.today() }; });
+    toast('Análise concluída', 'success');
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+function openModal(id) {
+  const p = id ? projects.find(x=>x.id===id) : null;
+  editId = p?.id || null;
+  document.getElementById('p-modal-title').textContent = p ? 'Editar projeto' : 'Novo projeto';
+  document.getElementById('p-nome').value    = p?.nome || '';
+  document.getElementById('p-cliente').value = p?.cliente || '';
+  document.getElementById('p-resp').value    = p?.responsavel || 'Rafael';
+  document.getElementById('p-inicio').value  = p?.inicio || U.today();
+  document.getElementById('p-entrega').value = p?.previsao || '';
+  document.getElementById('p-etapas').value  = DEFAULT_ETAPAS;
+  document.getElementById('p-etapas-group').style.display = p ? 'none' : ''; // etapas são editadas no próprio card
+  document.getElementById('modal-projeto').classList.remove('hidden');
+  document.getElementById('p-nome').focus();
+}
+function closeModal() { document.getElementById('modal-projeto').classList.add('hidden'); }
+function closeModalBg(e) { if(e.target.classList.contains('modal-overlay')) closeModal(); }
+
+async function saveProject() {
+  const nome = document.getElementById('p-nome').value.trim();
+  if (!nome) { toast('Informe o nome do projeto', 'warn'); return; }
+  const fields = {
+    nome, cliente: document.getElementById('p-cliente').value.trim(),
+    responsavel: document.getElementById('p-resp').value.trim(),
+    inicio: document.getElementById('p-inicio').value,
+    previsao: document.getElementById('p-entrega').value,
+  };
+  if (fields.inicio && fields.previsao && fields.previsao < fields.inicio) { toast('A previsão de entrega está antes do início', 'warn'); return; }
+  if (editId) {
+    await updateProject(editId, p => Object.assign(p, fields));
+  } else {
+    const etapas = document.getElementById('p-etapas').value.split('\n').map(s=>s.trim()).filter(Boolean)
+      .map(n=>({ id:U.uid('e'), nome:n, status:'pendente', responsavel:fields.responsavel }));
+    const proj = { id:U.uid('p'), ...fields, pausado:false, ai_suggestion:null, etapas };
+    openIds.add(proj.id);
+    await store.mutate('projetos', list => { list.unshift(proj); });
+    await refresh();
+  }
+  closeModal();
+  toast(`Projeto "${nome}" ${editId ? 'atualizado' : 'criado'}`, 'success');
+}
+
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
+init();
+</script>
+</body>
+</html>
