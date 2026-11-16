@@ -248,6 +248,7 @@ dialog.janela::backdrop{background:rgba(5,5,4,.6);-webkit-backdrop-filter:blur(4
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/Flip.min.js"></script>
 <script src="icones.js"></script>
+<script src="ilustracoes.js"></script>
 <script src="marca.js"></script>
 <script src="logo.js"></script>
 <script src="rotulo.js"></script>
@@ -260,7 +261,7 @@ const marca = MARCA.load();
 const byId = id => PRODUTOS.find(p => p.id === id);
 const pomadaDe = p => POMADAS.find(x => x.id === p.pomada);
 // pomadas: embalagem fechada + potinho aberto mostrando a cor e a textura da massa
-const imagem = p => !p.emb ? icone(p.ico)
+const imagem = p => !p.emb ? (ilustracao(p.id) || icone(p.ico))
   : p.pomada ? `<span class="combo">${embalagem(p.emb, marca, { pomada: pomadaDe(p) })}${potinhoAberto(pomadaDe(p), MARCA.tema(marca))}</span>`
   : embalagem(p.emb, marca, { rotulo: p.rotulo });
 const ORDEM_NOVO = p => (p.selo === "Novo" ? 0 : 1);
