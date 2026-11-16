@@ -261,8 +261,9 @@ const marca = MARCA.load();
 const byId = id => PRODUTOS.find(p => p.id === id);
 const pomadaDe = p => POMADAS.find(x => x.id === p.pomada);
 // pomadas: embalagem fechada + potinho aberto mostrando a cor e a textura da massa
+const MARCA_STARS = { nome: "Stars", tema: "black", logo: "classico", cidade: "PRONTO" }; // linha pronta usa a marca Stars, não a do cliente
 const imagem = p => !p.emb ? (ilustracao(p.id) || icone(p.ico))
-  : p.pomada ? `<span class="combo">${embalagem(p.emb, marca, { pomada: pomadaDe(p) })}${potinhoAberto(pomadaDe(p), MARCA.tema(marca))}</span>`
+  : p.pomada ? `<span class="combo">${embalagem(p.emb, p.stars ? MARCA_STARS : marca, { pomada: pomadaDe(p) })}${potinhoAberto(pomadaDe(p), MARCA.tema(p.stars ? MARCA_STARS : marca))}</span>`
   : embalagem(p.emb, marca, { rotulo: p.rotulo });
 const ORDEM_NOVO = p => (p.selo === "Novo" ? 0 : 1);
 document.title = `Loja · ${BRAND}`;

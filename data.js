@@ -3,7 +3,7 @@
    shortcut: catálogo fixo no navegador; trocar por uma API quando houver plataforma (login, estoque, pagamento). */
 const BRAND = "Stars"; // nome de trabalho; busca no INPI ainda pendente
 
-const CATEGORIAS = ["Com a sua marca", "Máquinas", "Corte", "Barba", "Bancada", "Higiene", "Mobiliário", "Balcão e varejo"];
+const CATEGORIAS = ["Com a sua marca", "Linha Stars", "Máquinas", "Corte", "Barba", "Bancada", "Higiene", "Mobiliário", "Balcão e varejo"];
 
 // tipo "lote": produto com a marca da barbearia (passa por aprovação de arte). emb = desenho da embalagem; pomada = estilo da massa.
 // tipo "revenda": item do fornecedor para a bancada. ico = ícone de linha.
@@ -12,6 +12,7 @@ const CATEGORIAS = ["Com a sua marca", "Máquinas", "Corte", "Barba", "Bancada",
 const PRECOS_EXEMPLO = {
   "lote-pasta": 1800, "lote-argila": 1950, "lote-gel": 1800, "lote-molhado": 1800, "lote-fibra": 1950, "lote-cera": 1650,
   "lote-oleo": 2100, "lote-balm": 1700, "lote-shampoo": 2400, "lote-tonico": 1900, "lote-kit": 3200,
+  "stars-pasta": 38, "stars-argila": 42, "stars-gel": 38, "stars-molhado": 38, "stars-fibra": 42, "stars-cera": 36,
   "maquina-corte": 450, "maquina-acab": 320, "shaver": 280, "laminas-maq": 89, "oleo-maq": 25,
   "tesoura-laser": 180, "tesoura-desbaste": 160, "pentes": 45, "pentes-encaixe": 39, "navalhete": 35, "laminas-navalhete": 22,
   "pincel": 49, "toalhas": 59, "gel-barbear": 32, "borrifador": 29, "capa": 69, "espanador": 25, "secador": 390, "espelho": 45, "carrinho": 290,
@@ -32,6 +33,12 @@ const PRODUTOS = [
   P("lote-tonico", "Com a sua marca", "Tônico Capilar", "Spray com a sua marca", { emb: "spray", rotulo: "TÔNICO CAPILAR", desc: "Refresca o couro cabeludo no fim do corte." }),
   P("lote-kit", "Com a sua marca", "Kit Presente", "Caixa com pomada + óleo, com a sua marca", { emb: "caixa", rotulo: "KIT PRESENTE", selo: "Datas comemorativas", desc: "Dia dos Pais e Natal: o cliente leva a marca da casa de presente." }),
 
+  P("stars-pasta", "Linha Stars", "Pasta Modeladora", "Pote pronto da marca Stars · 120 g", { emb: "pote", pomada: "pasta", stars: true, desc: "Cremosa, acabamento natural. Para usar na bancada, sem lote mínimo." }),
+  P("stars-argila", "Linha Stars", "Argila Matte", "Pote pronto da marca Stars · 120 g", { emb: "pote", pomada: "argila", stars: true, desc: "Fixação forte, zero brilho. Pote avulso para o atendimento." }),
+  P("stars-gel", "Linha Stars", "Gel-Cera Brilho", "Pote pronto da marca Stars · 120 g", { emb: "pote", pomada: "gel", stars: true, desc: "Brilho espelhado para risca-lado e topete. Compra por unidade." }),
+  P("stars-molhado", "Linha Stars", "Efeito Molhado", "Pote pronto da marca Stars · 120 g", { emb: "pote", pomada: "molhado", stars: true, desc: "Visual molhado o dia todo, sai com água. Compra por unidade." }),
+  P("stars-fibra", "Linha Stars", "Fibra Texturizadora", "Pote pronto da marca Stars · 120 g", { emb: "pote", pomada: "fibra", stars: true, desc: "Separa os fios com controle. Pote pronto, entrega rápida." }),
+  P("stars-cera", "Linha Stars", "Cera Black", "Pote pronto da marca Stars · 120 g", { emb: "pote", pomada: "cera", stars: true, desc: "Pigmento escuro que disfarça falhas. Pote pronto para a bancada." }),
   P("maquina-corte", "Máquinas", "Máquina de corte profissional", "Sem fio · lâmina de aço", { ico: "razor-electric", selo: "Mais pedido" }),
   P("maquina-acab", "Máquinas", "Máquina de acabamento", "Lâmina T para pezinho e contorno", { ico: "razor-electric" }),
   P("shaver", "Máquinas", "Shaver de acabamento", "Zero rente, para o degradê", { ico: "razor-electric", selo: "Novo" }),
