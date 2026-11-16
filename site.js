@@ -33,7 +33,7 @@ document.documentElement.classList.add("js");
       Valores, prazos e lotes de exemplo; a fábrica confirma. Produtos cosméticos regularizados na Anvisa: <span class="ph">grau 1, notificação em andamento</span>.</div>
       <div><a href="private-label.html">Private label</a> · Fotos: Unsplash (licença Unsplash) · Ícones: Tabler Icons (MIT) · créditos em img/CREDITS.txt</div>
     </div></footer>`);
-  $$("[data-brand]").forEach(e => e.textContent = window.BRAND || "Marca Demo");
+  $$("[data-brand]").forEach(e => e.textContent = window.BRAND || "Stars");
   const tpl = $("template[data-top]");
   if (tpl) $("[data-top-right]").append(tpl.content.cloneNode(true));
   const menuBtn = $(".menu-btn"), nav = $("#menu-site");

@@ -1,7 +1,7 @@
 /* DADOS DE EXEMPLO do protótipo. Nada aqui é real: produtos, pedidos e prazos são ilustrativos.
    Todos os valores são EXEMPLOS para a demonstração (pedido do Rafael em 25/10/2026); a tela marca cada um.
    shortcut: catálogo fixo no navegador; trocar por uma API quando houver plataforma (login, estoque, pagamento). */
-const BRAND = "Marca Demo"; // nome neutro até a busca no INPI
+const BRAND = "Stars"; // nome de trabalho; busca no INPI ainda pendente
 
 const CATEGORIAS = ["Com a sua marca", "Máquinas", "Corte", "Barba", "Bancada", "Higiene", "Mobiliário", "Balcão e varejo"];
 
