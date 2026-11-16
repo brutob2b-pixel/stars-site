@@ -101,6 +101,8 @@
   .tl .quando{grid-column:2;padding-top:0}
 }
 @media (prefers-reduced-motion:reduce){.tl .agora .dot{animation:none}}
+.kpi.dest{border-color:color-mix(in srgb,var(--accent) 60%,var(--glass-line))}
+.kpi.dest b{color:var(--accent-2)}
 </style>
 </head>
 <body data-pagina="painel">
@@ -119,10 +121,10 @@
 
   <div data-so="barbearia">
     <div class="kpis">
+      <div class="kpi glass dest" data-reveal><b class="ph" data-renda>R$ 0</b><span>renda extra do mês (potes vendidos × <span class="ph">R$ 17,75</span>)</span></div>
       <div class="kpi glass" data-reveal><b data-kpi="andamento">0</b><span>pedidos em andamento</span></div>
       <div class="kpi glass" data-reveal><b data-kpi="estoque">0</b><span>potes no estoque da casa</span></div>
       <div class="kpi glass" data-reveal><b data-kpi="vendidos">0</b><span>potes vendidos no mês</span></div>
-      <div class="kpi glass" data-reveal><b class="ph" data-renda>R$ 0</b><span>renda extra do mês</span></div>
     </div>
 
     <div class="dois">

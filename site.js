@@ -13,13 +13,13 @@ document.documentElement.classList.add("js");
 (function moldura() {
   const pagina = document.body.dataset.pagina;
   const LINKS = [["index.html", "Início", ""], ["shop.html", "Loja", "loja"], ["marca.html", "Estúdio de marca", "marca"],
-    ["marketing.html", "Marketing", "marketing"], ["mentoria.html", "Mentoria", "mentoria"], ["suite.html", "Suíte", "suite"], ["painel.html", "Painel", "painel"]];
+    ["marketing.html", "Marketing", "marketing"], ["mentoria.html", "Mentoria", "mentoria"], ["suite.html", "Suíte", "suite"], ["painel.html", "Painel", "painel"], ["private-label.html", "Private label", "privatelabel"]];
   document.body.insertAdjacentHTML("afterbegin", `
     <div class="atmos" aria-hidden="true"></div>
     <div class="draft" role="note"><strong>Demonstração: dados ilustrativos.</strong> Protótipo para apresentação · valores sublinhados são exemplos</div>
     <header class="top">
       <div class="wrap">
-        <a class="logo" href="index.html"><span data-brand></span><small>private label para barbearias</small></a>
+        <a class="logo" href="index.html"><span data-brand></span><small>pomada com a sua marca, para barbearias</small></a>
         <nav aria-label="Páginas" id="menu-site">${LINKS.map(([h, t, k]) => `<a href="${h}"${k === pagina ? ' aria-current="page"' : ""}>${t}</a>`).join("")}</nav>
         <div class="right">
           <span data-top-right style="display:contents"></span>
@@ -29,16 +29,15 @@ document.documentElement.classList.add("js");
     </header>`);
   document.body.insertAdjacentHTML("beforeend", `
     <footer class="site"><div class="wrap cols">
-      <div>© <span data-brand></span> · Protótipo · Razão social e CNPJ: <span class="ph">Stars Comércio de Cosméticos Ltda. · CNPJ 00.000.000/0001-00</span><br>
+      <div>© <span data-brand></span> · Protótipo · Razão social e CNPJ: <span class="ph">Razão social de exemplo · CNPJ 00.000.000/0001-00</span><br>
       Valores, prazos e lotes de exemplo; a fábrica confirma. Produtos cosméticos regularizados na Anvisa: <span class="ph">grau 1, notificação em andamento</span>.</div>
-      <div>Fotos: Unsplash (licença Unsplash) · Ícones: Tabler Icons (MIT) · créditos em img/CREDITS.txt</div>
+      <div><a href="private-label.html">Private label</a> · Fotos: Unsplash (licença Unsplash) · Ícones: Tabler Icons (MIT) · créditos em img/CREDITS.txt</div>
     </div></footer>`);
-  $$("[data-brand]").forEach(e => e.textContent = window.BRAND || "Stars");
+  $$("[data-brand]").forEach(e => e.textContent = window.BRAND || "Marca Demo");
   const tpl = $("template[data-top]");
   if (tpl) $("[data-top-right]").append(tpl.content.cloneNode(true));
   const menuBtn = $(".menu-btn"), nav = $("#menu-site");
   menuBtn.addEventListener("click", () => { const open = nav.classList.toggle("open"); menuBtn.setAttribute("aria-expanded", open); });
-  nav.addEventListener("click", e => { if (e.target.closest("a")) { nav.classList.remove("open"); menuBtn.setAttribute("aria-expanded", "false"); } });
   nav.addEventListener("click", e => { if (e.target.closest("a")) { nav.classList.remove("open"); menuBtn.setAttribute("aria-expanded", "false"); } });
   addEventListener("keydown", e => { if (e.key === "Escape" && nav.classList.contains("open")) { nav.classList.remove("open"); menuBtn.setAttribute("aria-expanded", "false"); menuBtn.focus(); } });
 })();
@@ -49,7 +48,7 @@ function revelar(root = document) {
   if (!SITE.anima || !SITE.ST) { els.forEach(e => e.classList.add("in")); return; }
   const toque = matchMedia("(pointer: coarse)").matches; // no celular as entradas são mais curtas e começam antes
   SITE.ST.batch(els, { start: toque ? "top 98%" : "top 92%", once: true, onEnter: b => {
-    SITE.G.fromTo(b, { opacity: 0, y: toque ? 14 : 24 }, { opacity: 1, y: 0, duration: toque ? 0.45 : 0.8, ease: "power3.out", stagger: toque ? 0.03 : 0.06 });
+    SITE.G.fromTo(b, { opacity: 0, y: toque ? 14 : 24 }, { opacity: 1, y: 0, duration: toque ? 0.4 : 0.55, ease: "power3.out", stagger: toque ? 0.03 : 0.04 });
     b.forEach(e => e.classList.add("in"));
   } });
 }

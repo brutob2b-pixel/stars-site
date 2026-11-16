@@ -190,7 +190,7 @@ dialog.janela::backdrop{background:rgba(5,5,4,.6);-webkit-backdrop-filter:blur(4
 
   <section class="section">
     <div class="section-head">
-      <div><p class="eyebrow">Sua linha</p><h2 style="margin-top:10px">Marca própria</h2></div>
+      <div><p class="eyebrow">Sua linha</p><h2 style="margin-top:10px">Com a sua marca</h2></div>
       <a class="btn btn-ghost btn-sm" href="marca.html">Personalizar a arte</a>
     </div>
     <div class="faixa" data-faixa></div>
@@ -201,7 +201,7 @@ dialog.janela::backdrop{background:rgba(5,5,4,.6);-webkit-backdrop-filter:blur(4
       <aside class="filtros glass" aria-label="Filtros">
         <h3>Categorias</h3>
         <div class="cats" data-cats></div>
-        <label class="check"><input type="checkbox" data-so-marca> Só marca própria</label>
+        <label class="check"><input type="checkbox" data-so-marca> Só com a sua marca</label>
         <label class="check"><input type="checkbox" data-so-destaque> Só destaques</label>
       </aside>
       <div>
@@ -214,6 +214,14 @@ dialog.janela::backdrop{background:rgba(5,5,4,.6);-webkit-backdrop-filter:blur(4
         <div class="grid" data-grid></div>
         <p class="muted" style="font-size:13px;margin-top:16px">Preços, estoque e prazos de exemplo, só para a demonstração. Os reais vêm do fornecedor e da fábrica.</p>
       </div>
+    </div>
+  </section>
+  <section class="wide" id="private-label" style="padding-block:56px">
+    <div class="wrap">
+      <p class="eyebrow">Opção para quem já tem marca</p>
+      <h2 style="margin-top:10px">Private label</h2>
+      <p class="lead">Já tem marca registrada e só quer fabricar? Fale com a gente: avaliamos caso a caso, com o seu rótulo e a sua fórmula de referência. <span class="ph">Condições a confirmar com a fábrica.</span></p>
+      <a class="btn btn-ghost" href="private-label.html">Saiba como funciona</a>
     </div>
   </section>
 </main>
@@ -256,7 +264,7 @@ const imagem = p => !p.emb ? icone(p.ico)
   : p.pomada ? `<span class="combo">${embalagem(p.emb, marca, { pomada: pomadaDe(p) })}${potinhoAberto(pomadaDe(p), MARCA.tema(marca))}</span>`
   : embalagem(p.emb, marca, { rotulo: p.rotulo });
 const ORDEM_NOVO = p => (p.selo === "Novo" ? 0 : 1);
-document.title = `Loja ${BRAND}`;
+document.title = `Loja · ${BRAND}`;
 $$("[data-ico]").forEach(e => e.outerHTML = icone(e.dataset.ico));
 $$("[data-marca-nome]").forEach(e => e.textContent = MARCA.nome(marca));
 
@@ -441,7 +449,7 @@ function telaCK() {
     `<h3>Quem está comprando</h3><div class="ck-grid" style="margin-top:14px">
       ${campo("barbearia", "Barbearia", 'required maxlength="60" autocomplete="organization"', "full")}
       ${campo("responsavel", "Responsável", 'required maxlength="60" autocomplete="name"')}
-      ${campo("whats", "WhatsApp com DDD", 'required inputmode="tel" maxlength="15" placeholder="11 90000-0000" autocomplete="tel"')}
+      ${campo("whats", "WhatsApp com DDD", 'required inputmode="tel" maxlength="15" placeholder="(00) 00000-0000" autocomplete="tel"')}
       <p class="muted full" style="font-size:13px">CNPJ: <span class="ph">00.000.000/0001-00</span> · no produto real vem do cadastro da barbearia.</p></div>`,
     `<h3>Como receber</h3><div class="opcoes" style="margin-top:14px">
       <label class="opcao"><input type="radio" name="ent" value="entrega" ${d.entrega === "entrega" ? "checked" : ""}><span><b>Entrega na barbearia</b><small>Todo o Brasil · frete <span class="ph">${precoTxt(FRETE_EXEMPLO)}</span></small></span></label>
@@ -466,7 +474,7 @@ function telaCK() {
       ${d.pag === "pix" ? `<div class="pix" style="margin-top:14px">${qrDemo()}<div><b>Pix de demonstração</b><p class="muted" style="font-size:13px;margin-top:6px">Este código não paga nada. No produto real, a chave e o valor vêm do meio de pagamento escolhido.</p></div></div>` : ""}`
   ];
   ck.innerHTML = `<button class="x" type="button" aria-label="Fechar" data-fechar>×</button>
-    <div class="ck"><div><p class="eyebrow">Checkout · demonstração</p><h2 id="ck-t" style="margin-top:8px">Finalizar compra</h2></div>
+    <div class="ck"><div><p class="eyebrow">Compra · demonstração</p><h2 id="ck-t" style="margin-top:8px">Finalizar compra</h2></div>
     ${passos}<div data-tela>${telas[CK.passo]}</div><p class="ck-erro" role="alert" data-erro></p>
     <div class="ck-foot"><button class="btn btn-ghost" type="button" data-ckv ${CK.passo === 0 ? "hidden" : ""}>Voltar</button>
     <button class="btn btn-solid" type="button" data-cks style="margin-left:auto">${CK.passo === 3 ? "Confirmar pedido" : "Continuar"}</button></div></div>`;

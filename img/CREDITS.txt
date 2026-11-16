@@ -13,4 +13,6 @@ cadeira-prata.webp — foto de Joshua Lawrence na Unsplash (unsplash.com/photos/
 barba-pb.webp — foto de Nathon Oski na Unsplash (unsplash.com/photos/fE42nRlBcG8), Licença Unsplash (uso comercial permitido)
 secador.webp — foto de delfina pan na Unsplash (unsplash.com/photos/wJoB8D3hnzc), Licença Unsplash (uso comercial permitido)
 
-prova-prateleira.webp, prova-balcao.webp, prova-bancada.webp — imagens geradas por IA (ilustrativas, não são barbearias reais); trocar por fotos reais das barbearias piloto
+prova-prateleira.webp, prova-balcao.webp, prova-bancada.webp — imagens geradas por IA; NÃO são mais usadas no site (substituídas por números de exemplo)
+
+tampa-pomada.webp, tarja-pomada.png/.json, jar_*.webp, tampa-0*.webp, tarja.webp, sim.webp — arte de demonstração do simulador Veleiros (projeto próprio da UP Co., arte gerada por IA); confirmar a origem de cada arquivo antes de publicar.

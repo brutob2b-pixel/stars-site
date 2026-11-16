@@ -1,9 +1,9 @@
 /* DADOS DE EXEMPLO do protótipo. Nada aqui é real: produtos, pedidos e prazos são ilustrativos.
    Todos os valores são EXEMPLOS para a demonstração (pedido do Rafael em 25/10/2026); a tela marca cada um.
    shortcut: catálogo fixo no navegador; trocar por uma API quando houver plataforma (login, estoque, pagamento). */
-const BRAND = "Stars"; // provisório até a busca no INPI
+const BRAND = "Marca Demo"; // nome neutro até a busca no INPI
 
-const CATEGORIAS = ["Marca própria", "Máquinas", "Corte", "Barba", "Bancada", "Higiene", "Mobiliário", "Balcão e varejo"];
+const CATEGORIAS = ["Com a sua marca", "Máquinas", "Corte", "Barba", "Bancada", "Higiene", "Mobiliário", "Balcão e varejo"];
 
 // tipo "lote": produto com a marca da barbearia (passa por aprovação de arte). emb = desenho da embalagem; pomada = estilo da massa.
 // tipo "revenda": item do fornecedor para a bancada. ico = ícone de linha.
@@ -18,19 +18,19 @@ const PRECOS_EXEMPLO = {
   "papel-pescoco": 18, "luvas": 39, "alcool": 15, "esterilizador": 199, "bacia": 35,
   "cadeira": 2900, "poltrona": 890, "luminaria": 189, "display": 149, "sacolas": 120, "fidelidade": 90, "vale": 60
 };
-const P = (id, cat, nome, detalhe, extra = {}) => ({ id, cat, nome, detalhe, preco: PRECOS_EXEMPLO[id] ?? null, tipo: cat === "Marca própria" ? "lote" : "revenda", ...extra });
+const P = (id, cat, nome, detalhe, extra = {}) => ({ id, cat, nome, detalhe, preco: PRECOS_EXEMPLO[id] ?? null, tipo: cat === "Com a sua marca" ? "lote" : "revenda", ...extra });
 const PRODUTOS = [
-  P("lote-pasta", "Marca própria", "Pasta Modeladora", "Pote com a sua marca", { emb: "pote", pomada: "pasta", selo: "Mais pedido", desc: "Cremosa, acabamento natural. O coringa da bancada." }),
-  P("lote-argila", "Marca própria", "Argila Matte", "Pote com a sua marca", { emb: "pote", pomada: "argila", desc: "Fixação forte, efeito seco e zero brilho." }),
-  P("lote-gel", "Marca própria", "Gel-Cera Brilho", "Pote com a sua marca", { emb: "pote", pomada: "gel", desc: "Brilho espelhado para risca-lado e topete." }),
-  P("lote-molhado", "Marca própria", "Efeito Molhado", "Pote com a sua marca", { emb: "pote", pomada: "molhado", selo: "Novo", desc: "Visual molhado o dia todo, sai com água." }),
-  P("lote-fibra", "Marca própria", "Fibra Texturizadora", "Pote com a sua marca", { emb: "pote", pomada: "fibra", desc: "Separa os fios e dá textura com controle." }),
-  P("lote-cera", "Marca própria", "Cera Black", "Lata com a sua marca", { emb: "lata", pomada: "cera", desc: "Pigmento escuro que disfarça falhas e fios brancos." }),
-  P("lote-oleo", "Marca própria", "Óleo de Barba", "Frasco conta-gotas com a sua marca", { emb: "frasco", rotulo: "ÓLEO DE BARBA", desc: "Hidrata os fios e perfuma a barba. Venda casada com o corte de barba." }),
-  P("lote-balm", "Marca própria", "Balm Pós-Barba", "Bisnaga com a sua marca", { emb: "tubo", rotulo: "BALM PÓS-BARBA", desc: "Acalma a pele depois da navalha." }),
-  P("lote-shampoo", "Marca própria", "Shampoo 3 em 1", "Frasco com válvula, com a sua marca", { emb: "pump", rotulo: "SHAMPOO 3 EM 1", desc: "Cabelo, barba e corpo. Usado no lavatório e vendido no balcão." }),
-  P("lote-tonico", "Marca própria", "Tônico Capilar", "Spray com a sua marca", { emb: "spray", rotulo: "TÔNICO CAPILAR", desc: "Refresca o couro cabeludo no fim do corte." }),
-  P("lote-kit", "Marca própria", "Kit Presente", "Caixa com pomada + óleo, com a sua marca", { emb: "caixa", rotulo: "KIT PRESENTE", selo: "Datas comemorativas", desc: "Dia dos Pais e Natal: o cliente leva a marca da casa de presente." }),
+  P("lote-pasta", "Com a sua marca", "Pasta Modeladora", "Pote com a sua marca", { emb: "pote", pomada: "pasta", selo: "Mais pedido", desc: "Cremosa, acabamento natural. O coringa da bancada." }),
+  P("lote-argila", "Com a sua marca", "Argila Matte", "Pote com a sua marca", { emb: "pote", pomada: "argila", desc: "Fixação forte, efeito seco e zero brilho." }),
+  P("lote-gel", "Com a sua marca", "Gel-Cera Brilho", "Pote com a sua marca", { emb: "pote", pomada: "gel", desc: "Brilho espelhado para risca-lado e topete." }),
+  P("lote-molhado", "Com a sua marca", "Efeito Molhado", "Pote com a sua marca", { emb: "pote", pomada: "molhado", selo: "Novo", desc: "Visual molhado o dia todo, sai com água." }),
+  P("lote-fibra", "Com a sua marca", "Fibra Texturizadora", "Pote com a sua marca", { emb: "pote", pomada: "fibra", desc: "Separa os fios e dá textura com controle." }),
+  P("lote-cera", "Com a sua marca", "Cera Black", "Lata com a sua marca", { emb: "lata", pomada: "cera", desc: "Pigmento escuro que disfarça falhas e fios brancos." }),
+  P("lote-oleo", "Com a sua marca", "Óleo de Barba", "Frasco conta-gotas com a sua marca", { emb: "frasco", rotulo: "ÓLEO DE BARBA", desc: "Hidrata os fios e perfuma a barba. Venda casada com o corte de barba." }),
+  P("lote-balm", "Com a sua marca", "Balm Pós-Barba", "Bisnaga com a sua marca", { emb: "tubo", rotulo: "BALM PÓS-BARBA", desc: "Acalma a pele depois da navalha." }),
+  P("lote-shampoo", "Com a sua marca", "Shampoo 3 em 1", "Frasco com válvula, com a sua marca", { emb: "pump", rotulo: "SHAMPOO 3 EM 1", desc: "Cabelo, barba e corpo. Usado no lavatório e vendido no balcão." }),
+  P("lote-tonico", "Com a sua marca", "Tônico Capilar", "Spray com a sua marca", { emb: "spray", rotulo: "TÔNICO CAPILAR", desc: "Refresca o couro cabeludo no fim do corte." }),
+  P("lote-kit", "Com a sua marca", "Kit Presente", "Caixa com pomada + óleo, com a sua marca", { emb: "caixa", rotulo: "KIT PRESENTE", selo: "Datas comemorativas", desc: "Dia dos Pais e Natal: o cliente leva a marca da casa de presente." }),
 
   P("maquina-corte", "Máquinas", "Máquina de corte profissional", "Sem fio · lâmina de aço", { ico: "razor-electric", selo: "Mais pedido" }),
   P("maquina-acab", "Máquinas", "Máquina de acabamento", "Lâmina T para pezinho e contorno", { ico: "razor-electric" }),
@@ -94,7 +94,7 @@ const STARS_DATA = {
 /* pedidos feitos no checkout da loja (guardados só neste navegador) */
 const PEDIDOS_KEY = "stars-pedidos";
 const PEDIDOS = {
-  load() { try { return JSON.parse(localStorage.getItem(PEDIDOS_KEY)) || []; } catch { return []; } },
+  load() { try { const l = JSON.parse(localStorage.getItem(PEDIDOS_KEY)); return Array.isArray(l) ? l : []; } catch { return []; } },
   add(p) {
     const lista = [p, ...PEDIDOS.load()].slice(0, 20);
     try { localStorage.setItem(PEDIDOS_KEY, JSON.stringify(lista)); } catch { /* sem armazenamento: não aparece no painel */ }
@@ -132,7 +132,7 @@ const PLANOS_MENTORIA = [
 /* inscrições feitas na página de Mentoria (guardadas só neste navegador) */
 const INSCRICOES_KEY = "stars-inscricoes";
 const INSCRICOES = {
-  load() { try { return JSON.parse(localStorage.getItem(INSCRICOES_KEY)) || []; } catch { return []; } },
+  load() { try { const l = JSON.parse(localStorage.getItem(INSCRICOES_KEY)); return Array.isArray(l) ? l : []; } catch { return []; } },
   add(i) {
     const lista = [i, ...INSCRICOES.load().filter(x => !(x.curso === i.curso && x.turma === i.turma))].slice(0, 20);
     try { localStorage.setItem(INSCRICOES_KEY, JSON.stringify(lista)); } catch { /* sem armazenamento: não aparece no painel */ }

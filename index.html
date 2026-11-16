@@ -113,9 +113,10 @@ main h1,main h2,main h3,main p,main li{text-shadow:0 1px 2px rgba(0,0,0,.7),0 0 
 .hero h1 em{font-style:normal;color:var(--accent)}
 .hero .lead{font-size:clamp(18px,1.6vw,21px);margin:22px 0 28px;max-width:30em}
 .namefield{display:flex;flex-direction:column;gap:8px;margin-bottom:22px;max-width:420px}
-.namefield label{font-size:14px;color:var(--muted)}
-.namefield input{height:54px;border-radius:14px;border:1px solid var(--line);background:var(--bg-2);color:var(--text);padding:0 16px;font:600 18px var(--f-body)}
-.namefield input:focus{border-color:var(--accent);outline:none}
+.namefield label{font:600 15px var(--f-body);color:var(--accent-2)}
+@keyframes nomepulsa{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent-2) 0%,transparent)}50%{box-shadow:0 0 0 6px color-mix(in srgb,var(--accent-2) 28%,transparent)}}
+.namefield input{height:58px;border-radius:14px;border:1.5px solid color-mix(in srgb,var(--accent) 60%,transparent);animation:nomepulsa 2.4s ease-in-out 3 1.5s;background:var(--bg-2);color:var(--text);padding:0 16px;font:600 18px var(--f-body)}
+.namefield input:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent-2) 45%,transparent)}
 .ctas{display:flex;flex-wrap:wrap;gap:12px}
 .scrollhint{position:absolute;left:50%;bottom:24px;transform:translateX(-50%);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
 
@@ -165,7 +166,7 @@ main h1,main h2,main h3,main p,main li{text-shadow:0 1px 2px rgba(0,0,0,.7),0 0 
 .field{display:flex;flex-direction:column;gap:8px;margin:24px 0 18px;max-width:420px}
 .field label{font-size:14px;color:var(--muted)}
 .field input{height:50px;border-radius:14px;border:1px solid var(--line);background:var(--bg-2);color:var(--text);padding:0 16px;font:600 17px var(--f-body)}
-.field input:focus{border-color:var(--accent);outline:none}
+.field input:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent-2) 45%,transparent)}
 .logos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .logos button{padding:8px 8px 10px;border-radius:16px;border:1px solid var(--line);background:var(--bg-2);color:var(--text);font:500 14px var(--f-body);cursor:pointer;display:flex;flex-direction:column;gap:8px;align-items:center}
 .logos button[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
@@ -246,6 +247,9 @@ main h1,main h2,main h3,main p,main li{text-shadow:0 1px 2px rgba(0,0,0,.7),0 0 
 .prova figure{margin:0;padding:14px;border:1px solid var(--line);border-radius:18px;background:color-mix(in srgb,var(--surface) 95%,transparent)}
 .prova .foto img{width:100%;height:100%;object-fit:cover;display:block;border-radius:inherit}
 .prova .foto:has(img){padding:0;border-style:solid;overflow:hidden}
+.prova .num{display:flex;flex-direction:column;gap:4px;padding:18px 6px 6px;border-bottom:1px solid var(--line)}
+.prova .num b{font:700 clamp(34px,4vw,52px)/1 var(--f-disp);color:var(--accent-2)}
+.prova .num small{font-size:13px;color:var(--muted)}
 .prova .foto{aspect-ratio:4/3;border-radius:12px;background:var(--bg-2);border:1px dashed var(--line);display:grid;place-items:center;color:var(--warn);font:600 12px var(--f-body);letter-spacing:.1em;text-align:center;padding:8px}
 .prova blockquote{margin:14px 0 8px}
 .prova figcaption{font-size:13px;color:var(--muted)}
@@ -469,15 +473,15 @@ html{scrollbar-gutter:stable}
 
 <header class="top">
   <div class="wrap">
-    <a class="logo" href="#topo"><span data-brand></span><small>private label para barbearias</small></a>
+    <a class="logo" href="#topo"><span data-brand></span><small>pomada com a sua marca, para barbearias</small></a>
     <nav aria-label="Seções e páginas" id="menu-home">
-      <a href="#estilos">Estilos</a>
-      <a href="#renda-extra">Renda extra</a>
       <a href="shop.html">Loja</a>
       <a href="marca.html">Estúdio de marca</a>
       <a href="marketing.html">Marketing</a>
       <a href="mentoria.html">Mentoria</a>
+      <a href="suite.html">Suíte</a>
       <a href="painel.html">Painel</a>
+      <a href="private-label.html">Private label</a>
     </nav>
     <div class="right">
       <button class="btn" type="button" data-abrir-sim>Simular pedido</button>
@@ -507,10 +511,10 @@ html{scrollbar-gutter:stable}
     <div class="wrap">
       <div class="col">
         <p class="eyebrow" data-reveal>Barbearias e salões · todo o Brasil</p>
-        <h1 style="margin-top:16px">Marca própria, sistema e marketing para a sua <em>barbearia</em>.</h1>
-        <p class="lead" data-reveal>Monte o pote com o nome da sua casa, venda e ganhe renda extra, e acompanhe tudo na Suíte UP. Para barbearias e salões de todo o Brasil.</p>
+        <h1 style="margin-top:16px">A pomada com a marca da sua <em>barbearia</em>.</h1>
+        <p class="lead" data-reveal>Monte o pote com o nome da sua casa e venda para os seus clientes como renda extra. Para barbearias e salões de todo o Brasil.</p>
         <div class="namefield" data-reveal>
-          <label for="nome">Escreva o nome da sua barbearia e veja no pote</label>
+          <label for="nome">Digite o nome da sua barbearia e veja o pote mudar na hora</label>
           <input id="nome" maxlength="28" autocomplete="organization" placeholder="Ex.: Barbearia do Zé">
         </div>
         <button class="bf-chamada" type="button" data-briefing data-reveal><span data-bf-tit>Não sabe por onde começar?</span><b data-bf-sub>Monte a sua base de marca em 1 minuto →</b></button>
@@ -530,10 +534,10 @@ html{scrollbar-gutter:stable}
       <h2 data-reveal style="margin-top:14px">O que entregamos para a sua barbearia</h2>
       <p class="muted" data-reveal style="margin-top:18px;max-width:40em">Cada área terá a sua página. Você começa pelo pote e liga o resto quando fizer sentido.</p>
       <div class="areas">
-        <a class="area feat" href="#como-funciona" data-reveal><span class="tag-ok">Disponível</span><h3>Private label</h3><p>Monte o pote com a sua marca no simulador 3D, feche pelo WhatsApp e receba o lote de <span data-lote></span> unidades em até <span data-prazo></span> dias*.</p><span class="go">Ver como funciona →</span></a>
+        <a class="area feat" href="#como-funciona" data-reveal><span class="tag-ok">Disponível</span><h3>Sua marca</h3><p>Monte o pote com a sua marca no simulador 3D, feche pelo WhatsApp e receba o lote de <span data-lote></span> unidades em até <span data-prazo></span> dias*.</p><span class="go">Ver como funciona →</span></a>
         <a class="area" href="#estilos" data-reveal><span class="tag-ok">Disponível</span><h3>Seis estilos</h3><p>Argila, pasta, gel, efeito molhado, fibra e cera black.</p><span class="go">Ver os estilos →</span></a>
         <a class="area" href="marca.html" data-reveal><span class="tag-ok">Protótipo</span><h3>Estúdio de marca</h3><p>Logotipo, cores, rótulo e a linha inteira com o nome da casa.</p><span class="go">Abrir o estúdio →</span></a>
-        <a class="area" href="shop.html" data-reveal><span class="tag-ok">Protótipo</span><h3>Loja</h3><p>Marca própria e mais de 30 itens para a bancada, num carrinho só.</p><span class="go">Ir à loja →</span></a>
+        <a class="area" href="shop.html" data-reveal><span class="tag-ok">Protótipo</span><h3>Loja</h3><p>Produtos com a sua marca e mais de 30 itens para a bancada, num carrinho só.</p><span class="go">Ir à loja →</span></a>
         <a class="area" href="marketing.html" data-reveal><span class="tag-ok">Protótipo</span><h3>Marketing</h3><p>Posts prontos com a sua marca, materiais de balcão e mensagens.</p><span class="go">Ver o kit →</span></a>
         <a class="area" href="painel.html" data-reveal><span class="tag-ok">Protótipo</span><h3>Painel do parceiro</h3><p>Pedidos dia a dia, estoque da linha e vendas da lojinha.</p><span class="go">Abrir painel →</span></a>
         <a class="area l2" href="mentoria.html" data-reveal><span class="tag-ok">Protótipo</span><h3>Mentoria</h3><p>Cursos em quatro trilhas: gestão, marketing, branding e técnicas de corte e barba.</p><span class="go">Ver os cursos →</span></a>
@@ -544,12 +548,12 @@ html{scrollbar-gutter:stable}
     </div>
   </section>
 
-  <!-- 2. Private label: como funciona em 3 passos -->
+  <!-- 2. Como funciona em 3 passos -->
   <section class="steps" id="como-funciona" data-state="2">
     <div class="pin">
       <div class="wrap" style="width:100%">
         <div class="col">
-          <p class="eyebrow">Private label · como funciona</p>
+          <p class="eyebrow">Sua marca · como funciona</p>
           <h2 style="margin-top:14px">Da tela ao balcão em 3 passos</h2>
           <ol>
             <li><span class="n">1</span><div><h3>Monte no simulador 3D</h3><p>Escolha o pote e a tampa e suba a sua arte, ou comece por um logotipo base. Você vê o resultado antes de pagar.</p></div></li>
@@ -686,7 +690,7 @@ html{scrollbar-gutter:stable}
       <div class="col">
         <div class="head" data-reveal><p class="eyebrow">Sistemas e BI</p><span class="tag">Em adaptação</span></div>
         <h2 data-reveal style="margin-top:14px">A Suíte UP, feita para barbearias</h2>
-        <p class="muted" data-reveal style="margin-top:18px">A Suíte da UP Co., com 11 módulos, está sendo adaptada para barbearias e salões. A ideia: pedidos, vendas e resultados da casa num só painel, com os números que ajudam a decidir.</p>
+        <p class="muted" data-reveal style="margin-top:18px">A Suíte da UP Co., com 11 módulos, está sendo adaptada para barbearias e salões. A ideia: pedidos, vendas e resultados da casa num só painel, com os números que ajudam a decidir. Os módulos também servem para organizar a gestão da sua própria empresa, além da linha com a sua marca.</p>
         <ul class="recebe one" data-reveal>
           <li><div>Painel de números da barbearia<small>Vendas do pote, renda extra e movimento. Indicadores: <span class="ph">potes vendidos, ticket médio, comissão por barbeiro e reposição</span></small></div></li>
           <li><div>Módulos da versão para barbearias<small>Lista: <span class="ph">Agenda, Caixa, Estoque, Comissões, Clientes e BI (6 dos 11 módulos da Suíte)</span></small></div></li>
@@ -718,13 +722,14 @@ html{scrollbar-gutter:stable}
   <!-- 4d. Prova social e perguntas frequentes -->
   <section class="wide" id="perguntas" data-state="9">
     <div class="wrap">
-      <p class="eyebrow" data-reveal>Quem já usa</p>
+      <p class="eyebrow" data-reveal>Depoimentos de exemplo</p>
       <h2 data-reveal style="margin-top:14px">Barbearias de todo o Brasil</h2>
       <div class="prova" data-reveal>
-        <figure><div class="foto"><img src="img/fotos/prova-prateleira.webp" alt="Prateleira atrás do espelho com potes de pomada pretos, navalha e pincel de barba" loading="lazy"></div><blockquote>“<span class="ph">Os potes ficam na prateleira atrás da cadeira e o cliente pergunta sozinho. No primeiro mês vendi mais do que esperava.</span>”</blockquote><figcaption><span class="ph">Marcos Almeida · Barbearia Navalha Dourada, São Paulo (SP)</span></figcaption></figure>
-        <figure><div class="foto"><img src="img/fotos/prova-balcao.webp" alt="Barbeiro posicionando um pote de pomada no expositor do balcão" loading="lazy"></div><blockquote>“<span class="ph">Ter o nome da barbearia no pote mudou a conversa: o cliente leva e ainda marca o perfil da casa no Instagram.</span>”</blockquote><figcaption><span class="ph">Diego Souza · Casa do Fade, Belo Horizonte (MG)</span></figcaption></figure>
-        <figure><div class="foto"><img src="img/fotos/prova-bancada.webp" alt="Bancada de trabalho com pote de pomada aberto, tesoura, pente e máquina" loading="lazy"></div><blockquote>“<span class="ph">Eu já usava a pomada no corte. Agora ela também vira renda extra no balcão, sem eu precisar de estoque grande.</span>”</blockquote><figcaption><span class="ph">Rafael Costa · Barbearia Ponto Certo, Recife (PE)</span></figcaption></figure>
+        <figure><div class="num"><b><span class="ph">42</span></b><small>potes vendidos no primeiro mês</small></div><blockquote>“<span class="ph">Os potes ficam na prateleira atrás da cadeira e o cliente pergunta sozinho. No primeiro mês vendi mais do que esperava.</span>”</blockquote><figcaption><span class="ph">Marcos Almeida · Barbearia Navalha Dourada, São Paulo (SP)</span></figcaption></figure>
+        <figure><div class="num"><b><span class="ph">3 em 10</span></b><small>clientes levam um pote para casa</small></div><blockquote>“<span class="ph">Ter o nome da barbearia no pote mudou a conversa: o cliente leva e ainda marca o perfil da casa no Instagram.</span>”</blockquote><figcaption><span class="ph">Diego Souza · Casa do Fade, Belo Horizonte (MG)</span></figcaption></figure>
+        <figure><div class="num"><b><span class="ph">R$ 1.065</span></b><small>de renda extra por mês, com 4 cadeiras</small></div><blockquote>“<span class="ph">Eu já usava a pomada no corte. Agora ela também vira renda extra no balcão, sem eu precisar de estoque grande.</span>”</blockquote><figcaption><span class="ph">Rafael Costa · Barbearia Ponto Certo, Recife (PE)</span></figcaption></figure>
       </div>
+      <p class="foot" data-reveal style="margin-top:14px">Depoimentos e números ilustrativos: serão trocados pelos das barbearias piloto.</p>
       <h2 data-reveal style="margin-top:72px;font-size:clamp(34px,4.4vw,60px)">Perguntas frequentes</h2>
       <div class="faq" data-reveal>
         <details><summary>Qual o pedido mínimo?</summary><p>O lote inicial é de <span data-lote></span> unidades por produto. <span class="ph">[CONFIRMAR COM A FÁBRICA]</span></p></details>
@@ -752,7 +757,7 @@ html{scrollbar-gutter:stable}
           <li style="--k:3"><span>Prazo</span><b>até <span data-prazo></span> dias</b></li>
         </ul>
         <div class="ctas" data-reveal style="justify-content:center"><a class="btn btn-wa" data-wa target="_blank" rel="noopener">Chamar no WhatsApp</a><button class="btn" type="button" data-abrir-sim>Simular pedido</button></div>
-        <p class="note muted" data-wa-note hidden>Número do WhatsApp: <span class="ph">(11) 90000-0000</span> · botão desligado na demonstração</p>
+        <p class="note muted" data-wa-note hidden>Número do WhatsApp: <span class="ph">(00) 00000-0000</span> · botão desligado na demonstração</p>
       </div>
     </div>
   </section>
@@ -826,7 +831,7 @@ html{scrollbar-gutter:stable}
 </dialog>
 
 <footer>
-  <div class="wrap">© <span data-brand></span> · Razão social e CNPJ: <span class="ph">Stars Comércio de Cosméticos Ltda. · CNPJ 00.000.000/0001-00</span> · Visual provisório até o brandbook.<br>Valores e prazos são estimativas e dependem da confirmação da fábrica; produtos cosméticos regularizados na Anvisa: <span class="ph">grau 1, notificação em andamento</span>.<br>Cartola 3D: “<a href="https://sketchfab.com/3d-models/top-hat-acc9845b7c48479c9b23d93d3643612f" rel="noopener">Top hat</a>” por Filip, licença <a href="https://creativecommons.org/licenses/by/4.0/" rel="noopener">CC BY 4.0</a>.</div>
+  <div class="wrap">© <span data-brand></span> · Razão social e CNPJ: <span class="ph">Razão social de exemplo · CNPJ 00.000.000/0001-00</span> · Visual provisório até o brandbook.<br>Valores e prazos são estimativas e dependem da confirmação da fábrica; produtos cosméticos regularizados na Anvisa: <span class="ph">grau 1, notificação em andamento</span>.<br>Para quem já tem marca e só quer fabricar: <a href="private-label.html">private label</a>.<br>Cartola 3D: “<a href="https://sketchfab.com/3d-models/top-hat-acc9845b7c48479c9b23d93d3643612f" rel="noopener">Top hat</a>” por Filip, licença <a href="https://creativecommons.org/licenses/by/4.0/" rel="noopener">CC BY 4.0</a>.</div>
 </footer>
 
 <script src="marca.js"></script>
@@ -834,7 +839,6 @@ html{scrollbar-gutter:stable}
 <script src="rotulo.js"></script>
 <script src="cartoes.js"></script>
 <script src="briefing.js"></script>
-<script src="hat-data.js"></script>
 <!-- GSAP: movimento. Se a CDN falhar, a página aparece sem animação. -->
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
@@ -849,7 +853,7 @@ html{scrollbar-gutter:stable}
 <script>
 /* ===== TROQUE AQUI ===== */
 // Nome provisório: só publicar depois da busca de anterioridade no INPI.
-const BRAND = "Stars";
+const BRAND = "Marca Demo";
 // Só dígitos com DDD, ex.: "11999999999". Enquanto for placeholder, o botão fica desligado.
 const WHATSAPP_NUMERO = "[PLACEHOLDER]";
 const SIMULADOR_URL = "https://brutob2b-pixel.github.io/Veleiros/";
@@ -877,7 +881,7 @@ const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
 /* ---- textos que dependem das constantes ---- */
-document.title = `${BRAND} — a sua marca no balcão`;
+document.title = `A pomada com a sua marca · ${BRAND}`;
 $$("[data-brand]").forEach(e => e.textContent = BRAND);
 $$("[data-brand-ini]").forEach(e => e.textContent = BRAND[0]);
 $$("[data-lote]").forEach(e => { e.textContent = N.lote ?? "[PLACEHOLDER]"; e.classList.add("ph"); });
@@ -1435,6 +1439,7 @@ async function initStage(RoomEnvironment) {
   try {
     const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js");
     const holder = new THREE.Group();
+    if (!window.TOP_HAT_B64) await new Promise((ok, no) => { const s = document.createElement("script"); s.src = "hat-data.js"; s.onload = ok; s.onerror = no; document.head.append(s); }); // cartola só carrega depois da página
     const bin = Uint8Array.from(atob(window.TOP_HAT_B64), c => c.charCodeAt(0));
     holder.add((await new GLTFLoader().parseAsync(bin.buffer, "")).scene);
     holder.traverse(o => {
@@ -1706,12 +1711,16 @@ async function initStage(RoomEnvironment) {
   redraw = () => { drawTop(); drawBand(); stageRefresh(); };
   // tarja pronta vinda de rotulo-vetorizador (node exportar-3d.js); sem ela, vale a faixa padrão
   let tarja = null, tampa = null;
+  // ARTE_PRONTA: a arte náutica de exemplo (img/tampa-pomada.webp, tarja-pomada.png) fica desligada; a home usa a tampa e a tarja geradas pela marca (legíveis, sem 4 MB de imagem).
+  const ARTE_PRONTA = false;
+  if (ARTE_PRONTA) {
   new Promise((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = no; i.src = "img/tampa-pomada.webp"; })
-    .then((img) => { tampa = img; redraw(); }).catch(() => {}); // sem o arquivo, vale a tampa padrão
-  Promise.all([
-    fetch("img/tarja-pomada.json").then(r => r.ok ? r.json() : Promise.reject(r.status)),
-    new Promise((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = no; i.src = "img/tarja-pomada.png"; }),
-  ]).then(([cfg, img]) => { tarja = { cfg, img }; redraw(); }).catch(() => {});
+      .then((img) => { tampa = img; redraw(); }).catch(() => {}); // sem o arquivo, vale a tampa padrão
+    Promise.all([
+      Promise.resolve({largura_px:4096,altura_px:367,largura_mm:190,altura_mm:17,nome:{cx:0.29473684210526313,cy:0.5,w:0.24084210526315789,h:0.3209411764705883}}) /* medidas da tarja embutidas: funciona também aberto por duplo clique */,
+      new Promise((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = no; i.src = "img/tarja-pomada.png"; }),
+    ]).then(([cfg, img]) => { tarja = { cfg, img }; redraw(); }).catch(() => {});
+  }
   redraw();
 
   /* estados do pote por seção: x em fração da meia-largura visível, y em fração da meia-altura */
