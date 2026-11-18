@@ -16,3 +16,5 @@ secador.webp — foto de delfina pan na Unsplash (unsplash.com/photos/wJoB8D3hnz
 prova-prateleira.webp, prova-balcao.webp, prova-bancada.webp — imagens geradas por IA (ilustrativas, não são barbearias reais); trocar por fotos reais das barbearias piloto
 
 tampa-pomada.webp, tarja-pomada.png/.json, jar_*.webp, tampa-0*.webp, tarja.webp, sim.webp — arte de demonstração do simulador Veleiros (projeto próprio da UP Co., arte gerada por IA); confirmar a origem de cada arquivo antes de publicar.
+
+produtos/*.webp — fotos de produto geradas por IA (enviadas pelo Rafael em 18/11/2026); marca "Rota do Caribe" é exemplo ilustrativo; sem fotos de terceiros

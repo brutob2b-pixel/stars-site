@@ -57,6 +57,10 @@
 .prod{display:flex;flex-direction:column;overflow:hidden;position:relative}
 .prod .img{position:relative;aspect-ratio:1/1;display:grid;place-items:center;cursor:pointer;border:0;padding:12px;background:radial-gradient(circle at 50% 42%,rgba(217,164,65,.16),rgba(0,0,0,0) 62%);color:var(--accent-2)}
 .prod .img .emb{width:86%}
+.prod .img img.foto{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.pdp .vitr img.foto{width:min(100%,460px);height:auto;aspect-ratio:1;border-radius:14px;object-fit:cover}
+.cart .mini img.foto{width:60px;height:60px;border-radius:8px;object-fit:cover}
+.voo img.foto{width:80px;height:80px;border-radius:8px;object-fit:cover}
 .prod .img .ico{width:44%;height:auto;stroke-width:1.1}
 .prod .selo{position:absolute;top:10px;left:10px;z-index:1;padding:4px 9px;border-radius:999px;font:600 11px/1.2 var(--f-body);letter-spacing:.06em;text-transform:uppercase;background:rgba(14,13,11,.7);border:1px solid color-mix(in srgb,var(--accent) 60%,transparent);color:var(--accent-2)}
 .prod .body{padding:4px 14px 14px;display:flex;flex-direction:column;gap:4px;flex:1}
@@ -261,9 +265,9 @@ const marca = MARCA.load();
 const byId = id => PRODUTOS.find(p => p.id === id);
 const pomadaDe = p => POMADAS.find(x => x.id === p.pomada);
 // pomadas: embalagem fechada + potinho aberto mostrando a cor e a textura da massa
-const MARCA_STARS = { nome: "Stars", tema: "black", logo: "classico", cidade: "PRONTO" }; // linha pronta usa a marca Stars, não a do cliente
-const imagem = p => !p.emb ? (ilustracao(p.id) || icone(p.ico))
-  : p.pomada ? `<span class="combo">${embalagem(p.emb, p.stars ? MARCA_STARS : marca, { pomada: pomadaDe(p) })}${potinhoAberto(pomadaDe(p), MARCA.tema(p.stars ? MARCA_STARS : marca))}</span>`
+const imagem = (p, svg = false) => p.foto && !svg ? `<img class="foto" src="img/produtos/${p.id}.webp" alt="${escHTML(p.nome)}" loading="lazy" width="800" height="800">`
+  : !p.emb ? (ilustracao(p.id) || icone(p.ico))
+  : p.pomada ? `<span class="combo">${embalagem(p.emb, marca, { pomada: pomadaDe(p) })}${potinhoAberto(pomadaDe(p), MARCA.tema(marca))}</span>`
   : embalagem(p.emb, marca, { rotulo: p.rotulo });
 const ORDEM_NOVO = p => (p.selo === "Novo" ? 0 : 1);
 document.title = `Loja · ${BRAND}`;
@@ -272,7 +276,7 @@ $$("[data-marca-nome]").forEach(e => e.textContent = MARCA.nome(marca));
 
 /* ---- topo e faixa da linha própria ---- */
 const linha = PRODUTOS.filter(p => p.tipo === "lote");
-$("[data-hero-embs]").innerHTML = ["lote-argila", "lote-oleo", "lote-shampoo", "lote-tonico"].map(id => imagem(byId(id))).join("");
+$("[data-hero-embs]").innerHTML = ["lote-argila", "lote-oleo", "lote-shampoo", "lote-tonico"].map(id => imagem(byId(id), true)).join("");
 $("[data-faixa]").innerHTML = linha.map(p => `<a class="glass" href="#p-${p.id}" data-ver="${p.id}">${imagem(p)}<b>${p.nome}</b><small>${p.detalhe}</small></a>`).join("");
 $("[data-atalhos]").innerHTML = ["Argila", "Navalhete", "Capa", "Máquina", "Óleo"].map(t => `<button class="chip" type="button" data-atalho="${t}">${t}</button>`).join("");
 
