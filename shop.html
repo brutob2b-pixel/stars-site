@@ -30,6 +30,8 @@
 .faixa{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(150px,1fr);gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 2px 14px;scrollbar-width:thin}
 .faixa a{scroll-snap-align:start;text-decoration:none;padding:12px 12px 14px;text-align:center;display:grid;gap:4px;transition:transform .3s}
 .faixa a:hover{transform:translateY(-4px)}
+.faixa a img.foto{width:100%;height:auto;aspect-ratio:1;object-fit:cover;border-radius:12px;margin-bottom:6px}
+.foto .linha .embs img.foto{width:100%;height:auto;aspect-ratio:1;object-fit:cover;border-radius:8px}
 .faixa a b{font:700 16px/1.05 var(--f-disp);text-transform:uppercase}
 .faixa a small{color:var(--muted);font-size:12px}
 .emb{width:100%;height:auto;display:block;overflow:visible}
@@ -187,7 +189,7 @@ dialog.janela::backdrop{background:rgba(5,5,4,.6);-webkit-backdrop-filter:blur(4
       <img src="img/fotos/cadeira-tijolo.webp" alt="Cadeira de barbeiro de couro preto diante de parede de tijolos" loading="eager">
       <div class="linha glass">
         <div class="embs" data-hero-embs></div>
-        <small>A linha com <strong data-marca-nome></strong>. <a href="marca.html">Mudar no Estúdio →</a></small>
+        <small>Exemplo de linha com a marca do cliente. <a href="marca.html">Montar a minha no Estúdio →</a></small>
       </div>
     </div>
   </section>
@@ -276,8 +278,8 @@ $$("[data-marca-nome]").forEach(e => e.textContent = MARCA.nome(marca));
 
 /* ---- topo e faixa da linha própria ---- */
 const linha = PRODUTOS.filter(p => p.tipo === "lote");
-$("[data-hero-embs]").innerHTML = ["lote-argila", "lote-oleo", "lote-shampoo", "lote-tonico"].map(id => imagem(byId(id), true)).join("");
-$("[data-faixa]").innerHTML = linha.map(p => `<a class="glass" href="#p-${p.id}" data-ver="${p.id}">${imagem(p, true)}<b>${p.nome}</b><small>${p.detalhe}</small></a>`).join("");
+$("[data-hero-embs]").innerHTML = ["lote-argila", "lote-oleo", "lote-shampoo", "lote-tonico"].map(id => imagem(byId(id))).join("");
+$("[data-faixa]").innerHTML = linha.map(p => `<a class="glass" href="#p-${p.id}" data-ver="${p.id}">${imagem(p)}<b>${p.nome}</b><small>${p.detalhe}</small></a>`).join("");
 $("[data-atalhos]").innerHTML = ["Argila", "Navalhete", "Capa", "Máquina", "Óleo"].map(t => `<button class="chip" type="button" data-atalho="${t}">${t}</button>`).join("");
 
 /* ---- filtros, busca e ordem ---- */
