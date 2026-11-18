@@ -1832,19 +1832,20 @@ async function initStage(RoomEnvironment) {
   function ajustaCenas() {
     fit0 = null;
     if (!mobile) return;
-    const pxu = innerHeight / (2 * halfH), h = innerHeight, topo = 72;
+    const pxu = innerHeight / (2 * halfH), h = innerHeight, barra = document.querySelector(".top").offsetHeight + 32, banner = document.querySelector(".draft").offsetHeight; // folga de 32 px sob o menu; na 1ª cena soma o aviso de demonstração
     fit0 = MOB.map((st, i) => {
       const c = sections[i] && sections[i].querySelector(".col");
       if (!c || i === MOB.length - 1) return st;
       const pin = c.closest(".pin"), r = c.getBoundingClientRect();
       const colTop = pin ? r.top - pin.getBoundingClientRect().top : r.top + scrollY - anchors[i];
-      const base = colTop - 8, livre = base - topo;
+      const topo = barra + (i === 0 ? banner : 0), base = colTop - 8, livre = base - topo;
       if (livre < 70) return st;
       const u = (3 + 1.2 * st.lift) * pxu, s = Math.min(st.s, livre / u), alto = s * u;
       const cy = Math.min(base - alto / 2, Math.max(topo + alto / 2, (1 - st.y) / 2 * h));
       return { ...st, s, y: -((cy / h) * 2 - 1) };
     });
   }
+  const hdrEl = document.querySelector(".top");
   function apply(st) {
     pivot.position.set(st.x * halfW, st.y * halfH, 0);
     const gx = clamp((st.x + 1) * 50, 12, 88).toFixed(1) + "%", gy = clamp((1 - st.y) * 50, 15, 85).toFixed(1) + "%";
@@ -1852,6 +1853,12 @@ async function initStage(RoomEnvironment) {
     if (gy !== atmos.gy) { atmos.gy = gy; atmos.el.setProperty("--gy", gy); }
     // em tela estreita o pote não pode passar de ~30% da largura, senão cobre o texto
     pivot.scale.setScalar((mobile ? st.s : Math.min(st.s, 0.3 * halfW / R)) * pop);
+    // celular, durante a abertura: a cartola (mais alta que o pote) não pode entrar no banner/menu; desce o conjunto o que faltar
+    if (mobile && hat.visible) {
+      const pxu = innerHeight / (2 * halfH), limite = halfH - (hdrEl.getBoundingClientRect().bottom + 14) / pxu;
+      const topo = pivot.position.y + (hatTop + 0.15) * pivot.scale.x;
+      if (topo > limite) pivot.position.y -= topo - limite;
+    }
     pivot.rotation.x = st.rx + mouse.y * 0.12;
     // abre de lado: sobe e tomba para o lado oposto ao texto (lx), deixando a pomada à vista
     lid.position.set(st.lx * st.lift * 1.7, jar.position.y + BODY_H + st.lift * 0.8, 0);
