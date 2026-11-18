@@ -277,7 +277,7 @@ $$("[data-marca-nome]").forEach(e => e.textContent = MARCA.nome(marca));
 /* ---- topo e faixa da linha própria ---- */
 const linha = PRODUTOS.filter(p => p.tipo === "lote");
 $("[data-hero-embs]").innerHTML = ["lote-argila", "lote-oleo", "lote-shampoo", "lote-tonico"].map(id => imagem(byId(id), true)).join("");
-$("[data-faixa]").innerHTML = linha.map(p => `<a class="glass" href="#p-${p.id}" data-ver="${p.id}">${imagem(p)}<b>${p.nome}</b><small>${p.detalhe}</small></a>`).join("");
+$("[data-faixa]").innerHTML = linha.map(p => `<a class="glass" href="#p-${p.id}" data-ver="${p.id}">${imagem(p, true)}<b>${p.nome}</b><small>${p.detalhe}</small></a>`).join("");
 $("[data-atalhos]").innerHTML = ["Argila", "Navalhete", "Capa", "Máquina", "Óleo"].map(t => `<button class="chip" type="button" data-atalho="${t}">${t}</button>`).join("");
 
 /* ---- filtros, busca e ordem ---- */
